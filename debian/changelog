@@ -1,5 +1,9 @@
-kano-toolset (1.0-1) UNRELEASED; urgency=low
+kano-toolset (1.0-1.1) unstable; urgency=low
 
+  [ Alex ]
   * Initial release. (Closes: #XXXXXX)
 
- -- Alex <alex@Kano>  Tue, 12 Nov 2013 11:59:24 +0000
+  [ Team Kano ]
+  * Package rebuilt, updated to revision 7f968345.
+
+ -- Team Kano <hello@kano.me>  Tue, 12 Nov 2013 12:21:39 +0000
