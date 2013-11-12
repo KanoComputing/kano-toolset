@@ -1,3 +1,9 @@
+kano-toolset (1.0-2) unstable; urgency=low
+
+  * Package rebuilt, updated to revision ecc81adb.
+
+ -- Team Kano <hello@kano.me>  Tue, 12 Nov 2013 16:03:04 +0000
+
 kano-toolset (1.0-1.1) unstable; urgency=low
 
   [ Alex ]
