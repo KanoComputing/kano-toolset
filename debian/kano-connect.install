@@ -1,0 +1,6 @@
+./email_sender.py /usr/sbin
+./kano-launcher.py /usr/sbin
+./make-common.sh /usr/sbin
+./kano-shutdown.sh /usr/sbin
+./make-focus.py /usr/sbin
+./rpi-info.sh /usr/sbin
