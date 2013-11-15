@@ -14,25 +14,68 @@
 #  Returns 0 if no focus action has taken place, non-zero otherwise.
 #
 
-import sys
+import os, sys, atexit
 import Xlib
 import Xlib.display
+
+def get_active_window():
+    '''
+    Returns the currently active window name, as returned
+    by xprop's _NET_WM_NAME attribute - the window title.
+    '''
+    wname = None
+    cmdline = 'xprop -id $(xdotool getactivewindow)|grep _NET_WM_NAME'
+    out = os.popen (cmdline).read()
+    if len(out):
+        try:
+            wname = out.split('=')[1]
+            wname = wname.strip(' ').strip('\n').strip('"').strip(' ')
+        except:
+            print 'could not find active window'
+            pass
+
+    print 'Currently active window name=', wname
+    return wname
+
+def sendkey(key_name):
+    '''
+    Sends a keyboard event to the X server.
+    Returns True if success, False otherwise
+    '''
+    cmdline = 'xdotool key %s' % (key_name.upper())
+    rc = os.system(cmdline)
+    if rc == 0:
+        print 'key event %s sent' % key_name
+        return True
+    else:
+        return False
+
+def setfocus(windowname):
+    '''
+    Sets focus to the window with title name <windowname>.
+    Returns True on success, False on failure. Waits for focus to be acquired.
+    '''
+    focused = False
+    cmdline = 'xdotool windowfocus --sync $(xdotool search --name "%s" | head -n 1) > /dev/null 2>&1' % windowname
+    rc = os.system (cmdline)
+    if rc == 0:
+        print 'focus changed to window "%s"' % windowname
+        focused = True
+    else:
+        print 'error sending focus - rc=%d' % os.WEXITSTATUS(rc)
+
+    return focused
 
 class FocusClass:
     def __init__(self, display):
         '''
-        When you subclass your app, save your application name (arbitrary) and class name tuple
-        which identifies your app to the X server - as returned by obxprop / xprop WM_CLASS(STRING)
+        When you subclass your app, save your application name, as reported by xprop _NET_WM_NAME(UTF8_STRING)
         '''
         self.appname = None
-        self.wclass = (None, None)
         self.display = display
 
     def get_appname(self):
         return self.appname
-
-    def get_wclass(self):
-        return self.wclass
 
     def kano_focus(self):
         '''
@@ -44,36 +87,6 @@ class FocusClass:
         print 'nothing to be done'
         return 0
 
-    def _findwindow_(self, windowname):
-        screen = self.display.screen() 
-        root = screen.root  
-        tree = root.query_tree() 
-        wins = tree.children 
-        for win in wins: 
-            wname = win.get_wm_name()
-            if wname != None: print wname, win
-            if wname == windowname:
-                return win
-        return None
-
-    def sendkey(self, key):
-        Xlib.ext.xtest.fake_input(self.display, Xlib.X.KeyPress, key)
-
-    def setfocus(self, windowname):
-        '''
-        Sets focus to the window with title name <windowname>.
-        Returns True on success, False on failure.
-        '''
-        w = self._findwindow_ (windowname)
-        if w:
-            print 'forcing focus to', w
-            w.raise_window()
-            w.set_input_focus(Xlib.X.RevertToParent, Xlib.X.CurrentTime)
-            self.display.sync()
-            return True
-
-        return False
-
 class FocusMakeMinecraft (FocusClass):
     '''
     Minecraft's Midori workspace
@@ -81,19 +94,18 @@ class FocusMakeMinecraft (FocusClass):
     def __init__(self, display):
         FocusClass.__init__(self, display)
         self.appname = 'Make Minecraft'
-        self.wclass = ('make-minecraft', 'Make-minecraft')
     def kano_focus(self):
-        return self.setfocus('Minecraft - Pi edition')
+        return setfocus('Minecraft - Pi edition')
 
 class FocusMinecraft (FocusClass):
     '''
+    Minecraft - The game window
     '''
     def __init__(self, display):
         FocusClass.__init__(self, display)
         self.appname = 'Minecraft'
-        self.wclass = ('make-minecraft', 'Make-minecraft')
     def kano_focus(self):
-        return self.setfocus('Make Minecraft')
+        return setfocus('Make Minecraft')
 
 class FocusMakePong (FocusClass):
     '''
@@ -102,9 +114,8 @@ class FocusMakePong (FocusClass):
     def __init__(self, display):
         FocusClass.__init__(self, display)
         self.appname = 'Make Pong'
-        self.wclass = ('make-pong', 'Make Pong')
     def kano_focus(self):
-        return self.sendkey('<f8>')
+        return sendkey('f8')
 
 class FocusPong (FocusClass):
     '''
@@ -113,32 +124,46 @@ class FocusPong (FocusClass):
     def __init__(self, display):
         FocusClass.__init__(self, display)
         self.appname = 'Pong'
-        self.wclass = ('pong', 'Pong')
     def kano_focus(self):
-        return self.setfocus('Make Pong')
+        return setfocus('Make Pong')
 
+def lock_file(fname):
+    ''' TODO: Use a more robust file locking method,
+    for example: http://stackoverflow.com/questions/5339200/how-to-create-a-single-instance-application-in-c/5339606#5339606
+    '''
+    if os.access (fname, os.R_OK):
+        return False
+    else:
+        f = open (fname, 'w')
+        f.write('make-focus-locked')
+        f.close()
+        return True
+
+def unlock_file(fname):
+    os.unlink(fname)
 
 if __name__ == '__main__':
 
-    lockfile = '/tmp/make-focus.lock'
+    lock_filename = '/tmp/make-focus.lock'
     focused = False
     display = Xlib.display.Display()
 
     # reentrancy protection
+    atexit.register (unlock_file, fname=lock_filename)
+    if lock_file(lock_filename) == False:
+        sys.exit(-1)
 
     # List of Kano applications sensitive to the Focus hotkey press
     kano_wins = [ FocusMakeMinecraft(display), FocusMinecraft(display),
                   FocusMakePong(display), FocusPong(display) ]
 
-    # Find the window with current input focus
-    f = display.get_input_focus()
-    fname  = f.focus.get_wm_name()
-    fclass = f.focus.get_wm_class()
-    print 'Current focused window:', f, fname, fclass
-
-    for w in kano_wins:
-        if w.get_wclass() == fclass:
-            print 'Calling %s set focus...' % w.get_appname()
-            focused = w.kano_focus()
+    active_window_name = get_active_window()
+    if active_window_name and len(active_window_name) > 0:
+        print 'Active window _NET_WM_NAME(UTF8_STRING) = "%s"' % active_window_name
+        for w in kano_wins:
+            if active_window_name.find (w.appname) != -1:
+                print 'Calling "%s" class set focus...' % w.get_appname()
+                focused = w.kano_focus()
+                break
 
     sys.exit(focused)
