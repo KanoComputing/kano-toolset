@@ -95,7 +95,11 @@ class FocusMakeMinecraft (FocusClass):
         FocusClass.__init__(self, display)
         self.appname = 'Make Minecraft'
     def kano_focus(self):
-        return setfocus('Minecraft - Pi edition')
+        '''
+        Push the Make button.
+        '''
+        os.system ('/usr/sbin/make-minecraft.sh $HOME/Minecraft-content/minecraft.py &')
+        return 0
 
 class FocusMinecraft (FocusClass):
     '''
