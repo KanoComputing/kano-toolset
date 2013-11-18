@@ -96,10 +96,9 @@ class FocusMakeMinecraft (FocusClass):
         self.appname = 'Make Minecraft'
     def kano_focus(self):
         '''
-        Push the Make button.
+        Push the Make button (call make-minecraft.sh with the script).
         '''
         os.system ('/usr/sbin/make-minecraft.sh $HOME/Minecraft-content/minecraft.py &')
-        os.system ('xdotool mousemove --sync 900 50 && xdotool click 1')
         return 0
 
 class FocusMinecraft (FocusClass):
