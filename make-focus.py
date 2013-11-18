@@ -99,7 +99,8 @@ class FocusMakeMinecraft (FocusClass):
         Push the Make button.
         '''
         os.system ('/usr/sbin/make-minecraft.sh $HOME/Minecraft-content/minecraft.py &')
-        return setfocus('Minecraft - Pi edition')
+        os.system ('xdotool mousemove --sync 900 50 && xdotool click 1')
+        return 0
 
 class FocusMinecraft (FocusClass):
     '''
