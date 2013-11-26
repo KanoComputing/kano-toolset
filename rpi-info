@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+#  rpi-info.sh
+#
+#  Displays a report of hardware details of a RaspberryPI unit.
+#  Code parts taken from: http://elinux.org/RPI_vcgencmd_usage
+#
+
+echo "Core CPU components clock frequencies:"
+for src in arm core h264 isp v3d uart pwm emmc pixel vec hdmi dpi ; do
+	echo -e "$src:\t$(vcgencmd measure_clock $src)" ; \
+done
+
+echo
+echo "RAM components supplied voltages:"
+for id in core sdram_c sdram_i sdram_p ; do
+	echo -e "$id:\t$(vcgencmd measure_volts $id)" ;
+done
+
+echo
+echo "CPU Temperature:"
+vcgencmd measure_temp
+
+echo
+echo "CPU Enabled CODECs:"
+for codec in H264 MPG2 WVC1 MPG4 MJPG WMV9 ; do
+	echo -e "$codec:\t$(vcgencmd codec_enabled $codec)" ;
+done
+
+echo
+echo "System configurations settings:"
+vcgencmd get_config int
+
+echo
+echo "RAM/GPU Memory split ratio:"
+vcgencmd get_mem arm && vcgencmd get_mem gpu
+
+echo
+echo "Firmware version:"
+vcgencmd version
+

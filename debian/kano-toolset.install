@@ -1,0 +1,6 @@
+./email-sender /usr/bin
+./kano-launcher /usr/bin
+./make-common /usr/bin
+./kano-shutdown /usr/bin
+./make-focus /usr/bin
+./rpi-info /usr/bin
