@@ -103,7 +103,7 @@ class FocusMakeMinecraft (FocusClass):
         '''
         Push the Make button (call make-minecraft.sh with the script).
         '''
-        os.system('/usr/bin/make-minecraft $HOME/Minecraft-content/minecraft.py &')
+        os.system('/usr/bin/make-minecraft $HOME/Minecraft-content/mc_script.py &')
         return 0
 
 
