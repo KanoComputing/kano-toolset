@@ -30,10 +30,11 @@ function is_app_running()
 
 function restart_daemons()
 {
-    # Launch Minecraft python server
+    # Close all other opened projects if any
     killall -q python
     killall -q minecraft-pi
     killall -q midori
+    killall -q make-music
 
     # This python app will listen for F8 keypress
     # and give focus to Make Minecraft
