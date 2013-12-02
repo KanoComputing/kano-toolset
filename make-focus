@@ -31,10 +31,10 @@ def get_active_window():
             wname = out.split('=')[1]
             wname = wname.strip(' ').strip('\n').strip('"').strip(' ')
         except:
-            print 'could not find active window'
+            # could not find active window
             pass
 
-    print 'Currently active window name=', wname
+    # Currently active window name is: wname
     return wname
 
 
@@ -46,7 +46,7 @@ def sendkey(key_name):
     cmdline = 'xdotool key %s' % (key_name.upper())
     rc = os.system(cmdline)
     if rc == 0:
-        print 'key event %s sent' % key_name
+        # key event "key_name" sent
         return True
     else:
         return False
@@ -61,10 +61,10 @@ def setfocus(windowname):
     cmdline = 'xdotool windowfocus --sync $(xdotool search --name "%s" | head -n 1) > /dev/null 2>&1' % windowname
     rc = os.system(cmdline)
     if rc == 0:
-        print 'focus changed to window "%s"' % windowname
+        # focus changed to window "windowname"
         focused = True
-    else:
-        print 'error sending focus - rc=%d' % os.WEXITSTATUS(rc)
+    #else:
+        #print 'error sending focus - rc=%d' % os.WEXITSTATUS(rc)
 
     return focused
 
@@ -87,7 +87,6 @@ class FocusClass:
         and your app has the current input focus.
         Return a meaningul non-zero (int) if you performed some action.
         '''
-        print 'nothing to be done'
         return 0
 
 
@@ -176,10 +175,10 @@ if __name__ == '__main__':
 
     active_window_name = get_active_window()
     if active_window_name and len(active_window_name) > 0:
-        print 'Active window _NET_WM_NAME(UTF8_STRING) = "%s"' % active_window_name
+        # Active window _NET_WM_NAME(UTF8_STRING) = "active_window_name"
         for w in kano_wins:
             if active_window_name.find(w.appname) != -1:
-                print 'Calling "%s" class set focus...' % w.get_appname()
+                # Calling "w.get_appname()" class set focus...
                 focused = w.kano_focus()
                 break
 

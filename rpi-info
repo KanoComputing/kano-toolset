@@ -38,4 +38,3 @@ vcgencmd get_mem arm && vcgencmd get_mem gpu
 echo
 echo "Firmware version:"
 vcgencmd version
-

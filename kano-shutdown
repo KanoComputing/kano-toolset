@@ -6,7 +6,9 @@
 
 set -e
 
+# Launch confirmation window
 zenity --question --title "Warning: Kanux Shutdown"  --text "Are you sure you want to shutdown?"
 if [ $? == 0 ]; then
-   sudo /sbin/poweroff
+    # Turn off the kit
+    sudo /sbin/poweroff
 fi

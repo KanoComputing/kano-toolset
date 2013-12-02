@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  kano-launcher common functions for all scripts that start Kanux desktop icons
+#  Common functions for all scripts that start Kanux desktop icons
 #
 
 lockfile=/tmp/kano-launcher.lock
@@ -16,7 +16,6 @@ function is_app_running()
 {
     # usage: mywid=""; is_app_running "mywndow" mywid
     # retuns 1 if running or 0 if not running, wid in $2
-
     wdata=`xwininfo -root -tree | grep "$1"`
     rc=$?
     if [ $rc -eq 0 ]; then
@@ -43,9 +42,7 @@ function restart_daemons()
 
 function protect_reentrancy
 {
-    #
     # if we are running, give focus and exit
-    #
     if [ -f $lockfile ]; then
 	echo "$APPNAME2 is starting."
 	exit 0

@@ -1,13 +1,16 @@
 #!/usr/bin/python
 
-import sys, os
+import sys
+import os
 
 if __name__ == '__main__':
 
+    # Check for the correct number of parameters
     if len(sys.argv) == 2:
+        # Launch the app requested
         cmdline = sys.argv[1]
         rc = os.system(cmdline)
         sys.exit(rc)
     else:
-        print 'I need an app command line to execute'
+        # Not the correct number of parameters, return error code 1
         sys.exit(1)
