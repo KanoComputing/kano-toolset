@@ -1,18 +1,24 @@
 #!/usr/bin/python
+
+# make-focus
 #
-#  This module gets called when Kano "Focus" key is pressed.
-#  It finds the currently active window, decides if/where focus needs to go and switches focus.
+# Copyright (C) 2013 Kano Computing Ltd.
+# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-#  This script is fired by openbox, it is registered in the lxde xml file,
-#  normally ~/config/openbox/lxde-rc.xml
+# This module gets called when Kano "Focus" key is pressed.
+# It finds the currently active window, decides if/where focus needs to go and switches focus.
 #
-#  This module requires the debian package: python-xlib
-#  Code excerpts collected from: http://thp.io/2007/09/x11-idle-time-and-focused-window-in.html
-#  For sending keys: http://autokey.googlecode.com/svn-history/r8/trunk/autokey.py
-#  API documentation: http://python-xlib.sourceforge.net/doc/html/python-xlib_16.html
+# This script is fired by openbox, it is registered in the lxde xml file,
+# normally ~/config/openbox/lxde-rc.xml
 #
-#  Returns 0 if no focus action has taken place, non-zero otherwise.
+# This module requires the debian package: python-xlib
+# Code excerpts collected from: http://thp.io/2007/09/x11-idle-time-and-focused-window-in.html
+# For sending keys: http://autokey.googlecode.com/svn-history/r8/trunk/autokey.py
+# API documentation: http://python-xlib.sourceforge.net/doc/html/python-xlib_16.html
 #
+# Returns 0 if no focus action has taken place, non-zero otherwise.
+#
+
 import os, sys, atexit
 import Xlib
 import Xlib.display

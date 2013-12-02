@@ -1,9 +1,12 @@
 #!/bin/bash
+
+# rpi-info
 #
-#  rpi-info.sh
+# Copyright (C) 2013 Kano Computing Ltd.
+# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-#  Displays a report of hardware details of a RaspberryPI unit.
-#  Code parts taken from: http://elinux.org/RPI_vcgencmd_usage
+# Displays a report of hardware details of a RaspberryPI unit.
+# Code parts taken from: http://elinux.org/RPI_vcgencmd_usage
 #
 
 echo "Core CPU components clock frequencies:"

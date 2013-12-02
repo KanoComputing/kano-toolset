@@ -1,6 +1,11 @@
 #!/bin/bash
+
+# make-common
 #
-#  Common functions for all scripts that start Kanux desktop icons
+# Copyright (C) 2013 Kano Computing Ltd.
+# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Common functions for all scripts that start Kanux desktop icons
 #
 
 lockfile=/tmp/kano-launcher.lock

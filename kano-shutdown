@@ -1,7 +1,12 @@
 #!/bin/bash
+
+# kano-shutdown
 #
-#  Script to shutdown the system after a confirmation message
-#  on the graphic frontend. The user needs sudo NOPASSWD: privileges for /sbin/poweroff.
+# Copyright (C) 2013 Kano Computing Ltd.
+# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Script to shutdown the system after a confirmation message
+# on the graphic frontend. The user needs sudo NOPASSWD: privileges for /sbin/poweroff.
 #
 
 set -e
