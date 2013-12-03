@@ -42,6 +42,7 @@ function restart_daemons()
 
     # This python app will listen for F8 keypress
     # and give focus to Make Minecraft
+    python /usr/bin/kevents 0 &
     python /usr/bin/kevents 1 &
 }
 
