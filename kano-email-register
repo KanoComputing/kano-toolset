@@ -8,6 +8,7 @@
 # Argument 1: email
 # Argument 2: user name
 # Argument 3: RPi ID
+#
 
 import requests
 import sys
