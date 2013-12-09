@@ -1,4 +1,4 @@
-./email-sender /usr/bin
+./kano-email-register /usr/bin
 ./kano-launcher /usr/bin
 ./make-common /usr/bin
 ./kano-shutdown /usr/bin
