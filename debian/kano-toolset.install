@@ -1,6 +1,6 @@
 ./kano-email-register /usr/bin
 ./kano-launcher /usr/bin
-./make-common /usr/bin
+./make-common /usr/share/kano-toolset
 ./kano-shutdown /usr/bin
 ./make-focus /usr/bin
 ./rpi-info /usr/bin
