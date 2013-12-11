@@ -39,11 +39,6 @@ function restart_daemons()
     killall -q minecraft-pi
     killall -q midori
     killall -q make-music
-
-    # This python app will listen for F8 keypress
-    # and give focus to Make Minecraft
-    python /usr/bin/kevents 0 &
-    python /usr/bin/kevents 1 &
 }
 
 function protect_reentrancy
