@@ -1,22 +1,27 @@
-#!/usr/bin/python
+#!/bin/bash
 
-# kano-launcher
-#
-# Copyright (C) 2013 Kano Computing Ltd.
-# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
+# Usage: kano-launcher cmd [preset]
+#        kano-launcher cmd [preset]
+#        kano-launcher cmd [preset]
 
-import sys
-import os
+. make-common
 
-if __name__ == '__main__':
+restart_daemons
 
-    # Check for the correct number of parameters
-    if len(sys.argv) == 2:
-        # Launch the app requested
-        cmdline = sys.argv[1]
-        rc = os.system(cmdline)
-        sys.exit(rc)
-    else:
-        # Not the correct number of parameters, return error code 1
-        sys.exit(1)
+if [ -z "$1" ]; then
+    exit 1
+fi
+
+eval "$1 &"
+pid="$!"
+#sleep 1
+
+# Apply window presets
+case "$2" in
+    make-video)
+        kano-window-tool -t "Make Video" -dno -w0.8 -h0.6 -c -f ;;
+    make-snake)
+        kano-window-tool -t "Make Snake" -dno -m -f ;;
+    extras)
+        kano-window-tool -t "extras" -c -f ;;
+esac
