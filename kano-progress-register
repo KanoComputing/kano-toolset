@@ -1,0 +1,105 @@
+#!/usr/bin/env python
+
+# kano-progression-register
+#
+# Copyright (C) 2013 Kano Computing Ltd.
+# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Argument 1: Project or Scan
+# If Project name send Google Form or create temp file
+# If Scan: scan for temp files and send Google Forms
+#
+
+import os.path
+import requests
+import sys
+import time
+from subprocess import Popen, PIPE, STDOUT
+import getpass
+import urllib2
+
+USER = getpass.getuser()
+
+
+def is_internet():
+    try:
+        urllib2.urlopen('http://google.com', timeout=1)
+        return True
+    except:
+        return False
+
+
+def send_form(project):
+    # Details of the Google form
+    url = "https://docs.google.com/a/kano.me/forms/d/15tfyqx2J0XFjf1rytguy8cFEZ3E20HZ3iU5wVZalyAk/formResponse"
+    # User email
+    email_cmd = 'tail -1 /home/$USER/.useremail 2> /dev/null'
+    email_event = Popen(email_cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    email = email_event.communicate()
+    entryEmail = "entry.1049053909"
+    # User name
+    entryName = "entry.1615253867"
+    # RPi ID
+    id_cmd = 'tail -1 /proc/cpuinfo'
+    id_event = Popen(id_cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    pi_id = id_event.communicate()
+    entryId = "entry.842182050"
+    id = pi_id[0].split(":")[1]
+    # Project
+    entryProject = "entry.1067737306"
+
+    info = {entryEmail: email, entryName: USER, entryId: id, entryProject: project}
+
+    # Create a post request with the information gathered
+    numTries = 3
+    while numTries > 0:
+        r = requests.post(url, data=info)
+        if r.status_code == 200:
+            break
+        numTries -= 1
+        time.sleep(1)
+
+
+if __name__ == '__main__':
+    # Check for the correct number of parameters
+    if len(sys.argv) != 2:
+        print "Error: incorrect parameters [Project/Scan]"
+        sys.exit(1)
+
+    # Check mode (project os scan)
+    if sys.argv[1] == 'Scan' or sys.argv[1] == 'scan':
+        # Video
+        video_file = "/home/" + USER + "/.project_video"
+        if os.path.exists(video_file):
+            send_form('video')
+            os.system('rm -f ' + video_file)
+        # Snake
+        snake_file = "/home/" + USER + "/.project_snake"
+        if os.path.exists(snake_file):
+            send_form('snake')
+            os.system('rm -f ' + snake_file)
+        # Pong
+        pong_file = "/home/" + USER + "/.project_pong"
+        if os.path.exists(pong_file):
+            print 'PONG'
+            send_form('pong')
+            os.system('rm -f ' + pong_file)
+        # Minecraft
+        mc_file = "/home/" + USER + "/.project_minecraft"
+        if os.path.exists(mc_file):
+            send_form('minecraft')
+            os.system('rm -f ' + mc_file)
+    else:
+        # Check for internet
+        if not is_internet():
+            tmp_file = "/home/" + USER + "/.project_" + sys.argv[1]
+            if not os.path.exists(tmp_file):
+                # If not internet then create a file to send later
+                cmd = "touch " + tmp_file
+                os.system(cmd)
+
+            sys.exit(0)
+
+        send_form(sys.argv[1])
+
+    sys.exit(0)

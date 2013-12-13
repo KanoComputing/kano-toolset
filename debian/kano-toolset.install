@@ -1,5 +1,6 @@
 ./kano-email-register /usr/bin
 ./kano-launcher /usr/bin
+./kano-progress-register /usr/bin
 ./kano-window-tool /usr/bin
 ./make-common /usr/share/kano-toolset
 ./kano-shutdown /usr/bin
