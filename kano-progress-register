@@ -92,7 +92,9 @@ if __name__ == '__main__':
 
     # Check mode (project os scan)
     if sys.argv[1] == 'Scan' or sys.argv[1] == 'scan':
-        scan()
+        # Check for internet
+        if is_internet():
+            scan()
     else:
         # Check for internet
         if not is_internet():
