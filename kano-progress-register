@@ -27,6 +27,30 @@ def is_internet():
         return True
     except:
         return False
+        
+
+def scan():
+    # Video
+    video_file = "/home/" + USER + "/.project_video"
+    if os.path.exists(video_file):
+        send_form('video')
+        os.system('rm -f ' + video_file)
+    # Snake
+    snake_file = "/home/" + USER + "/.project_snake"
+    if os.path.exists(snake_file):
+        send_form('snake')
+        os.system('rm -f ' + snake_file)
+    # Pong
+    pong_file = "/home/" + USER + "/.project_pong"
+    if os.path.exists(pong_file):
+        print 'PONG'
+        send_form('pong')
+        os.system('rm -f ' + pong_file)
+    # Minecraft
+    mc_file = "/home/" + USER + "/.project_minecraft"
+    if os.path.exists(mc_file):
+        send_form('minecraft')
+        os.system('rm -f ' + mc_file)    
 
 
 def send_form(project):
@@ -68,27 +92,7 @@ if __name__ == '__main__':
 
     # Check mode (project os scan)
     if sys.argv[1] == 'Scan' or sys.argv[1] == 'scan':
-        # Video
-        video_file = "/home/" + USER + "/.project_video"
-        if os.path.exists(video_file):
-            send_form('video')
-            os.system('rm -f ' + video_file)
-        # Snake
-        snake_file = "/home/" + USER + "/.project_snake"
-        if os.path.exists(snake_file):
-            send_form('snake')
-            os.system('rm -f ' + snake_file)
-        # Pong
-        pong_file = "/home/" + USER + "/.project_pong"
-        if os.path.exists(pong_file):
-            print 'PONG'
-            send_form('pong')
-            os.system('rm -f ' + pong_file)
-        # Minecraft
-        mc_file = "/home/" + USER + "/.project_minecraft"
-        if os.path.exists(mc_file):
-            send_form('minecraft')
-            os.system('rm -f ' + mc_file)
+        scan()
     else:
         # Check for internet
         if not is_internet():
@@ -100,6 +104,9 @@ if __name__ == '__main__':
 
             sys.exit(0)
 
+        # Send form with project passed through argument
         send_form(sys.argv[1])
+        # Check for unsend projects since we have internet
+        scan()
 
     sys.exit(0)
