@@ -39,6 +39,8 @@ function kill_apps()
     killall -q minecraft-pi
     killall -q midori
     killall -q make-music
+    killall -q make-video
+    killall -q make-snake
 }
 
 function protect_reentrancy

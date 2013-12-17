@@ -1,12 +1,29 @@
 #!/bin/bash
 
+# kano-launcher - A simple script to launch Kano projects
+# Copyright (C) 2013 Radek Pazdera, Kano Computing Ltd.
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
 # Usage: kano-launcher cmd [preset]
-#        kano-launcher cmd [preset]
-#        kano-launcher cmd [preset]
 
-. make-common
+. /usr/share/kano-toolset/make-common
 
-restart_daemons
+# Make sure there are no other projects running at the same time
+kill_apps
 
 if [ -z "$1" ]; then
     exit 1
@@ -14,7 +31,6 @@ fi
 
 eval "$1 &"
 pid="$!"
-#sleep 1
 
 # Apply window presets
 case "$2" in
@@ -25,3 +41,5 @@ case "$2" in
     extras)
         kano-window-tool -t "extras" -c -f ;;
 esac
+
+exit 0
