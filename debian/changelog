@@ -1,3 +1,10 @@
+kano-toolset (1.0-23.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Package rebuilt, updated to revision a1103af1.
+
+ -- Team Kano <hello@kano.me>  Tue, 17 Dec 2013 02:38:24 +0000
+
 kano-toolset (1.0-23) unstable; urgency=low
 
   * Package rebuilt, updated to revision 8279b876.
