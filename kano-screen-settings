@@ -1,0 +1,158 @@
+#!/usr/bin/env python
+
+# kano-screen-settings - Change screen resolution and other settings
+# Copyright (C) 2013 Radek Pazdera, Kano Computing Ltd.
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
+import time
+import sys
+import os
+import re
+import subprocess
+
+from argparse import ArgumentParser
+
+CONFIG_FILE="/boot/config.txt"
+
+# if the value argument is None, the option will be commented out
+def set_config_option(name, value=None):
+    with open(CONFIG_FILE, "r") as config_file:
+        lines = config_file.readlines()
+
+    option_re = r'^\s*#?\s*' + str(name) + r'=(.*)'
+
+    was_found = False
+    with open(CONFIG_FILE, "w") as config_file:
+        for line in lines:
+            if re.match(option_re, line):
+                was_found = True
+
+            replace_str = str(name) + "=" + str(value)
+            if value == None:
+                replace_str = r'#' + str(name) + r'=\1'
+
+            new_line = re.sub(option_re, replace_str, line)
+            config_file.write(new_line)
+
+        if not was_found and value != None:
+            config_file.write(str(name) + "=" + str(value) + "\n")
+
+# Group must be either 'DMT' or 'CEA'
+def get_supported_modes(group):
+    modes = {}
+    cea_modes = subprocess.check_output(["/opt/vc/bin/tvservice", "-m",
+                                        group.upper()]).split("\n")[1:]
+    mode_line_re = r'mode (\d+): (\d+x\d+) @ (\d+Hz) (\d+:\d+)'
+    for line in cea_modes:
+        mode_line_match = re.search(mode_line_re, line)
+        if mode_line_match:
+            number = mode_line_match.group(1)
+            res = mode_line_match.group(2)
+            freq = mode_line_match.group(3)
+            aspect = mode_line_match.group(4)
+            modes[int(number)] = [res, freq, aspect]
+
+    return modes
+
+def print_supported_modes():
+    cea_modes = get_supported_modes("CEA")
+    dmt_modes = get_supported_modes("DMT")
+
+    for key in sorted(cea_modes.iterkeys()):
+        values = cea_modes[key]
+        print "  cea:%d  %s  %s  %s" % (key, values[0], values[1], values[2])
+
+    for key in sorted(dmt_modes.iterkeys()):
+        values = dmt_modes[key]
+        print "  dmt:%d  %s  %s  %s" % (key, values[0], values[1], values[2])
+
+def set_hdmi_mode(mode):
+    if mode == "auto":
+        set_config_option("hdmi_group", None)
+        set_config_option("hdmi_mode", None)
+        return 0
+
+    group, number = mode.split(":")
+    group = group.lower()
+    number = int(number)
+
+    if group == "cea":
+        set_config_option("hdmi_group", 1)
+    elif group == "dmt":
+        set_config_option("hdmi_group", 2)
+    else:
+        sys.stderr.write("ERROR: Unknown group '%s'.\n" % group)
+        return 1
+
+    set_config_option("hdmi_mode", number)
+    return 0
+
+def parse_args():
+    app_desc="""Basic tool for configuring resolution and other screen settings.
+
+This is a temporary way of setting the correct screen resolution for your
+screen - only HDMI is supported at the moment. You can list all the HDMI modes
+supported by your screen using the -l option. To set a specific mode, use
+the -s option. If you have a black border around the picture on your screen,
+use the -o option to disable overscan. If a part of the image goes off your
+screen, use the -o option again, but this time to enable overscan.
+"""
+
+    parser = ArgumentParser(description=app_desc)
+
+    parser.add_argument("-o", "--overscan", metavar="yes|no",
+                        help="enable or disable overscan")
+
+    parser.add_argument("-l", "--list-modes", action="store_true",
+                        help="display the HDMI modes that are" + \
+                             "supported by your screen")
+
+    parser.add_argument("-s", "--set-mode", metavar="group:number",
+                        help="set HDMI mode")
+
+    args = parser.parse_args()
+    if args.list_modes == False and args.set_mode == None and \
+       args.overscan == None:
+        parser.print_help()
+        sys.exit(0)
+
+    return args
+
+def main():
+    args = parse_args()
+
+    if args.list_modes:
+        print_supported_modes()
+        return 0
+
+    if os.geteuid() != 0:
+        sys.stderr.write("ERROR: Administrator permissions required.\n")
+        return 1
+
+    if args.set_mode != None:
+        print "The settings will take effect after a reboot."
+        return set_hdmi_mode(args.set_mode)
+
+    if args.overscan == "yes":
+        set_config_option("disable_overscan", 0)
+    elif args.overscan == "no":
+        set_config_option("disable_overscan", 1)
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
