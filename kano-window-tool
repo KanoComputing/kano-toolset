@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-# kano-windonw-tool
+# Copyright (C) 2013, 2014 Kano Computing Ltd.
+# License: GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
 #
-# Copyright (C) 2013 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-# Tool used to manipulate window properties
-#
+# Author: Radek Pazdera <radek@kano.me>
+# Description: A tool used to manipulate window properties
 
 import time
 import sys
+import re
 
 from gtk import gdk
 from argparse import ArgumentParser
+from kanoapplib import gdk_window_settings
 
 BOTTOM_BAR_HEIGHT = 39
 
@@ -51,7 +51,14 @@ def parse_args():
     parser.add_argument("-f", "--focus", action="store_true",
                         help="set keyboard focus to the window")
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    if hasattr(args, "decoration"):
+        if re.match(r"[Yy]([Ee][Ss])?", args.decoration):
+            args.decoration = True
+        else:
+            args.decoration = False
+
+    return args
 
 def get_window_by_pid(pid):
     root = gdk.get_default_root_window()
@@ -88,22 +95,6 @@ def find_window(title, pid, wid):
         time.sleep(0.1)
     return win
 
-# Extremly hackish, but the most reliable way of determining
-# whether the window is decorated by the window manager
-def is_decorated(win):
-    extents = win.property_get("_NET_FRAME_EXTENTS")[2]
-    return sum(extents) > 0
-
-# Returns a 2-tuple (width, height) that is used for decoration
-def get_decoration_size(win):
-    extents = win.property_get("_NET_FRAME_EXTENTS")[2]
-    return (extents[0] + extents[1], extents[2] + extents[3])
-
-def finalize(retval):
-    gdk.window_process_all_updates()
-    gdk.flush()
-    return retval
-
 def main():
     args = parse_args()
 
@@ -112,84 +103,11 @@ def main():
         sys.stderr.write("No window found from the information you provided.\n")
         return 1
 
-    if args.focus:
-        win.raise_()
-        win.focus()
-
-    # Screen dimensions
-    scr_width = gdk.screen_width()
-    scr_height = gdk.screen_height() - BOTTOM_BAR_HEIGHT
-
-    # Window dimensions and position
-    x, y = win.get_root_origin()
-    width, height = win.get_geometry()[2:4]
-
-    # Sort out the decorations
-    if args.decoration != None:
-        if args.decoration == "no":
-            # Resize if the window was decorated before
-            if is_decorated(win):
-                dw, dh = get_decoration_size(win)
-                width += dw
-                height += dh
-
-                win.set_decorations(0)
-                gdk.flush()
-        else:
-            # Resize if the window was not decorated before
-            if not is_decorated(win):
-                win.set_decorations(1)
-                gdk.flush()
-
-                dw, dh = get_decoration_size(win)
-                width -= dw
-                height -= dh
-
-    # Resizing is irrelevant when maximizing, so just exit afterwards
-    if args.maximized:
-        win.maximize()
-        return finalize(0)
-
-    # Initialize the target values
-    new_x, new_y, new_width, new_height = x, y, width, height
-
-    # Window position
-    if args.x_pos != None:
-        if args.x_pos <= 1:
-            new_x = scr_width * args.x_pos
-        else:
-            new_x = args.x_pos
-
-    if args.y_pos != None:
-        if args.y_pos <= 1:
-            new_y = scr_height * args.y_pos
-        else:
-            new_y = args.y_pos
-
-    # Window dimensions
-    if args.width != None:
-        if args.width <= 1:
-            new_width = scr_width * args.width
-        else:
-            new_width = args.width
-        new_width -= get_decoration_size(win)[0]
-
-    if args.height != None:
-        if args.height <= 1:
-            new_height = scr_height * args.height
-        else:
-            new_height = args.height
-        new_height -= get_decoration_size(win)[1]
-
-    # Should the window be centered?
-    if args.centered:
-        new_x = (scr_width - new_width) / 2
-        new_y = (scr_height - new_height) / 2
-
     # Do all the resizing at once
-    win.move_resize(int(new_x), int(new_y), int(new_width), int(new_height))
+    gdk_window_settings(win, args.x_pos, args.y_pos, args.width, args.height,
+                        args.decoration, args.maximized, args.centered)
 
-    return finalize(0)
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())
