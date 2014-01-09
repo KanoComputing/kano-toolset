@@ -159,13 +159,18 @@ class WebApp(object):
         sys.exit(0)
 
     def _parse_api_call(self, call_str):
-        call_re = r"#api:(\w+)(/[^/]*)*$"
+        call_re = r"#api:(\w+)(\[\d+\])?(/[^/]*)*$"
         call_match = re.search(call_re, call_str)
 
         name = call_match.group(1)
         call = [name]
+        timestamp = call_match.group(2)
+        if timestamp != None:
+            call.append(timestamp[1:-1])
+        else:
+            call.append(None)
 
-        args = re.sub(r"^#api:%s/?" % name, r"", call_match.group(0))
+        args = re.sub(r"^#api:[^/]*/?", r"", call_match.group(0))
 
         if len(args) > 0:
             if args[-1] == "/":
@@ -180,10 +185,12 @@ class WebApp(object):
         # Not an api call, let webkit handle it
         if re.search("#api:", uri) == None:
             return False
+        
+	func_data = self._parse_api_call(uri)
 
-        func_data = self._parse_api_call(uri)
         name = func_data[0]
-        args = func_data[1:]
+        timestamp = func_data[1]
+        args = func_data[2:]
 
         try:
             func = getattr(self, name)
@@ -192,8 +199,25 @@ class WebApp(object):
             return True
 
         if len(args) > 0:
-            func(*args)
+            retval = func(*args)
         else:
-            func()
+            retval = func()
+
+        if retval == None:
+            retval = "null"
+
+        if timestamp != None:
+            script = """
+                for (var i = 0; i < backend.callbacks.length; i += 1) {
+                    callback = backend.callbacks[i];
+                    if (callback.func === "%s" &&
+                        callback.timestamp === %s) {
+                        callback.callback("%s");
+                        backend.callbacks.splice(i, 1);
+                        break;
+                    }
+                }
+            """
+            view.execute_script(script % (name, timestamp, retval))
 
         return True
