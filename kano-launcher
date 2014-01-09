@@ -41,7 +41,7 @@ case "$2" in
     extras)
         kano-window-tool -t "extras" -c -f ;;
     feedback)
-        kano-window-tool -t "Kano Feedback" -c -f ;;
+        kano-window-tool -t "Kano Feedback" -dno -c -f ;;
 esac
 
 exit 0
