@@ -80,7 +80,10 @@ def get_window_by_id(wid):
     return gdk.window_foreign_new(int(wid))
 
 # Find the window to be manipulated. Gives up after 30 seconds.
-def find_window(title, pid, wid):
+def find_window(title=None, pid=None, wid=None):
+    if title == None and pid == None and wid == None:
+        raise ArgumentError("At least one identificator needed.")
+
     win = None
     for i in range(1, 300):
         if title != None:

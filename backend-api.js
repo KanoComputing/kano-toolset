@@ -52,4 +52,21 @@ window.backend = {
 
         window.location.hash = 'api:' + func + '/' + args_string;
     },
+
+    trigger_cb: function (cb_name, timestamp, result) {
+        if (typeof result === "string") {
+            result = decodeURIComponent(result);
+        }
+
+        for (var i = 0; i < backend.callbacks.length; i += 1) {
+            callback = backend.callbacks[i];
+            if (callback.func === cb_name &&
+                callback.timestamp === timestamp) {
+                callback.callback(result);
+                backend.callbacks.splice(i, 1);
+                break;
+            }
+        }
+
+    },
 }

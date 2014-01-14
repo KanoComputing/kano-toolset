@@ -12,6 +12,7 @@ from gtk import gdk
 import webkit
 import sys
 import re
+import os
 import urllib
 import warnings
 
@@ -117,7 +118,7 @@ class WebApp(object):
     _x = None
     _y = None
     _width = None
-    _heigh = None
+    _height = None
     _centered = False
     _maximized = False
     _decoration = True
@@ -154,6 +155,41 @@ class WebApp(object):
 
     def error(self, msg):
        sys.stderr.write("Error: %s\n" % msg)
+
+    def chooseFile(self, default_dir=None):
+        dialog = gtk.FileChooserDialog("Open File",
+            buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                       gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+
+        dialog.set_default_response(gtk.RESPONSE_OK)
+ 
+        filter = gtk.FileFilter()
+        filter.set_name("XML Files")
+        filter.add_pattern("*.xml")
+        dialog.add_filter(filter)
+
+        if default_dir != None:
+            dialog.set_current_folder(os.path.expanduser(default_dir))
+
+        path = ""
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            path = dialog.get_filename()
+        elif response == gtk.RESPONSE_CANCEL:
+            self.error("No files selected.")
+
+        dialog.destroy()
+
+        return path
+
+    def readFile(self, path):
+        try:
+            with open(path, "r") as f:
+                return f.read()
+        except:
+            self.error("Unable to open file '%s'." % path)
+            return ""
 
     def _close(self, view, data=None):
         sys.exit(0)
@@ -203,21 +239,17 @@ class WebApp(object):
         else:
             retval = func()
 
-        if retval == None:
-            retval = "null"
-
         if timestamp != None:
-            script = """
-                for (var i = 0; i < backend.callbacks.length; i += 1) {
-                    callback = backend.callbacks[i];
-                    if (callback.func === "%s" &&
-                        callback.timestamp === %s) {
-                        callback.callback("%s");
-                        backend.callbacks.splice(i, 1);
-                        break;
-                    }
-                }
-            """
+            if retval == None:
+                retval = "null"
+            elif type(retval) == int or type(retval) == float:
+                retval = str(retval)
+            elif type(retval) == str:
+                print retval
+                retval = "\"" + urllib.quote(retval, "") + "\""
+                print retval
+
+            script = "backend.trigger_cb(\"%s\", %s, %s);"
             view.execute_script(script % (name, timestamp, retval))
 
         return True
