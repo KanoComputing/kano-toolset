@@ -12,7 +12,7 @@ import re
 
 from gtk import gdk
 from argparse import ArgumentParser
-from kanoapplib import gdk_window_settings
+from kanoapplib import gdk_window_settings, find_window
 
 BOTTOM_BAR_HEIGHT = 39
 
@@ -60,44 +60,6 @@ def parse_args():
 
     return args
 
-def get_window_by_pid(pid):
-    root = gdk.get_default_root_window()
-    for id in root.property_get('_NET_CLIENT_LIST')[2]:
-        w = gdk.window_foreign_new(id)
-        if w and pid in w.property_get("_NET_WM_PID")[2]:
-            return w
-
-def get_window_by_title(title):
-    root = gdk.get_default_root_window()
-    for id in root.property_get('_NET_CLIENT_LIST')[2]:
-        w = gdk.window_foreign_new(id)
-        if w and title == w.property_get("WM_NAME")[2]:
-            return w
-
-def get_window_by_id(wid):
-    if wid[0:2] == "0x":
-        wid = int(wid, 16)
-    return gdk.window_foreign_new(int(wid))
-
-# Find the window to be manipulated. Gives up after 30 seconds.
-def find_window(title=None, pid=None, wid=None):
-    if title == None and pid == None and wid == None:
-        raise ArgumentError("At least one identificator needed.")
-
-    win = None
-    for i in range(1, 300):
-        if title != None:
-            win = get_window_by_title(title)
-        elif pid != None:
-            win = get_window_by_pid(pid)
-        else:
-            win = get_window_by_id(wid)
-
-        if win != None:
-            break
-        time.sleep(0.1)
-    return win
-
 def main():
     args = parse_args()
 
@@ -105,6 +67,10 @@ def main():
     if win == None:
         sys.stderr.write("No window found from the information you provided.\n")
         return 1
+
+    if args.focus:
+        win.raise_()
+        win.focus()
 
     # Do all the resizing at once
     gdk_window_settings(win, args.x_pos, args.y_pos, args.width, args.height,

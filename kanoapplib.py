@@ -15,6 +15,7 @@ import re
 import os
 import urllib
 import warnings
+import time
 
 BOTTOM_BAR_HEIGHT = 39
 
@@ -28,6 +29,48 @@ def _is_decorated(win):
 def _get_decoration_size(win):
     extents = win.property_get("_NET_FRAME_EXTENTS")[2]
     return (extents[0] + extents[1], extents[2] + extents[3])
+
+def _get_window_by_pid(pid):
+    root = gdk.get_default_root_window()
+    for id in root.property_get('_NET_CLIENT_LIST')[2]:
+        w = gdk.window_foreign_new(id)
+        if w:
+            wm_pids = w.property_get("_NET_WM_PID")
+            if pid in wm_pids[2]:
+                return w
+
+def _get_window_by_title(title):
+    root = gdk.get_default_root_window()
+    for id in root.property_get('_NET_CLIENT_LIST')[2]:
+        w = gdk.window_foreign_new(id)
+        if w:
+            wm_name = w.property_get("WM_NAME")
+            if wm_name and title == wm_name[2]:
+                return w
+
+def _get_window_by_id(wid):
+    if wid[0:2] == "0x":
+        wid = int(wid, 16)
+    return gdk.window_foreign_new(int(wid))
+
+# Find the gdk window to be manipulated. Gives up after 30 seconds.
+def find_window(title=None, pid=None, wid=None):
+    if title == None and pid == None and wid == None:
+        raise ArgumentError("At least one identificator needed.")
+
+    win = None
+    for i in range(1, 300):
+        if title != None:
+            win = _get_window_by_title(title)
+        elif pid != None:
+            win = _get_window_by_pid(pid)
+        else:
+            win = _get_window_by_id(wid)
+
+        if win != None:
+            break
+        time.sleep(0.1)
+    return win
 
 def gdk_window_settings(win, x=None, y=None, width=None, height=None,
                         decoration=None, maximized=False, centered=False):
@@ -49,6 +92,7 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
                 old_height += dh
 
                 win.set_decorations(0)
+                gdk.window_process_all_updates()
                 gdk.flush()
         else:
             # Resize if the window was not decorated before
@@ -89,14 +133,18 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
             new_width = scr_width * width
         else:
             new_width = width
-        new_width -= _get_decoration_size(win)[0]
+
+        if decoration == True:
+            new_width -= _get_decoration_size(win)[0]
 
     if height != None:
         if height <= 1:
             new_height = scr_height * height
         else:
             new_height = height
-        new_height -= _get_decoration_size(win)[1]
+        
+        if decoration == True:
+            new_height -= _get_decoration_size(win)[1]
 
     # Should the window be centered?
     if centered:
@@ -130,6 +178,12 @@ class WebApp(object):
         view.connect('navigation-policy-decision-requested',
                      self._api_handler)
         view.connect('close-web-view', self._close)
+
+        if hasattr(self.__class__, "_focus_in"):
+            view.connect('focus-in-event', self._focus_in)
+
+        if hasattr(self.__class__, "_focus_out"):
+            view.connect('focus-out-event', self._focus_out)
 
         sw = gtk.ScrolledWindow()
         sw.add(view)
