@@ -77,12 +77,16 @@ def send_form(project):
     # Create a post request with the information gathered
     numTries = 3
     while numTries > 0:
-        r = requests.post(url, data=info)
+        try:
+            r = requests.post(url, data=info)
+        except requests.ConnectionError:
+            return 1
         if r.status_code == 200:
             break
         numTries -= 1
         time.sleep(1)
-
+    return 0
+    
 
 if __name__ == '__main__':
     # Check for the correct number of parameters
@@ -107,8 +111,9 @@ if __name__ == '__main__':
             sys.exit(0)
 
         # Send form with project passed through argument
-        send_form(sys.argv[1])
+        r = send_form(sys.argv[1])
         # Check for unsend projects since we have internet
-        scan()
+        if r == 0:
+            scan()
 
     sys.exit(0)
