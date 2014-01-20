@@ -16,6 +16,7 @@ import os
 import urllib
 import warnings
 import time
+import subprocess
 
 BOTTOM_BAR_HEIGHT = 39
 
@@ -171,13 +172,26 @@ class WebApp(object):
     _maximized = False
     _decoration = True
 
+    _zenity = None
+
     def run(self):
         warnings.simplefilter("ignore")
+   
+        zenity_cmd = ["zenity", "--progress", "--no-cancel",
+                     "--title='Loading'",
+                     "--text='Loading Make-Pong...'",
+                     "--width=300", "--height=90", "--auto-close",
+                     "--timeout=30", "--auto-kill"]
+
+        self._zenity = subprocess.Popen(zenity_cmd, stdin=subprocess.PIPE)
+        zin = self._zenity.stdin
+        zin.write("20\n")
 
         self._view = view = webkit.WebView()
         view.connect('navigation-policy-decision-requested',
                      self._api_handler)
         view.connect('close-web-view', self._close)
+        view.connect('onload-event', self._onload)
 
         if hasattr(self.__class__, "_focus_in"):
             view.connect('focus-in-event', self._focus_in)
@@ -185,24 +199,39 @@ class WebApp(object):
         if hasattr(self.__class__, "_focus_out"):
             view.connect('focus-out-event', self._focus_out)
 
+        zin.write("30\n")
+
         sw = gtk.ScrolledWindow()
         sw.add(view)
+
+        zin.write("40\n")
 
         self._win = win = gtk.Window(gtk.WINDOW_TOPLEVEL)
         win.set_title(self._title)
         win.connect("destroy", gtk.main_quit)
 
+        zin.write("50\n")
+        
         win.add(sw)
         win.realize()
         win.show_all()
+
+        zin.write("60\n")
 
         gdk_window_settings(win.window, self._x, self._y,
                             self._width, self._height, self._decoration,
                             self._maximized, self._centered)
 
+        zin.write("70\n")
+
         view.open(self._index)
 
         gtk.main()
+
+    def _onload(self, wv, frame, user_data=None):
+        if self._zenity:
+           self._zenity.stdin.write("100\n")
+           del self._zenity
 
     def exit(self):
         sys.exit(0)
