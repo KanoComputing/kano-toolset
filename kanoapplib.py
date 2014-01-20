@@ -179,7 +179,7 @@ class WebApp(object):
    
         zenity_cmd = ["zenity", "--progress", "--no-cancel",
                      "--title='Loading'",
-                     "--text='Loading Make-Pong...'",
+                     "--text='Loading Project...'",
                      "--width=300", "--height=90", "--auto-close",
                      "--timeout=30", "--auto-kill"]
 
