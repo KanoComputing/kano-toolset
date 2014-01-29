@@ -2,7 +2,7 @@
 
 # kano-progression-register
 #
-# Copyright (C) 2013 Kano Computing Ltd.
+# Copyright (C) 2014 Kano Computing Ltd.
 # License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # Argument 1: Project or Scan
@@ -43,7 +43,6 @@ def scan():
     # Pong
     pong_file = "/home/" + USER + "/.project_pong"
     if os.path.exists(pong_file):
-        print 'PONG'
         send_form('pong')
         os.system('rm -f ' + pong_file)
     # Minecraft
