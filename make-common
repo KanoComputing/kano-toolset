@@ -1,23 +1,23 @@
-#!/bin/bash
+#!/bin/sh
 
 # make-common
 #
-# Copyright (C) 2013 Kano Computing Ltd.
-# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # Common functions for all scripts that start Kanux desktop icons
 #
 
 lockfile=/tmp/kano-launcher.lock
 
-function cleanup {
+cleanup() {
     if [ -f $lockfile ]; then
         rm $lockfile
     fi
 }
 trap cleanup EXIT
 
-function is_app_running()
+is_app_running()
 {
     # usage: mywid=""; is_app_running "mywndow" mywid
     # retuns 1 if running or 0 if not running, wid in $2
@@ -32,7 +32,7 @@ function is_app_running()
     fi
 }
 
-function kill_apps()
+kill_apps()
 {
     # Close all other opened projects if any
     killall -q python
@@ -43,7 +43,7 @@ function kill_apps()
     killall -q make-snake
 }
 
-function protect_reentrancy
+protect_reentrancy()
 {
     # if we are running, give focus and exit
     if [ -f $lockfile ]; then
