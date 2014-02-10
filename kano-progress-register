@@ -3,13 +3,14 @@
 # kano-progression-register
 #
 # Copyright (C) 2014 Kano Computing Ltd.
-# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # Argument 1: Project or Scan
 # If Project name send Google Form or create temp file
 # If Scan: scan for temp files and send Google Forms
 #
 
+import os
 import os.path
 import requests
 import sys
@@ -18,7 +19,7 @@ from subprocess import Popen, PIPE, STDOUT
 import getpass
 import urllib2
 
-USER = getpass.getuser()
+USER = os.environ['LOGNAME']
 
 
 def is_internet():
