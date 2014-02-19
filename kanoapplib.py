@@ -182,8 +182,7 @@ class WebApp(object):
                      "--text=Loading...",
                      "--width=300", "--height=90", "--auto-close",
                      "--timeout=10", "--auto-kill"]
-                     
-	zin.write("10\n")
+
         self._zenity = subprocess.Popen(zenity_cmd, stdin=subprocess.PIPE)
         zin = self._zenity.stdin
         zin.write("20\n")
