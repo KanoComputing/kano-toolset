@@ -22,7 +22,7 @@ BOTTOM_BAR_HEIGHT = 39
 
 
 # Get property needs to run through a loop in case the
-# windo is not yet ready
+# window is not yet ready
 def _get_win_property(win, property_name):
     for i in range(0, 10):
         property = win.property_get(property_name)
