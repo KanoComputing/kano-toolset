@@ -250,7 +250,10 @@ class WebApp(object):
 
     def _onload(self, wv, frame, user_data=None):
         if self._zenity:
-            self._zenity.stdin.write("100\n")
+            try:
+                self._zenity.stdin.write("100\n")
+            except:
+                pass
             del self._zenity
 
     def exit(self):
