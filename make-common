@@ -37,7 +37,6 @@ kill_apps()
     # Close all other opened projects if any
     killall -q python
     killall -q minecraft-pi
-    killall -q midori
     killall -q make-music
     killall -q make-video
     killall -q make-snake
