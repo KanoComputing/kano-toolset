@@ -213,6 +213,10 @@ class WebApp(object):
         view.connect('close-web-view', self._close)
         view.connect('onload-event', self._onload)
 
+        # FIXME: The Inspector cannot be closed once opened.
+        # The following line should be commented out for release until we fix this.
+        # view.get_settings().set_property("enable-developer-extras", True)
+
         if hasattr(self.__class__, "_focus_in"):
             view.connect('focus-in-event', self._focus_in)
 
@@ -221,8 +225,13 @@ class WebApp(object):
 
         zin.write("40\n")
 
+        splitter = gtk.VPaned()
         sw = gtk.ScrolledWindow()
         sw.add(view)
+        splitter.add1(sw)
+
+        inspector = view.get_web_inspector()
+        inspector.connect("inspect-web-view", self._activate_inspector, splitter)
 
         zin.write("50\n")
 
@@ -232,7 +241,7 @@ class WebApp(object):
 
         zin.write("70\n")
 
-        win.add(sw)
+        win.add(splitter)
         win.realize()
         win.show_all()
 
@@ -247,6 +256,11 @@ class WebApp(object):
         zin.write("99\n")
 
         gtk.main()
+
+    def _activate_inspector(self, inspector, target_view, splitter):
+        inspector_view = webkit.WebView()
+        splitter.add2(inspector_view)
+        return inspector_view
 
     def _onload(self, wv, frame, user_data=None):
         if self._zenity:
