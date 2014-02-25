@@ -16,19 +16,14 @@ import requests
 import sys
 import time
 from subprocess import Popen, PIPE, STDOUT
-import getpass
-import urllib2
 
 USER = os.environ['LOGNAME']
 
 
 def is_internet():
-    try:
-        urllib2.urlopen('http://google.com', timeout=1)
-        return True
-    except:
-        return False
-        
+    r = os.system('/usr/bin/is_internet')
+    return (r == 0)
+
 
 def scan():
     # Video
@@ -50,7 +45,7 @@ def scan():
     mc_file = "/home/" + USER + "/.project_minecraft"
     if os.path.exists(mc_file):
         send_form('minecraft')
-        os.system('rm -f ' + mc_file)    
+        os.system('rm -f ' + mc_file)
 
 
 def send_form(project):
@@ -86,7 +81,7 @@ def send_form(project):
         numTries -= 1
         time.sleep(1)
     return 0
-    
+
 
 if __name__ == '__main__':
     # Check for the correct number of parameters
