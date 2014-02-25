@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+#  Checks internet connectivity by fast pinging TEST_HOST
+#  Returns 0 if connection is ok, non-zero otherwise.
+#  The command is silent, no console output.
+#
+
+TEST_HOST=8.8.8.8
+
+fping -c 10 -p 30ms -qs $TEST_HOST > /dev/null 2>&1
+exit $?
