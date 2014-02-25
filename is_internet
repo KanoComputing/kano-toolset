@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# is_internet
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+#  Checks internet connectivity by fast pinging TEST_HOST
+#  Returns 0 if connection is ok, non-zero otherwise.
+#  The command is silent, no console output.
+#
+
+TEST_HOST=8.8.8.8
+
+fping -c 10 -p 30ms -q $TEST_HOST > /dev/null 2>&1
+exit $?

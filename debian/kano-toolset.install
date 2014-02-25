@@ -12,3 +12,4 @@
 ./uinput/scancodes.py usr/lib/python2.7/dist-packages/
 ./kanoapplib.py usr/lib/python2.7/dist-packages/
 ./backend-api.js usr/share/kano-toolset
+./is_internet /usr/bin

@@ -20,58 +20,78 @@ import subprocess
 
 BOTTOM_BAR_HEIGHT = 39
 
+
+# Get property needs to run through a loop in case the
+# window is not yet ready
+def _get_win_property(win, property_name):
+    for i in range(0, 10):
+        property = win.property_get(property_name)
+        if property is not None:
+            return property[2]
+        time.sleep(0.1)
+    return None
+
+
 # Extremly hackish, but the most reliable way of determining
 # whether the window is decorated by the window manager
 def _is_decorated(win):
-    extents = win.property_get("_NET_FRAME_EXTENTS")[2]
+    extents = _get_win_property(win, "_NET_FRAME_EXTENTS")
     return sum(extents) > 0
+
 
 # Returns a 2-tuple (width, height) that is used for decoration
 def _get_decoration_size(win):
-    extents = win.property_get("_NET_FRAME_EXTENTS")[2]
+    extents = _get_win_property(win, "_NET_FRAME_EXTENTS")
     return (extents[0] + extents[1], extents[2] + extents[3])
+
 
 def _get_window_by_pid(pid):
     root = gdk.get_default_root_window()
-    for id in root.property_get('_NET_CLIENT_LIST')[2]:
+    extents = _get_win_property(root, '_NET_CLIENT_LIST')
+    for id in extents:
         w = gdk.window_foreign_new(id)
         if w:
             wm_pids = w.property_get("_NET_WM_PID")
             if pid in wm_pids[2]:
                 return w
 
+
 def _get_window_by_title(title):
     root = gdk.get_default_root_window()
-    for id in root.property_get('_NET_CLIENT_LIST')[2]:
+    extents = _get_win_property(root, '_NET_CLIENT_LIST')
+    for id in extents:
         w = gdk.window_foreign_new(id)
         if w:
             wm_name = w.property_get("WM_NAME")
             if wm_name and title == wm_name[2]:
                 return w
 
+
 def _get_window_by_id(wid):
     if wid[0:2] == "0x":
         wid = int(wid, 16)
     return gdk.window_foreign_new(int(wid))
 
+
 # Find the gdk window to be manipulated. Gives up after 30 seconds.
 def find_window(title=None, pid=None, wid=None):
-    if title == None and pid == None and wid == None:
-        raise ArgumentError("At least one identificator needed.")
+    if (title is None) and (pid is None) and (wid is None):
+        raise ValueError("At least one identificator needed.")
 
     win = None
     for i in range(1, 300):
-        if title != None:
+        if title is not None:
             win = _get_window_by_title(title)
-        elif pid != None:
+        elif pid is not None:
             win = _get_window_by_pid(pid)
         else:
             win = _get_window_by_id(wid)
 
-        if win != None:
+        if win is not None:
             break
         time.sleep(0.1)
     return win
+
 
 def gdk_window_settings(win, x=None, y=None, width=None, height=None,
                         decoration=None, maximized=False, centered=False):
@@ -84,8 +104,8 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
     old_width, old_height = win.get_geometry()[2:4]
 
     # Sort out the decorations
-    if decoration != None:
-        if decoration == False:
+    if decoration is not None:
+        if decoration is False:
             # Resize if the window was decorated before
             if _is_decorated(win):
                 dw, dh = _get_decoration_size(win)
@@ -116,35 +136,35 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
     new_x, new_y, new_width, new_height = old_x, old_y, old_width, old_height
 
     # Window position
-    if x != None:
+    if x is not None:
         if x <= 1:
             new_x = scr_width * x
         else:
             new_x = x
 
-    if y != None:
+    if y is not None:
         if y <= 1:
             new_y = scr_height * y
         else:
             new_y = y
 
     # Window dimensions
-    if width != None:
+    if width is not None:
         if width <= 1:
             new_width = scr_width * width
         else:
             new_width = width
 
-        if decoration == True:
+        if decoration is True:
             new_width -= _get_decoration_size(win)[0]
 
-    if height != None:
+    if height is not None:
         if height <= 1:
             new_height = scr_height * height
         else:
             new_height = height
-        
-        if decoration == True:
+
+        if decoration is True:
             new_height -= _get_decoration_size(win)[1]
 
     # Should the window be centered?
@@ -176,12 +196,12 @@ class WebApp(object):
 
     def run(self):
         warnings.simplefilter("ignore")
-   
+
         zenity_cmd = ["zenity", "--progress", "--no-cancel",
-                     "--title=Loading",
-                     "--text=Loading...",
-                     "--width=300", "--height=90", "--auto-close",
-                     "--timeout=10", "--auto-kill"]
+                      "--title=Loading",
+                      "--text=Loading...",
+                      "--width=300", "--height=90", "--auto-close",
+                      "--timeout=10", "--auto-kill"]
 
         self._zenity = subprocess.Popen(zenity_cmd, stdin=subprocess.PIPE)
         zin = self._zenity.stdin
@@ -193,6 +213,10 @@ class WebApp(object):
         view.connect('close-web-view', self._close)
         view.connect('onload-event', self._onload)
 
+        # FIXME: The Inspector cannot be closed once opened.
+        # The following line should be commented out for release until we fix this.
+        # view.get_settings().set_property("enable-developer-extras", True)
+
         if hasattr(self.__class__, "_focus_in"):
             view.connect('focus-in-event', self._focus_in)
 
@@ -201,8 +225,13 @@ class WebApp(object):
 
         zin.write("40\n")
 
+        splitter = gtk.VPaned()
         sw = gtk.ScrolledWindow()
         sw.add(view)
+        splitter.add1(sw)
+
+        inspector = view.get_web_inspector()
+        inspector.connect("inspect-web-view", self._activate_inspector, splitter)
 
         zin.write("50\n")
 
@@ -211,8 +240,8 @@ class WebApp(object):
         win.connect("destroy", gtk.main_quit)
 
         zin.write("70\n")
-        
-        win.add(sw)
+
+        win.add(splitter)
         win.realize()
         win.show_all()
 
@@ -223,35 +252,43 @@ class WebApp(object):
         zin.write("90\n")
 
         view.open(self._index)
-        
+
         zin.write("99\n")
 
         gtk.main()
 
+    def _activate_inspector(self, inspector, target_view, splitter):
+        inspector_view = webkit.WebView()
+        splitter.add2(inspector_view)
+        return inspector_view
+
     def _onload(self, wv, frame, user_data=None):
         if self._zenity:
-           self._zenity.stdin.write("100\n")
-           del self._zenity
+            try:
+                self._zenity.stdin.write("100\n")
+            except:
+                pass
+            del self._zenity
 
     def exit(self):
         sys.exit(0)
 
     def error(self, msg):
-       sys.stderr.write("Error: %s\n" % msg)
+        sys.stderr.write("Error: %s\n" % msg)
 
     def chooseFile(self, default_dir=None):
         dialog = gtk.FileChooserDialog("Open File",
-            buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                       buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                        gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 
         dialog.set_default_response(gtk.RESPONSE_OK)
- 
+
         filter = gtk.FileFilter()
         filter.set_name("XML Files")
         filter.add_pattern("*.xml")
         dialog.add_filter(filter)
 
-        if default_dir != None:
+        if default_dir is not None:
             dialog.set_current_folder(os.path.expanduser(default_dir))
 
         path = ""
@@ -284,7 +321,7 @@ class WebApp(object):
         name = call_match.group(1)
         call = [name]
         timestamp = call_match.group(2)
-        if timestamp != None:
+        if timestamp is not None:
             call.append(timestamp[1:-1])
         else:
             call.append(None)
@@ -302,10 +339,10 @@ class WebApp(object):
         uri = action.get_original_uri()
 
         # Not an api call, let webkit handle it
-        if re.search("#api:", uri) == None:
+        if re.search("#api:", uri) is None:
             return False
-        
-	func_data = self._parse_api_call(uri)
+
+        func_data = self._parse_api_call(uri)
 
         name = func_data[0]
         timestamp = func_data[1]
@@ -322,8 +359,8 @@ class WebApp(object):
         else:
             retval = func()
 
-        if timestamp != None:
-            if retval == None:
+        if timestamp is not None:
+            if retval is None:
                 retval = "null"
             elif type(retval) == int or type(retval) == float:
                 retval = str(retval)
