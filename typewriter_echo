@@ -1,0 +1,119 @@
+#!/bin/bash
+
+# typewriter_echo
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Write to terminal in a Matrix-style
+#
+# Params:
+#   $1: Sring to be printed
+#   $2: Wait time at the end of the line (optional)
+#   $3: Number of line breaks at the end (optional)
+#   $4: Whether there is padding at the start of the line (1 or 0) (optional)
+#   $5: Whether there is padding at the start of the next line (1 or 0) (optional)
+#   $6: Number of line breaks at the start (optional)
+#
+
+function rand_wait
+{
+    local low=$1  # miliseconds
+    local high=$2 # miliseconds
+    local rv=`bc <<< "scale=4; $[($RANDOM % ($high - $low)) + $low] / 1000"`
+    echo "0$rv"
+}
+
+function clean_stdin
+{
+    read -t 1 -n 10000 discard
+}
+
+# params:
+#   $1: Number of characters to use to pad
+function add_character_padding
+{
+    string=""
+    for (( i=0; i<=$1 ; i++ )); do
+        string+=" "
+    done
+    echo "${string}"
+}
+
+function add_line_padding
+{
+    for n in `seq 1 $1`; do
+        linebreak
+    done
+}
+
+function linebreak
+{
+    echo -ne "\n"
+}
+
+# Main function
+function typewriter_echo
+{
+    string="$1"
+
+    # Amount of whitespace at used for padding
+    whitespace=`add_character_padding 3`
+
+    # $6: Number of line breaks at the start
+    if [ -n "$6" ]; then
+        add_line_padding "$6"
+    else
+        add_line_padding 0
+    fi
+
+    # $4: Whether there is padding at the start of the line (1 or 0)
+    if [ -n "$4" ] && [ "$4" -ne 0 ]; then
+        echo -n "$whitespace"
+    fi
+
+    # Write the text
+    while test -n "$string"; do
+        c=${string:0:1}
+        echo -ne "$c"
+        # New word
+        if [ "$c" == " " ]; then
+            sleep 0.06
+        # End of sentence
+        elif [ "$c" == "." ] || [ "$c" == "?" ]; then
+            sleep 0.04
+        # Character
+        else
+            sleep 0.02
+        fi
+        string=${string:1}
+    done
+
+    # $2: Wait time at the end of the line
+    if [ -n "$2" ]; then
+        sleep `bc <<<"scale=4; ($2 / 4)"`
+    fi
+
+    # $3: Number of line breaks at the end
+    if [ -n "$3" ]; then
+        add_line_padding "$3"
+    else
+        add_line_padding 1
+    fi
+
+    # $5: Whether there is padding at the start of the next line (1 or 0)
+    if [ -n "$5" ] && [ "$5" -ne 0 ]; then
+        echo -n "$whitespace"
+    fi
+
+}
+
+# Disable terminal echo, so the user cannot type between the text
+stty_orig=`stty -g`
+stty -echo
+
+typewriter_echo "$1" "$2" "$3" "$4" "$5" "$6"
+
+# Clean input and enable terminal echo again
+clean_stdin
+stty $stty_orig

@@ -8,8 +8,9 @@
 ./make-focus /usr/bin
 ./rpi-info /usr/bin
 ./uinput/uinput /usr/bin
-./uinput/pyinputevent.py usr/lib/python2.7/dist-packages/
-./uinput/scancodes.py usr/lib/python2.7/dist-packages/
-./kanoapplib.py usr/lib/python2.7/dist-packages/
-./backend-api.js usr/share/kano-toolset
+./uinput/pyinputevent.py /usr/lib/python2.7/dist-packages/
+./uinput/scancodes.py /usr/lib/python2.7/dist-packages/
+./kanoapplib.py /usr/lib/python2.7/dist-packages/
+./backend-api.js /usr/share/kano-toolset
 ./is_internet /usr/bin
+./typewriter_echo /usr/bin
