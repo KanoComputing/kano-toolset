@@ -3,14 +3,17 @@
 ./kano-progress-register /usr/bin
 ./kano-window-tool /usr/bin
 ./kano-screen-settings /usr/bin
-./make-common /usr/share/kano-toolset
 ./kano-shutdown /usr/bin
 ./make-focus /usr/bin
 ./rpi-info /usr/bin
 ./uinput/uinput /usr/bin
-./uinput/pyinputevent.py /usr/lib/python2.7/dist-packages/
-./uinput/scancodes.py /usr/lib/python2.7/dist-packages/
-./kanoapplib.py /usr/lib/python2.7/dist-packages/
-./backend-api.js /usr/share/kano-toolset
 ./is_internet /usr/bin
 ./typewriter_echo /usr/bin
+
+./backend-api.js /usr/share/kano-toolset
+./make-common /usr/share/kano-toolset
+
+./kano_utilslib.py /usr/lib/python2.7/dist-packages/
+./kanoapplib.py /usr/lib/python2.7/dist-packages/
+./uinput/pyinputevent.py /usr/lib/python2.7/dist-packages/
+./uinput/scancodes.py /usr/lib/python2.7/dist-packages/
