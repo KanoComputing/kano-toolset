@@ -7,5 +7,5 @@ Build-Depends: debhelper (>= 9)
 
 Package: kano-toolset
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-gtk2, python-webkit, fping
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-gtk2, python-webkit, fping, python
 Description: Collection of tools for Kanux
