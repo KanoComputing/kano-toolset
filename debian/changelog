@@ -1,3 +1,9 @@
+kano-toolset (1.0-60) unstable; urgency=low
+
+  * Package rebuilt, updated to revision afc8fe91.
+
+ -- Team Kano <dev@kano.me>  Wed, 05 Mar 2014 21:05:16 +0000
+
 kano-toolset (1.0-59) unstable; urgency=low
 
   * Package rebuilt, updated to revision 4823786d.
