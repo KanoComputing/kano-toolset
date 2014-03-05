@@ -10,11 +10,11 @@ uinput/uinput /usr/bin
 is_internet /usr/bin
 typewriter_echo /usr/bin
 
-backend-api.js /usr/share/kano-toolset/
-make-common /usr/share/kano-toolset/
+backend-api.js /usr/share/kano-toolset
+make-common /usr/share/kano-toolset
 
 kanoapplib.py /usr/lib/python2.7/dist-packages
 uinput/pyinputevent.py /usr/lib/python2.7/dist-packages
 uinput/scancodes.py /usr/lib/python2.7/dist-packages
 
-kano/* /usr/lib/python2.7/dist-packages/kano/
+kano/* /usr/lib/python2.7/dist-packages/kano
