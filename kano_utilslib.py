@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 
+# KANO Python utils
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+
 import os
 import subprocess
 import sys
 import signal
 import shutil
+import datetime
 
 
 def run_cmd(cmd):
@@ -33,15 +39,6 @@ def run_print_output_error(cmd):
     if e:
         print '\nerror:\n{}'.format(e.strip())
     return o, e, rc
-
-
-def is_internet():
-    _, _, rc = run_cmd('which fping')
-    if rc == 1:
-        sys.exit('fping not installed, run "apt-get install fping" first')
-
-    _, _, rc = run_cmd('/usr/bin/is_internet')
-    return rc == 0
 
 
 def is_gui():
@@ -113,3 +110,7 @@ def kill_child_processes(parent_pid):
     processes = [int(p) for p in o.splitlines()]
     for process in processes:
         os.kill(process, signal.SIGTERM)
+
+
+def get_date_now():
+    return datetime.datetime.utcnow().isoformat()
