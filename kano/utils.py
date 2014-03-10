@@ -134,7 +134,11 @@ def get_user_environ():
         return os.environ['LOGNAME']
 
 
-def get_home_directory(username):
+def get_home():
+    return os.path.expanduser('~')
+
+
+def get_home_by_username(username):
     return pwd.getpwnam(username).pw_dir
 
 
