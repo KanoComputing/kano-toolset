@@ -365,9 +365,7 @@ class WebApp(object):
             elif type(retval) == int or type(retval) == float:
                 retval = str(retval)
             elif type(retval) == str:
-                print retval
                 retval = "\"" + urllib.quote(retval, "") + "\""
-                print retval
 
             script = "backend.trigger_cb(\"%s\", %s, %s);"
             view.execute_script(script % (name, timestamp, retval))
