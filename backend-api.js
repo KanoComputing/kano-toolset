@@ -26,17 +26,17 @@ window.backend = {
 
             if (arguments.length > 1 &&
                 typeof arguments[arguments.length - 1] === 'function') {
-                
+
                 arguments = Array.prototype.slice.call(arguments, 0);
                 callback = arguments.pop();
-            	timestamp = (new Date).getTime();
+                timestamp = (new Date).getTime();
 
                 this.callbacks.push({
                     timestamp: timestamp,
                     func: func,
                     callback: callback
                 });
-                func += "[" + timestamp + "]";
+                func += '[' + timestamp + ']';
             }
 
             for (var i = 1; i < arguments.length; i += 1) {
@@ -54,7 +54,7 @@ window.backend = {
     },
 
     trigger_cb: function (cb_name, timestamp, result) {
-        if (typeof result === "string") {
+        if (typeof result === 'string') {
             result = decodeURIComponent(result);
         }
 
@@ -68,5 +68,5 @@ window.backend = {
             }
         }
 
-    },
-}
+    }
+};
