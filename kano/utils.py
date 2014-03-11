@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# KANO Python utils
+# kano.utils
 #
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
@@ -11,6 +11,8 @@ import sys
 import signal
 import shutil
 import datetime
+import getpass
+import pwd
 
 
 def run_cmd(cmd):
@@ -114,3 +116,44 @@ def kill_child_processes(parent_pid):
 
 def get_date_now():
     return datetime.datetime.utcnow().isoformat()
+
+
+def ensuredir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+
+def get_user_getpass():
+    return getpass.getuser()
+
+
+def get_user_environ():
+    if 'SUDO_USER' in os.environ:
+        return os.environ['SUDO_USER']
+    else:
+        return os.environ['LOGNAME']
+
+
+def get_home_directory(username):
+    return pwd.getpwnam(username).pw_dir
+
+
+def get_device_id():
+    cpuinfo_file = '/proc/cpuinfo'
+    lines = read_file_contents_as_lines(cpuinfo_file)
+
+    for l in lines:
+        parts = [p.strip() for p in l.split(':')]
+        if parts[0] == 'Serial':
+            return parts[1].upper()
+
+
+def get_mac_address():
+    cmd = '/sbin/ifconfig -a eth0 | grep HWaddr'
+    o, _, _ = run_cmd(cmd)
+    if len(o.split('HWaddr')) != 2:
+        return
+    mac_addr = o.split('HWaddr')[1].strip()
+    mac_addr_str = mac_addr.translate(None, ':').upper()
+    if len(mac_addr_str) == 12:
+        return mac_addr_str
