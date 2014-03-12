@@ -1,0 +1,31 @@
+#!/usr/bin/python
+#
+# IOSpeed computes disk throughput using the tips exposed
+# at elinux SD card comparison chart:
+#
+# http://elinux.org/RPi_SD_cards#Performance
+#
+
+import os
+import sys
+
+if __name__ == '__main__':
+
+    print 'Disk I/O metrics0'
+    os.system('uname -a')
+
+    scaling_governor = open('/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor', 'r').read().strip()
+    if scaling_governor == 'ondemand':
+        print 'WARNING: cpu scaling_governor:', scaling_governor
+
+    print 'Flushing I/O buffers'
+    os.system ('sync')
+    os.system ('sudo /bin/bash -c "echo 1 > /proc/sys/vm/drop_caches"')
+
+    print 'Testing I/O WRITE speed'
+    os.system('sync; time dd if=/dev/zero of=./test.img bs=500k count=1024; time sync')
+
+    print 'Testing I/O READ speed'
+    os.system('sync; time dd if=./test.img of=/dev/null bs=500k count=1024')
+
+    sys.exit(0)
