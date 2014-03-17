@@ -17,7 +17,6 @@ import urllib
 import warnings
 import time
 import subprocess
-import kano.profile as kp
 
 BOTTOM_BAR_HEIGHT = 39
 
@@ -277,17 +276,10 @@ class WebApp(object):
     def error(self, msg):
         sys.stderr.write("Error: %s\n" % msg)
 
-    def chooseFileKanoProfile(self, app_name=None):
-        if not app_name:
-            self.error("No app_name given.")
-        else:
-            self.chooseFile(app_name=app_name)
-
-    def chooseFile(self, default_dir=None, app_name=None):
-        dialog = gtk.FileChooserDialog(
-            "Open File",
-            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK)
-        )
+    def chooseFile(self, default_dir=None):
+        dialog = gtk.FileChooserDialog("Open File",
+                       buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                       gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 
         dialog.set_default_response(gtk.RESPONSE_OK)
 
@@ -296,13 +288,7 @@ class WebApp(object):
         filter.add_pattern("*.xml")
         dialog.add_filter(filter)
 
-        print default_dir, app_name
-        sys.exit()
-
-        if default_dir:
-            dialog.set_current_folder(os.path.expanduser(default_dir))
-        elif app_name:
-            default_dir = kp.get_app_data_dir(app_name)
+        if default_dir is not None:
             dialog.set_current_folder(os.path.expanduser(default_dir))
 
         path = ""
@@ -379,9 +365,7 @@ class WebApp(object):
             elif type(retval) == int or type(retval) == float:
                 retval = str(retval)
             elif type(retval) == str:
-                print retval
                 retval = "\"" + urllib.quote(retval, "") + "\""
-                print retval
 
             script = "backend.trigger_cb(\"%s\", %s, %s);"
             view.execute_script(script % (name, timestamp, retval))
