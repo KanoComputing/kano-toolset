@@ -4,6 +4,7 @@
 #
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
 
 import os
 import subprocess
@@ -82,12 +83,12 @@ def get_dpkg_dict():
     return apps_ok, apps_other
 
 
-def deletedir(directory):
+def delete_dir(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
 
 
-def deletefile(file):
+def delete_file(file):
     if os.path.exists(file):
         os.remove(file)
 
@@ -118,7 +119,7 @@ def get_date_now():
     return datetime.datetime.utcnow().isoformat()
 
 
-def ensuredir(directory):
+def ensure_dir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -127,14 +128,22 @@ def get_user_getpass():
     return getpass.getuser()
 
 
-def get_user_environ():
+def get_user():
+    return os.environ['LOGNAME']
+
+
+def get_user_unsudoed():
     if 'SUDO_USER' in os.environ:
         return os.environ['SUDO_USER']
     else:
         return os.environ['LOGNAME']
 
 
-def get_home_directory(username):
+def get_home():
+    return os.path.expanduser('~')
+
+
+def get_home_by_username(username):
     return pwd.getpwnam(username).pw_dir
 
 
