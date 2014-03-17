@@ -1,6 +1,6 @@
 # Kanux-utils
 
-Collection of utilities 
+Collection of utilities
 
 ## email-sender
 
@@ -12,12 +12,8 @@ Launches the app passed as an argument
 
 ## kano-shutdown
 
-Script to shutdown the system after a confirmation message on the graphic frontend. 
+Script to shutdown the system after a confirmation message on the graphic frontend.
 The user needs sudo NOPASSWD: privileges for /sbin/poweroff.
-
-## make-common
-
-Common functions for all scripts that start Kanux desktop icons
 
 ## make-focus
 
