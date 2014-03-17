@@ -8,18 +8,18 @@
 # A simple script to launch Kano projects
 # Usage: kano-launcher cmd [preset]
 
-. /usr/share/kano-toolset/make-common
-
 # Make sure there are no other projects running at the same time
-kill_apps
+killall -q python
+killall -q minecraft-pi
+killall -q make-music
+killall -q make-video
+killall -q make-snake
 
 if [ -z "$1" ]; then
     exit 1
 fi
 
-protect_reentrancy
 eval "$1 &"
-pid="$!"
 
 # Apply window presets
 case "$2" in
