@@ -24,29 +24,39 @@ BOTTOM_BAR_HEIGHT = 39
 # Get property needs to run through a loop in case the
 # window is not yet ready
 def _get_win_property(win, property_name):
+    if not win:
+        return
+
     for i in range(0, 10):
         property = win.property_get(property_name)
-        if property is not None:
+        if property:
             return property[2]
         time.sleep(0.1)
-    return None
+    return
 
 
 # Extremly hackish, but the most reliable way of determining
 # whether the window is decorated by the window manager
 def _is_decorated(win):
+    if not win:
+        return
+
     extents = _get_win_property(win, "_NET_FRAME_EXTENTS")
     return sum(extents) > 0
 
 
 # Returns a 2-tuple (width, height) that is used for decoration
 def _get_decoration_size(win):
+    if not win:
+        return
     extents = _get_win_property(win, "_NET_FRAME_EXTENTS")
     return (extents[0] + extents[1], extents[2] + extents[3])
 
 
 def _get_window_by_pid(pid):
     root = gdk.get_default_root_window()
+    if not root:
+        return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
     for id in extents:
         w = gdk.window_foreign_new(id)
@@ -58,6 +68,8 @@ def _get_window_by_pid(pid):
 
 def _get_window_by_title(title):
     root = gdk.get_default_root_window()
+    if not root:
+        return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
     for id in extents:
         w = gdk.window_foreign_new(id)
@@ -277,9 +289,10 @@ class WebApp(object):
         sys.stderr.write("Error: %s\n" % msg)
 
     def chooseFile(self, default_dir=None):
-        dialog = gtk.FileChooserDialog("Open File",
-                       buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                       gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        dialog = gtk.FileChooserDialog(
+            "Open File",
+            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                     gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 
         dialog.set_default_response(gtk.RESPONSE_OK)
 
