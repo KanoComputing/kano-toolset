@@ -18,6 +18,8 @@ import warnings
 import time
 import subprocess
 
+import kano.utils as ku
+
 BOTTOM_BAR_HEIGHT = 39
 
 
@@ -64,6 +66,34 @@ def _get_window_by_pid(pid):
             wm_pids = w.property_get("_NET_WM_PID")
             if pid in wm_pids[2]:
                 return w
+
+
+def _get_window_by_child_pid(pid):
+    root = gdk.get_default_root_window()
+    if not root:
+        return
+    extents = _get_win_property(root, '_NET_CLIENT_LIST')
+
+    # make a set of all visible pids
+    winpids = set()
+    for id in extents:
+        w = gdk.window_foreign_new(id)
+        if w:
+            for pid in w.property_get("_NET_WM_PID")[2]:
+                winpids.add(pid)
+
+    # make a list of (pid, pstree_section) pairs
+    winpid_trees = []
+    for winpid in winpids:
+        cmd = 'pstree -pl {}'.format(winpid)
+        o, _, _ = ku.run_cmd(cmd)
+        if str(pid) in o:
+            winpid_trees.append((winpid, o))
+
+    # sort the list by the pstree length
+    winpid_trees = sorted(winpid_trees, key=lambda k: len(k[1]), reverse=False)
+
+    return winpid_trees[0][0]
 
 
 def _get_window_by_title(title):
