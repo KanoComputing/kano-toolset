@@ -92,8 +92,15 @@ def _get_window_by_child_pid(pid):
 
     # sort the list by the pstree length
     winpid_trees = sorted(winpid_trees, key=lambda k: len(k[1]), reverse=False)
+    winpid = winpid_trees[0][0]
 
-    return winpid_trees[0][0]
+    # get win belonging to that pid
+    for id in extents:
+        w = gdk.window_foreign_new(id)
+        if w:
+            wm_pids = w.property_get("_NET_WM_PID")
+            if winpid in wm_pids[2]:
+                return w
 
 
 def _get_window_by_title(title):

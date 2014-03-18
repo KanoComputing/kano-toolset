@@ -6,18 +6,17 @@
 # Author: Radek Pazdera <radek@kano.me>
 # Description: A tool used to manipulate window properties
 
-import time
 import sys
 import re
 
-from gtk import gdk
 from argparse import ArgumentParser
 from kanoapplib import gdk_window_settings, find_window
 
 BOTTOM_BAR_HEIGHT = 39
 
+
 def parse_args():
-    app_desc="A tool for manipulating window parameters and properties."
+    app_desc = "A tool for manipulating window parameters and properties."
     parser = ArgumentParser(add_help=False, description=app_desc)
 
     parser.add_argument("--help", action="help",
@@ -60,11 +59,12 @@ def parse_args():
 
     return args
 
+
 def main():
     args = parse_args()
 
     win = find_window(args.title, args.pid, args.id)
-    if win == None:
+    if not win:
         sys.stderr.write("No window found from the information you provided.\n")
         return 1
 
