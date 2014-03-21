@@ -87,8 +87,11 @@ def _get_window_by_child_pid(pid):
     for winpid in winpids:
         cmd = 'pstree -pl {}'.format(winpid)
         o, _, _ = ku.run_cmd(cmd)
-        if str(pid) in o:
+        if '({})'.format(pid) in o:
             winpid_trees.append((winpid, o))
+
+    if not winpid_trees:
+        return
 
     # sort the list by the pstree length
     winpid_trees = sorted(winpid_trees, key=lambda k: len(k[1]), reverse=False)
