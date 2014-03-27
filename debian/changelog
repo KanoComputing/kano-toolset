@@ -1,3 +1,9 @@
+kano-toolset (1.0-61) UNRELEASED; urgency=low
+
+  * kanowifilib -> kano.network
+
+ -- Team Kano <dev@kano.me>  Thu, 27 Mar 2014 14:24:04 +0000
+
 kano-toolset (1.0-60) unstable; urgency=low
 
   * Package rebuilt, updated to revision afc8fe91.
