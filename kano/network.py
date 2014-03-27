@@ -511,7 +511,7 @@ if __name__ == '__main__':
 
     print 'Read wireless networks from a dump file (iwlist scan output)'
     if len(sys.argv) < 2:
-        print 'Syntax: kanowifilib.py <iwlist dump file>'
+        print 'Syntax: network.py <iwlist dump file>'
         sys.exit(1)
     else:
         iwlist = sys.argv[1]
