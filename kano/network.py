@@ -388,13 +388,14 @@ def connect(iface, essid, encrypt='off', seckey=None):
     of the wireless network AP.
     '''
 
+    udhcpc_cmdline = 'udhcpc -S -t 3 -A 10 -n -a --script=/etc/udhcpc/kano.script -i %s' % iface
     time.sleep(1)
 
     #
     # kill previous connection daemons
     #
     try:
-        execute("pkill -f 'udhcpc -S -t 3 -A 10 -n -a -i wlan0'")
+        execute("pkill %s" % (udhcpc_cmdline))
     except:
         pass
 
@@ -437,9 +438,7 @@ def connect(iface, essid, encrypt='off', seckey=None):
             pass
 
     try:
-        execute("udhcpc -S -t 3 -A 10 -n -a -i wlan0 %s" % iface)
-        execute("/bin/sh -c '/usr/local/bin/tzupdate | logger -i'")
-        execute("/bin/sh -c '/usr/bin/rdate -ncv $(cat /etc/timeserver.conf) | logger -i'")
+        execute(udhcpc_cmdline)
     except:
         pass
 
