@@ -10,7 +10,24 @@
 #  The command is silent, no console output.
 #
 
-TEST_HOST=8.8.8.8
+TEST_PING=8.8.8.8
 
-fping -c 10 -p 30ms -q $TEST_HOST > /dev/null 2>&1
-exit $?
+# FIXME: below address points to dev.kano.me, ip addres to avoid DNS
+TEST_CURL="http://80.243.184.98/public"
+rc=255
+
+fping -c 10 -p 30ms -q $TEST_PING > /dev/null 2>&1
+rc=$?
+if [ $rc -ne 0 ]; then
+    # check to see if socks is enabled
+    # by looking if bash preloads the socks library
+    ldd /bin/bash | grep 'socks' > /dev/null 2>&1
+    rc=$?
+    if [ "$rc" -eq "0" ]; then
+        # if so, use curl instead of ping to see if we can reach the internet
+	curl --retry 2 --retry-delay 1 $TEST_CURL > /dev/null 2>&1
+	rc=$?
+    fi
+fi
+
+exit $rc
