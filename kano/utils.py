@@ -163,6 +163,6 @@ def get_mac_address():
     if len(o.split('HWaddr')) != 2:
         return
     mac_addr = o.split('HWaddr')[1].strip()
-    mac_addr_str = mac_addr.translate(None, ':').upper()
-    if len(mac_addr_str) == 12:
+    mac_addr_str = mac_addr.upper()
+    if len(mac_addr_str) == 17:
         return mac_addr_str
