@@ -1,19 +1,9 @@
-kano-email-register /usr/bin
-kano-launcher /usr/bin
-kano-progress-register /usr/bin
-kano-window-tool /usr/bin
-kano-screen-settings /usr/bin
-kano-shutdown /usr/bin
-make-focus /usr/bin
-rpi-info /usr/bin
-uinput/uinput /usr/bin
-is_internet /usr/bin
-typewriter_echo /usr/bin
+bin /usr
+kano /usr/lib/python2.7/dist-packages
 
-backend-api.js /usr/share/kano-toolset
-
+js/backend-api.js /usr/share/kano-toolset
 kanoapplib.py /usr/lib/python2.7/dist-packages
+
+uinput/uinput /usr/bin
 uinput/pyinputevent.py /usr/lib/python2.7/dist-packages
 uinput/scancodes.py /usr/lib/python2.7/dist-packages
-
-kano/* /usr/lib/python2.7/dist-packages/kano
