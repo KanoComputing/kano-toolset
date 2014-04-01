@@ -2,7 +2,6 @@ bin /usr
 kano /usr/lib/python2.7/dist-packages
 
 js/backend-api.js /usr/share/kano-toolset
-kanoapplib.py /usr/lib/python2.7/dist-packages
 
 uinput/uinput /usr/bin
 uinput/pyinputevent.py /usr/lib/python2.7/dist-packages
