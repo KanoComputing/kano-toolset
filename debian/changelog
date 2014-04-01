@@ -1,4 +1,10 @@
-kano-toolset (1.0-61) UNRELEASED; urgency=low
+kano-toolset (1.0-62) unstable; urgency=low
+
+  * kano.window and kano.webapp
+
+ -- Team Kano <dev@kano.me>  Tue, 01 Apr 2014 20:10:03 +0100
+
+kano-toolset (1.0-61) unstable; urgency=low
 
   * kanowifilib -> kano.network
 
