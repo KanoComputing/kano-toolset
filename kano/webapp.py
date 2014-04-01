@@ -15,7 +15,7 @@ import urllib
 import warnings
 import subprocess
 
-from kanoapplib import gdk_window_settings
+from kano.window import gdk_window_settings
 
 
 class WebApp(object):

@@ -10,7 +10,7 @@ import sys
 import re
 
 from argparse import ArgumentParser
-from kanoapplib import gdk_window_settings, find_window
+from kano.window import gdk_window_settings, find_window
 
 BOTTOM_BAR_HEIGHT = 39
 
