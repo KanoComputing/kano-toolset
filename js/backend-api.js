@@ -7,7 +7,7 @@
 window.backend = {
     callbacks: [],
 
-    call: function () {
+    call: function() {
         if (arguments.length >= 1) {
             func = arguments[0];
             args = [];
@@ -41,7 +41,7 @@ window.backend = {
         window.location.hash = 'api:' + func + '/' + args_string;
     },
 
-    trigger_cb: function (cb_name, timestamp, result) {
+    trigger_cb: function(cb_name, timestamp, result) {
         if (typeof result === 'string') {
             result = decodeURIComponent(result);
         }
