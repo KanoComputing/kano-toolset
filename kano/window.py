@@ -9,7 +9,7 @@
 from gtk import gdk
 import time
 
-import kano.utils as ku
+from kano.utils import run_cmd
 
 BOTTOM_BAR_HEIGHT = 39
 
@@ -77,7 +77,7 @@ def _get_window_by_child_pid(pid):
     winpid_trees = []
     for winpid in winpids:
         cmd = 'pstree -pl {}'.format(winpid)
-        o, _, _ = ku.run_cmd(cmd)
+        o, _, _ = run_cmd(cmd)
         if '({})'.format(pid) in o:
             winpid_trees.append((winpid, o))
 
