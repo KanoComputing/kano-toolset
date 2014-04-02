@@ -11,7 +11,7 @@ import time
 
 from kano.utils import run_cmd
 
-BOTTOM_BAR_HEIGHT = 39
+BOTTOM_BAR_HEIGHT = 44
 
 
 # Get property needs to run through a loop in case the
