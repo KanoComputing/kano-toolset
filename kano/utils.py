@@ -147,9 +147,11 @@ def get_home_by_username(username):
     return pwd.getpwnam(username).pw_dir
 
 
-def get_device_id():
+def get_cpu_id():
     cpuinfo_file = '/proc/cpuinfo'
     lines = read_file_contents_as_lines(cpuinfo_file)
+    if not lines:
+        return
 
     for l in lines:
         parts = [p.strip() for p in l.split(':')]
