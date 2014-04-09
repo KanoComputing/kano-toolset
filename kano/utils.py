@@ -14,6 +14,7 @@ import shutil
 import datetime
 import getpass
 import pwd
+import json
 
 
 def run_cmd(cmd):
@@ -168,3 +169,16 @@ def get_mac_address():
     mac_addr_str = mac_addr.upper()
     if len(mac_addr_str) == 17:
         return mac_addr_str
+
+
+def read_json(filepath, silent=True):
+    try:
+        return json.loads(read_file_contents(filepath))
+    except Exception:
+        if not silent:
+            raise
+
+
+def write_json(filepath, data):
+    with open(filepath, 'w') as outfile:
+        json.dump(data, outfile, indent=2, sort_keys=True)
