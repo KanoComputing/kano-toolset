@@ -182,3 +182,11 @@ def read_json(filepath, silent=True):
 def write_json(filepath, data):
     with open(filepath, 'w') as outfile:
         json.dump(data, outfile, indent=2, sort_keys=True)
+
+
+def is_number(str):
+    try:
+        float(str)
+        return True
+    except ValueError:
+        return False
