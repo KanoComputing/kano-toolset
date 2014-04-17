@@ -15,6 +15,7 @@ import datetime
 import getpass
 import pwd
 import json
+import requests
 
 
 def run_cmd(cmd):
@@ -53,6 +54,12 @@ def read_file_contents(path):
     if os.path.exists(path):
         with open(path) as infile:
             return infile.read().strip()
+
+
+def write_file_contents(path, data):
+    if os.path.exists(path):
+        with open(path, 'w') as outfile:
+            outfile.write(data)
 
 
 def read_file_contents_as_lines(path):
@@ -190,3 +197,24 @@ def is_number(str):
         return True
     except ValueError:
         return False
+
+
+def uniqify_list(seq):
+    # Order preserving
+    seen = set()
+    return [x for x in seq if x not in seen and not seen.add(x)]
+
+
+def download_url(url, file):
+    try:
+        with open(file, 'wb') as handle:
+            request = requests.get(url, stream=True)
+            if not request.ok:
+                return False, request.text
+            for block in request.iter_content(1024):
+                if not block:
+                    break
+                handle.write(block)
+        return True, None
+    except Exception as e:
+        return False, str(e)
