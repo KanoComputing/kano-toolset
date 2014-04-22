@@ -15,7 +15,6 @@ import datetime
 import getpass
 import pwd
 import json
-import requests
 
 
 def run_cmd(cmd):
@@ -68,27 +67,6 @@ def read_file_contents_as_lines(path):
             content = infile.readlines()
             lines = [line.strip() for line in content]
             return lines
-
-
-def get_dpkg_dict():
-    apps_ok = dict()
-    apps_other = dict()
-
-    cmd = 'dpkg -l'
-    o, _, _ = run_cmd(cmd)
-    lines = o.splitlines()
-    for l in lines[5:]:
-        parts = l.split()
-        state = parts[0]
-        name = parts[1]
-        version = parts[2]
-
-        if state == 'ii':
-            apps_ok[name] = version
-        else:
-            apps_other[name] = version
-
-    return apps_ok, apps_other
 
 
 def delete_dir(directory):
@@ -206,6 +184,7 @@ def uniqify_list(seq):
 
 
 def download_url(url, file):
+    import requests
     try:
         with open(file, 'wb') as handle:
             request = requests.get(url, stream=True)
