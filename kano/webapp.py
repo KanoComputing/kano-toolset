@@ -30,6 +30,7 @@ class WebApp(object):
     _centered = False
     _maximized = False
     _decoration = True
+    _taskbar = True
 
     _zenity = None
 
@@ -77,6 +78,9 @@ class WebApp(object):
         self._win = win = gtk.Window(gtk.WINDOW_TOPLEVEL)
         win.set_title(self._title)
         win.connect("destroy", gtk.main_quit)
+
+        if self._taskbar is False:
+		    gtk.Window.set_skip_taskbar_hint(win, True)
 
         zin.write("70\n")
 
