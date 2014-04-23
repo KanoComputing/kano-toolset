@@ -380,9 +380,14 @@ def wpa_conf(essid, psk, confile):
     f.write(wpa_conf)
     f.close()
 
-
-def connect(iface, essid, encrypt='off', seckey=None):
+def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     '''
+    Attempts a wireless association with provided parameters.
+
+    If wpa_custom_file is provided, it will point to a wpa_supplication configuration file.
+    Essid, encrypt and seckey should be empty, and all parameters will be
+    delegated to the WPA daemon with this configuration file.
+
     encrypt can either be "off", "wep" or "wpa"
     in the latter 2 cases, seckey should be the encryption key
     of the wireless network AP.
@@ -405,6 +410,9 @@ def connect(iface, essid, encrypt='off', seckey=None):
     except:
         pass
 
+    #
+    # Set the ESSID of the wireless network to associate
+    #
     escaped_essid = essid.replace('\'', '\\\'')
     escaped_essid = escaped_essid.replace('\"', '\\\"')
 
@@ -413,7 +421,15 @@ def connect(iface, essid, encrypt='off', seckey=None):
     execute("iwconfig %s essid \"%s\"" % (iface, escaped_essid))
     execute("ifconfig %s up" % iface)
 
-    if encrypt == 'wep':
+    if wpa_custom_file:
+        syslog.syslog("Starting wpa_supplicant with custom config: %s" % wpa_custom_file)
+        try:
+            # wpa_supplicant might complain even if it goes ahead doing its job
+            execute("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
+        except:
+            pass
+
+    elif encrypt == 'wep':
         # WEP encryption keys have to be either 5, 13 or 58 ASCII chars in length (40/104/232 bits)
         # plus 24 bits for IV giving 64,128,256-bit encryption modes
         if len(seckey) not in (5, 13, 58):
@@ -464,8 +480,8 @@ class KwifiCache:
     def __init__(self, cache_file='/etc/kwifiprompt-cache.conf'):
         self.cache_file = cache_file
 
-    def save(self, essid, encryption, enckey):
-        return self._save_cache_(essid, encryption, enckey)
+    def save(self, essid, encryption, enckey, wpaconf=None):
+        return self._save_cache_(essid, encryption, enckey, wpaconf)
 
     def empty(self):
         try:
@@ -485,11 +501,12 @@ class KwifiCache:
     def get_latest(self):
         return self._get_cache_()
 
-    def _save_cache_(self, essid, encryption, enckey):
-        wdata = json.dumps({'essid': essid, 'encryption': encryption, 'enckey': enckey},
+    def _save_cache_(self, essid, encryption, enckey, wpaconf):
+        wdata = json.dumps({'essid': essid, 'encryption': encryption, 'enckey': enckey, 'conf': wpaconf},
                            sort_keys=True, indent=4, separators=(',', ': '))
         with open(self.cache_file, 'w') as f:
             f.write(wdata)
+            f.write('\n')
         return True
 
     def _get_cache_(self):
