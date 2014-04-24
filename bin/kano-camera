@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# kano-camera
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This script toggles the PiCamera functionality on and off 
+#
+
+# Print help
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    echo "This script toggles the camera on and off."
+    echo "The setting (start_x) can be found in /boot/config.txt"
+    echo "Usage: kano-camera"
+    echo ""
+    echo " -h, --help    Show this help message and exit"
+    echo " -s, --status  Print current status of the camera"
+    exit 0
+fi
+# Status parameter
+if [ "$1" = "-s" ] || [ "$1" = "--status" ]; then
+    if grep -q "start_x=1" /boot/config.txt; then
+        echo "PiCamera is currently enabled"
+    else
+        echo "PiCamera is currently disabled"
+    fi
+    exit 0
+fi
+# Unknown option
+if [ "$1" ]; then
+    echo "Unknown option: please type kano-camera -h for help"
+    exit 0
+fi
+
+# Check for root priviledges.
+if [ `id -u` -ne 0 ]; then
+    echo "Error: kano-camera must be executed with root privileges" 1>&2
+    exit 1
+fi
+
+# Turn camera off
+if grep -q "start_x=1" /boot/config.txt; then
+    echo "Toggling PiCamera off [reboot needed]"
+    sed -i "s/start_x=1/start_x=0/g" /boot/config.txt
+    exit 0
+# Turn camera on
+elif grep -q "start_x=0" /boot/config.txt; then
+    echo "Toggling PiCamera on [reboot needed]"
+    sed -i "s/start_x=0/start_x=1/g" /boot/config.txt
+    exit 0
+# Camera setting not detected, add it to config file
+else
+    echo "Toggling PiCamera on [reboot needed]"
+    echo "# Toggles PiCamera on(1) and off(0)" >> /boot/config.txt
+    echo "start_x=1" >> /boot/config.txt
+    exit 0
+fi
