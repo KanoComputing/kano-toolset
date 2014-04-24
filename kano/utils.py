@@ -183,10 +183,10 @@ def uniqify_list(seq):
     return [x for x in seq if x not in seen and not seen.add(x)]
 
 
-def download_url(url, file):
+def download_url(url, file_path):
     import requests
     try:
-        with open(file, 'wb') as handle:
+        with open(file_path, 'wb') as handle:
             request = requests.get(url, stream=True)
             if not request.ok:
                 return False, request.text
