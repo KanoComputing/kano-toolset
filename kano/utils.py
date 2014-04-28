@@ -167,6 +167,10 @@ def read_json(filepath, silent=True):
 def write_json(filepath, data):
     with open(filepath, 'w') as outfile:
         json.dump(data, outfile, indent=2, sort_keys=True)
+    _, _, rc = run_cmd('which underscore')
+    if rc == 0:
+        cmd = 'underscore print -i {filepath} -o {filepath}'.format(filepath=filepath)
+        run_cmd(cmd)
 
 
 def is_number(str):
