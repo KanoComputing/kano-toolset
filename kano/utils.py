@@ -197,3 +197,15 @@ def download_url(url, file_path):
         return True, None
     except Exception as e:
         return False, str(e)
+
+
+def get_ip_location():
+    import requests
+    try:
+        r = requests.get('http://www.telize.com/geoip')
+        if r.ok:
+            return r.ok, None, r.json()
+        else:
+            return r.ok, r.text, None
+    except Exception:
+        return False, 'Connection error', None
