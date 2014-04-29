@@ -18,7 +18,7 @@ class Launcher(WebApp):
         self._index = "http://world.kano.me"
         self._title = "Kano World"
 
-        self._decoration = False
+        self._decoration = True
         self._maximized = True
 
 launcher = Launcher()
