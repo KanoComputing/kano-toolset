@@ -164,9 +164,14 @@ def read_json(filepath, silent=True):
             raise
 
 
-def write_json(filepath, data):
+def write_json(filepath, data, prettyprint=False):
     with open(filepath, 'w') as outfile:
         json.dump(data, outfile, indent=2, sort_keys=True)
+    if prettyprint:
+        _, _, rc = run_cmd('which underscore')
+        if rc == 0:
+            cmd = 'underscore print -i {filepath} -o {filepath}'.format(filepath=filepath)
+            run_cmd(cmd)
 
 
 def is_number(str):
@@ -183,10 +188,10 @@ def uniqify_list(seq):
     return [x for x in seq if x not in seen and not seen.add(x)]
 
 
-def download_url(url, file):
+def download_url(url, file_path):
     import requests
     try:
-        with open(file, 'wb') as handle:
+        with open(file_path, 'wb') as handle:
             request = requests.get(url, stream=True)
             if not request.ok:
                 return False, request.text
@@ -197,3 +202,15 @@ def download_url(url, file):
         return True, None
     except Exception as e:
         return False, str(e)
+
+
+def get_ip_location():
+    import requests
+    try:
+        r = requests.get('http://www.telize.com/geoip')
+        if r.ok:
+            return r.ok, None, r.json()
+        else:
+            return r.ok, r.text, None
+    except Exception:
+        return False, 'Connection error', None
