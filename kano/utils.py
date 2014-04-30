@@ -56,9 +56,8 @@ def read_file_contents(path):
 
 
 def write_file_contents(path, data):
-    if os.path.exists(path):
-        with open(path, 'w') as outfile:
-            outfile.write(data)
+    with open(path, 'w') as outfile:
+        outfile.write(data)
 
 
 def read_file_contents_as_lines(path):
