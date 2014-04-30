@@ -26,7 +26,10 @@ email = sys.argv[1]
 entryName = "entry.1313297301"
 name = sys.argv[2]
 entryId = "entry.812659153"
-id = sys.argv[3].split(":")[1]
+id_split = sys.argv[3].split(":")
+if len(id_split) == 1:
+    sys.exit('arg[3] cannot be split!')
+id = id_split[1]
 
 info = {entryEmail: email, entryName: name, entryId: id}
 
