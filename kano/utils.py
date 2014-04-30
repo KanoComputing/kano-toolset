@@ -204,13 +204,20 @@ def download_url(url, file_path):
         return False, str(e)
 
 
-def get_ip_location():
+def requests_get_json(url, params=None):
     import requests
     try:
-        r = requests.get('http://www.telize.com/geoip')
+        r = requests.get(url, params=params)
         if r.ok:
             return r.ok, None, r.json()
         else:
             return r.ok, r.text, None
-    except Exception:
-        return False, 'Connection error', None
+    except Exception as e:
+        return False, str(e), None
+
+
+def is_installed(program):
+    _, _, rc = run_cmd('which {}'.format(program))
+    return rc == 0
+
+
