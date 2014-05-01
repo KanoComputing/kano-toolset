@@ -220,3 +220,6 @@ def is_installed(program):
     return rc == 0
 
 
+def list_dir(dir):
+    if os.path.exists(dir):
+        return os.listdir(dir)
