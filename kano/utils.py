@@ -223,3 +223,5 @@ def is_installed(program):
 def list_dir(dir):
     if os.path.exists(dir):
         return os.listdir(dir)
+    return list()
+
