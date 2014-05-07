@@ -163,9 +163,9 @@ def read_json(filepath, silent=True):
             raise
 
 
-def write_json(filepath, data, prettyprint=False):
+def write_json(filepath, data, prettyprint=False, sort_keys=True):
     with open(filepath, 'w') as outfile:
-        json.dump(data, outfile, indent=2, sort_keys=True)
+        json.dump(data, outfile, indent=2, sort_keys=sort_keys)
     if prettyprint:
         _, _, rc = run_cmd('which underscore')
         if rc == 0:
