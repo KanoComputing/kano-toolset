@@ -8,7 +8,10 @@
 # Launcher app for kano world
 #
 
+import os
+import sys
 from kano.webapp import WebApp
+from kano.network import is_internet
 
 app_name = 'kano-world-launcher'
 
@@ -21,5 +24,10 @@ class Launcher(WebApp):
         self._decoration = True
         self._maximized = True
 
+# Check internet status
+if not is_internet():
+    os.system('sudo /usr/bin/kano-settings 5')
+    sys.exit()
+    
 launcher = Launcher()
 launcher.run()
