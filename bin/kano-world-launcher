@@ -12,13 +12,17 @@ import os
 import sys
 from kano.webapp import WebApp
 from kano.network import is_internet
+from kano.world.functions import is_registered, get_token
 
 app_name = 'kano-world-launcher'
 
 
 class Launcher(WebApp):
     def __init__(self):
-        self._index = "http://world.kano.me"
+        url = "http://world.kano.me"
+        if is_registered:
+            url = url + '/%s' % get_token()
+        self._index = url
         self._title = "Kano World"
 
         self._decoration = True
@@ -28,6 +32,6 @@ class Launcher(WebApp):
 if not is_internet():
     os.system('sudo /usr/bin/kano-settings 5')
     sys.exit()
-    
+
 launcher = Launcher()
 launcher.run()
