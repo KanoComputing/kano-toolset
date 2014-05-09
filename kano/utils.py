@@ -14,6 +14,7 @@ import shutil
 import datetime
 import getpass
 import pwd
+import grp
 import json
 
 
@@ -224,4 +225,16 @@ def list_dir(dir):
     if os.path.exists(dir):
         return os.listdir(dir)
     return list()
+
+
+def chown_path(path, user=None, group=None):
+    user_unsudoed = get_user_unsudoed()
+    if not user:
+        user = user_unsudoed
+    if not group:
+        group = user_unsudoed
+    uid = pwd.getpwnam(user).pw_uid
+    gid = grp.getgrnam(group).gr_gid
+    os.chown(path, uid, gid)
+
 
