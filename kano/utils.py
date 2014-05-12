@@ -28,6 +28,10 @@ def run_cmd(cmd):
     return stdout, stderr, returncode
 
 
+def run_bg(cmd):
+    subprocess.Popen(cmd, shell=True)
+
+
 def run_term_on_error(cmd):
     o, e, rc = run_cmd(cmd)
     if e:
