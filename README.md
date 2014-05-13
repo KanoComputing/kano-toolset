@@ -2,10 +2,6 @@
 
 Collection of utilities
 
-## email-sender
-
-Python script to send user email, name and RPi id to a Google form
-
 ## kano-launcher
 
 Launches the app passed as an argument
