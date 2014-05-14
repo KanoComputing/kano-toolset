@@ -51,7 +51,7 @@ case $1 in
 	echo $tzupdated | logger -t tzupdate -i
 
 	# set time from a network NTP server
-	dated=`/usr/bin/rdate -ncv $(cat /etc/timeserver.conf) 2>&1`
+	dated=`/usr/bin/rdate -cv $(cat /etc/timeserver.conf) 2>&1`
 	if [ "$?" -eq 0 ]; then
 	  echo "SUCCESS: $dated" > /var/log/rdate.log
 	else
