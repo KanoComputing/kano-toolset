@@ -22,7 +22,7 @@ rc=255
 lnketh0=$?
 ifplugstatus wlan0 > /dev/null 2>&1
 lnkwlan0=$?
-if [ "$lnkwlan0" != "2" ] || [ "$lnkwlan0" != "2" ]; then
+if [ "$lnketh0" != "2" ] || [ "$lnkwlan0" != "2" ]; then
     exit 3
 fi
 
