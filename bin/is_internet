@@ -23,7 +23,7 @@ ifplugstatus eth0 > /dev/null 2>&1
 lnketh0=$?
 ifplugstatus wlan0 > /dev/null 2>&1
 lnkwlan0=$?
-if [ "$lnketh0" != "2" ] || [ "$lnkwlan0" != "2" ]; then
+if [ "$lnketh0" != "2" ] && [ "$lnkwlan0" != "2" ]; then
     exit 3
 fi
 
