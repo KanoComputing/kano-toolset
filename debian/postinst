@@ -14,6 +14,7 @@ case "$1" in
         # Create custom sudoers file
         echo "%sudo   ALL=(root) NOPASSWD: /usr/bin/kano-launcher" > $TMP_FILE
         echo "%sudo   ALL=(root) NOPASSWD: /usr/bin/is_internet" >> $TMP_FILE
+        echo "%sudo   ALL=(root) NOPASSWD: /usr/sbin/ifplugstatus" >> $TMP_FILE
 
         # The owner and group for the sudoers file must both be 0
         chown root:root $TMP_FILE
