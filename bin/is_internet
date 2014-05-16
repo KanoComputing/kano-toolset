@@ -19,9 +19,9 @@ rc=255
 # Kanux provides networking through either Ethernet or Wireless
 # Before trying to reach the internet we make sure that one of this devices
 # is hard-wired (ethernet) or associated (wireless).
-sudo ifplugstatus eth0 > /dev/null 2>&1
+ifplugstatus eth0 > /dev/null 2>&1
 lnketh0=$?
-sudo ifplugstatus wlan0 > /dev/null 2>&1
+ifplugstatus wlan0 > /dev/null 2>&1
 lnkwlan0=$?
 if [ "$lnketh0" != "2" ] && [ "$lnkwlan0" != "2" ]; then
     exit 3
