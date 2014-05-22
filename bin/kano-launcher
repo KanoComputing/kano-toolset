@@ -27,8 +27,6 @@ case "$2" in
         kano-window-tool -t "Make Video" -dno -w0.8 -h0.6 -c -f ;;
     make-snake)
         kano-window-tool -t "Make Snake" -dno -m -f ;;
-    extras)
-        kano-window-tool -t "extras" -c -f ;;
     feedback)
         kano-window-tool -t "Kano Feedback" -dno -c -f ;;
     settings)
