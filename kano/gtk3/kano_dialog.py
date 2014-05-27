@@ -137,7 +137,7 @@ def get_path():
     # local path
     styles_local = os.path.join(dir_path, 'styles/dialog.css')
     # bin path
-    styles_usr = '/usr/lib/python2.7/dist-packages/styles/dialog.css'
+    styles_usr = '/usr/share/kano/CSS/dialog.css'
     if os.path.exists(styles_local):
         styles_dir = styles_local
         return styles_dir
