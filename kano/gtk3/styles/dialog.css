@@ -11,6 +11,9 @@
 @define-color subheading_color #6e6e6e;
 @define-color button_color #7cc640;
 
+* {
+    -GtkWidget-focus-line-width: 0px;
+}
 
 /* This is the border colour of the dialog box.
    We draw the border by putting an event box on top of the window */

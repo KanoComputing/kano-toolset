@@ -54,10 +54,10 @@ class KanoDialog():
 
         for button_name, return_value in self.button_dict.iteritems():
             button = Gtk.Button(button_name)
+            attach_cursor_events(button)
             button.connect('button-press-event', self.exit_dialog, return_value)
             button.connect('key-press-event', self.exit_dialog, return_value)
             button.get_style_context().add_class("green_button")
-            attach_cursor_events(button)
             self.buttons.append(button)
             button_box.pack_end(button, False, False, 10)
 
@@ -125,6 +125,12 @@ def arrow_cursor(button, event):
     button.get_root_window().set_cursor(cursor)
 
 
+def attach_cursor_events(button):
+    button.connect('enter-notify-event', hand_cursor)
+    button.connect('leave-notify-event', arrow_cursor)
+    button.connect('button-press-event', arrow_cursor)
+
+
 def get_path():
     # setting up directories
     dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -140,12 +146,6 @@ def get_path():
         return styles_dir
     else:
         raise Exception('Neither local nor usr styles found!')
-
-
-def attach_cursor_events(button):
-    button.connect('enter-notify-event', hand_cursor)
-    button.connect('leave-notify-event', arrow_cursor)
-    button.connect('button-press-event', arrow_cursor)
 
 
 # TEST DIALOG
