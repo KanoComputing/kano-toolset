@@ -1,0 +1,64 @@
+/*
+
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This controls the dialog style
+
+*/
+
+@define-color title_color #323232;
+@define-color subheading_color #6e6e6e;
+@define-color button_color #7cc640;
+
+
+/* This is the border colour of the dialog box.
+   We draw the border by putting an event box on top of the window */
+GtkDialog {
+    background: #e7e7e7;
+}
+
+/* The title of the current level */
+.title {
+    color: @title_color;
+    padding-top: 25px;
+    font: Bariol Bold 16;
+}
+
+/* Description of current project */
+.description {
+    color: @subheading_color;
+    padding-bottom: 18px;
+    font: Bariol 14;
+}
+
+.alert_title {
+    font: Bariol Bold 20px;
+    color: @title_color;
+}
+
+.alert_description {
+    font: Bariol 14px;
+    color: @subheading_color;
+}
+
+.white {
+    color: #ffffff;
+    background: #ffffff;
+}
+
+.green_button {
+    background: @button_color;
+    border-radius: 3px;
+    border-color: transparent;
+    padding: 10px 20px 10px 20px;
+}
+
+.green_button GtkLabel {
+    color: #ffffff;
+    font: Bariol Bold 13;
+}
+
+.green_button:insensitive {
+    background: #dddddd;
+}
