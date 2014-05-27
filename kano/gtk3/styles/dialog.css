@@ -32,16 +32,6 @@ GtkDialog {
     font: Bariol 14;
 }
 
-.alert_title {
-    font: Bariol Bold 20px;
-    color: @title_color;
-}
-
-.alert_description {
-    font: Bariol 14px;
-    color: @subheading_color;
-}
-
 .white {
     color: #ffffff;
     background: #ffffff;

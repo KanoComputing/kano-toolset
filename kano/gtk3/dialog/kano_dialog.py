@@ -24,6 +24,13 @@ class KanoDialog():
         self.launch_dialog()
 
     def launch_dialog(self, widget=None, event=None):
+        cssProvider = Gtk.CssProvider()
+        dir_path = get_path()
+        cssProvider.load_from_path(dir_path)
+        screen = Gdk.Screen.get_default()
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
         self.dialog = Gtk.Dialog()
         self.dialog.set_decorated(False)
         self.dialog.set_size_request(300, 100)
@@ -143,4 +150,5 @@ def attach_cursor_events(button):
 
 # TEST DIALOG
 if __name__ == '__main__':
-    KanoDialog("Here is a test dialog", "What do you think?")
+    kdialog = KanoDialog("Here is a test dialog", "What do you think?")
+    kdialog.run()
