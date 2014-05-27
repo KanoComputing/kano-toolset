@@ -14,23 +14,16 @@ import os
 
 
 class KanoDialog():
-
-    def __init__(self, title_text="", heading_text="", callback=None, widget=None):
+    # button_dict includes the button text and button return values
+    def __init__(self, title_text="", heading_text="", button_dict=None, widget=None):
         self.title_text = title_text
         self.heading_text = heading_text
-        self.callback = callback
         self.widget = widget
+        self.button_dict = button_dict
+        self.returnvalue = 0
         self.launch_dialog()
 
     def launch_dialog(self, widget=None, event=None):
-
-        cssProvider = Gtk.CssProvider()
-        dir_path = get_path()
-        cssProvider.load_from_path(dir_path)
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         self.dialog = Gtk.Dialog()
         self.dialog.set_decorated(False)
         self.dialog.set_size_request(300, 100)
@@ -44,14 +37,23 @@ class KanoDialog():
         self.dialog.add(background)
         self.title = Heading(self.title_text, self.heading_text)
         content_area.pack_start(self.title.container, False, False, 0)
-        self.dialog_button = Gtk.Button("EXIT")
-        self.dialog_button.get_style_context().add_class("green_button")
-        attach_cursor_events(self.dialog_button)
-        self.dialog_button.connect("button_press_event", self.exit_dialog)
-        self.dialog_button.connect('key-press-event', self.exit_dialog)
-
+        self.buttons = []
         button_box = Gtk.Box()
-        button_box.add(self.dialog_button)
+
+        if self.button_dict is None:
+            button_name = "OK"
+            return_value = 0
+            self.button_dict = {button_name: return_value}
+
+        for button_name, return_value in self.button_dict.iteritems():
+            button = Gtk.Button(button_name)
+            button.connect('button-press-event', self.exit_dialog, return_value)
+            button.connect('key-press-event', self.exit_dialog, return_value)
+            button.get_style_context().add_class("green_button")
+            attach_cursor_events(button)
+            self.buttons.append(button)
+            button_box.pack_end(button, False, False, 10)
+
         alignment = Gtk.Alignment(xscale=0, yscale=1, xalign=0.5, yalign=1)
         alignment.add(button_box)
 
@@ -59,27 +61,23 @@ class KanoDialog():
             content_area.pack_start(self.widget, False, False, 0)
 
         content_area.pack_start(alignment, False, False, 10)
-        self.dialog.show_all()
-        self.dialog.run()
 
-    def exit_dialog(self, widget, event):
+    def exit_dialog(self, widget, event, return_value):
         if not hasattr(event, 'keyval') or event.keyval == 65293:
             self.dialog.destroy()
             arrow_cursor(self.dialog, None)
-            if self.callback is not None:
-                self.callback()
+            self.returnvalue = return_value
+            return return_value
 
-    def set_callback(self, callback):
-        self.callback = callback
-        self.dialog_button.connect("button_press_event", self.exit_dialog)
+    def run(self):
+        self.dialog.show_all()
+        self.dialog.run()
+        return self.returnvalue
 
     def set_text(self, title_text, heading_text):
         self.title_text = title_text
         self.heading_text = heading_text
         self.title.set_text(title_text, heading_text)
-
-    def set_button_text(self, text):
-        self.dialog_button.set_label(text)
 
 
 class Heading():
