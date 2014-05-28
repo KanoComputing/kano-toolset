@@ -63,6 +63,9 @@ class WebApp(object):
         if hasattr(self.__class__, "_focus_out"):
             view.connect('focus-out-event', self._focus_out)
 
+        if hasattr(self.__class__, "_download"):
+            view.connect('download-requested', self._download)
+
         zin.write("40\n")
 
         splitter = gtk.VPaned()
