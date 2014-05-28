@@ -16,13 +16,11 @@ import sys
 
 class GreenButton(Gtk.Button):
     def __init__(self, text=""):
-        print "helllooooooo"
         cssProvider = Gtk.CssProvider()
         button_css = os.path.join(common_css_dir, 'buttons.css')
         if not os.path.exists(button_css):
             sys.exit('CSS file missing!')
         cssProvider.load_from_path(button_css)
-        print button_css
 
         screen = Gdk.Screen.get_default()
         styleContext = Gtk.StyleContext()
