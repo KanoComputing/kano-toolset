@@ -19,7 +19,6 @@
 @define-color active_writing #323232;
 @define-color active_border #ababab;
 @define-color hover_color #eeeeee;
-@define-color top_bar_color #e1e1e1;
 
 /* All */
 * {
@@ -163,20 +162,6 @@ GtkScrolledWindow {
     font: Bariol 14;
 }
 
-/* The bar at the top that mimics the window bar */
-.top_bar_container {
-    background: @top_bar_color;
-}
-
-.top_bar_button {
-    background: @top_bar_color;
-}
-
-/* Header in top bar (title of window) */
-.top_bar_title {
-    color: #222222;
-    font: Bariol Bold 13;
-}
 
 /* Menu - relevent for settings and extras */
 

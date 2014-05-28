@@ -10,12 +10,14 @@ import os
 dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # media dir
-css_local = os.path.join(dir_path, 'CSS')
-css_usr = '/usr/share/kano/CSS'
+media_local = os.path.join(dir_path, 'media')
+media_usr = '/usr/share/kano/media'
 
-if os.path.exists(css_local):
-    common_css_dir = css_local
-elif os.path.exists(css_usr):
-    common_css_dir = css_usr
+if os.path.exists(media_local):
+    common_media_dir = media_local
+elif os.path.exists(media_usr):
+    common_media_dir = media_usr
 else:
-    raise Exception('Neither local nor usr css dir found!')
+    raise Exception('Neither local nor usr media dir found!')
+
+common_css_dir = os.path.join(common_media_dir, 'CSS')
