@@ -1,0 +1,211 @@
+/*
+
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This controls the styles
+
+*/
+
+/* Define colours */
+
+@define-color kano_green #7cc640;
+@define-color kano_orange #ff842A;
+
+@define-color title_color #323232;
+@define-color subheading_color #6e6e6e;
+@define-color inactive_writing #cdcdcd;
+@define-color inactive_border #e1e1e1;
+@define-color active_writing #323232;
+@define-color active_border #ababab;
+@define-color hover_color #eeeeee;
+@define-color top_bar_color #e1e1e1;
+
+/* All */
+* {
+    -GtkButton-inner-border: 0;
+    -GtkEntry-inner-border: 0;
+    -GtkComboBox-inner-border: 0;
+    -GtkMenuToolButton-inner-border: 0;
+    -GtkTreeMenu-inner-border: 0;
+    -unico-focus-border-color: transparent; /* Removes the annoying red outline on active buttons*/
+    engine: none; /* Turns off annoying borders */
+    border-width: 0px;
+    -GtkScrolledWindow-scrollbar-spacing: 0;
+    -GtkWidget-focus-line-width: 0px;
+    -GtkTreeView-vertical-separator: 0;
+    -GtkWidget-separator-width: 0;
+    -GtkWidget-separator-height: 0;
+}
+
+/* This is to remove padding */
+GtkBox GtkEventBox,
+GtkBox GtkFixed,
+GtkBox GtkGrid,
+GtkEventBox GtkImage,
+GtkGrid GtkEventBox,
+GtkFixed GtkImage,
+GtkFixed GtkEventBox,
+GtkWindow GtkImage,
+GtkWindow GtkGrid,
+GtkWindow GtkBox,
+GtkWindow GtkEventBox {
+    padding: 0;
+}
+
+GtkWindow {
+    color: #ffffff;
+    background: #ffffff;
+}
+
+GtkEntry {
+    border-color: @active_border;
+    color: @active_writing;
+    border-style: solid;
+    border-width: 2px;
+    border-radius:3px;
+    padding: 10px;
+    font: Bariol 13;
+}
+GtkEntry:insensitive {
+    border-color: @inactive_border;
+    color: @inactive_writing;
+    border-style: solid;
+    border-width: 2px;
+    border-radius:3px;
+}
+
+GtkImage {
+    border-style:none;
+    background: transparent;
+}
+
+GtkImage:hover {
+    border-style: none;
+    background: transparent;
+}
+
+GtkComboBox {
+    /* font effect arrow size */
+    font: Bariol 5;
+}
+
+GtkComboBox GtkButton {
+    border-color: @active_border;
+    border-style: solid;
+    border-width: 2px;
+    border-radius:3px;
+    padding: 10px;
+    background: #ffffff;
+}
+
+GtkComboBox GtkCellView {
+    color: @active_writing;
+    font: Bariol 14;
+}
+
+GtkComboBox .menu {
+    border-style: solid;
+    border-color: @active_border;
+    border-width: 2px;
+    border-radius: 3px;
+}
+
+GtkComboBox .separator {
+    /* This removes lines in combotextbox*/
+    -GtkWidget-wide-separators: true;
+}
+
+GtkButton {
+    background:transparent;
+    border-style: none; /* Remove grey border on outside */
+    border-width:0px;
+    border-color: transparent;
+}
+
+GtkCheckButton,
+GtkRadioButton {
+    border-style: solid;
+    border-color: @active_border;
+    border-width: 2px;
+    font: Bariol 13;
+    background: #ffffff;
+}
+
+GtkCheckButton:active,
+GtkRadioButton:active {
+    color: @kano_green;
+}
+
+GtkCheckButton:hover {
+    background: transparent;
+}
+
+GtkRadioButton
+GtkLabel{
+    color: @active_writing;
+}
+
+GtkScrolledWindow {
+    padding: 10px;
+}
+
+/* The title of the current level*/
+.title {
+    color: @title_color;
+    padding-top:25px;
+    font: Bariol Bold 16;
+}
+/* Description of current project */
+.description {
+    color: @subheading_color;
+    padding-bottom: 18px;
+    font: Bariol 14;
+}
+
+/* The bar at the top that mimics the window bar */
+.top_bar_container {
+    background: @top_bar_color;
+}
+
+.top_bar_button {
+    background: @top_bar_color;
+}
+
+/* Header in top bar (title of window) */
+.top_bar_title {
+    color: #222222;
+    font: Bariol Bold 13;
+}
+
+/* Menu - relevent for settings and extras */
+
+/* Used for the stripy grid */
+.appgrid_grey {
+    background: @top_bar_color;
+}
+
+/* Title of menu button on default intro screen (Keyboard, Wfi etc) */
+.menu_intro_label {
+    color: @title_color;
+    font: Bariol Bold 18;
+}
+/* Info about the settings of the curet project */
+.menu_custom_label {
+    color: @subheading_color;
+    font: Bariol 12;
+}
+
+.orange_button {
+    background: #ffffff;
+}
+
+.orange_button GtkLabel {
+    color: @kano_orange;
+    font: Bariol Bold 13px;
+}
+
+.white {
+    color: #ffffff;
+    background: #ffffff;
+}
