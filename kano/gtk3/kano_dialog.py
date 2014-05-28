@@ -7,6 +7,16 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # This is a custom dialog pop up styled in Gtk 3
+#
+# Example usage:
+# from kano.gtk3 import kano_dialog
+#
+# kdialog = kano_dialog.KanoDialog("title", "description", {"OK": 0,"CANCEL": -1})
+# response = kdialog.run()
+# if response == 0:
+#   print "OK button was clicked"
+# else:
+#   print "CANCEL button was clicked"
 
 
 from gi.repository import Gtk, Gdk
