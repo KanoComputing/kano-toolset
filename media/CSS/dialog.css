@@ -21,3 +21,13 @@ GtkDialog {
     color: #ffffff;
     background: #ffffff;
 }
+
+GtkEntry {
+    border-color: @active_border;
+    color: @active_writing;
+    border-style: solid;
+    border-width: 2px;
+    border-radius:3px;
+    padding: 10px;
+    font: Bariol 13;
+}

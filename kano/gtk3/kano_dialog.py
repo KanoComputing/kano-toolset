@@ -24,17 +24,19 @@ from kano.gtk3.green_button import GreenButton
 from kano.gtk3.heading import Heading
 from kano.paths import common_css_dir
 import os
+import sys
 
 
 class KanoDialog():
     # button_dict includes the button text and button return values
-    def __init__(self, title_text="", heading_text="", button_dict=None, widget=None):
+    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_label=False):
         self.title_text = title_text
-        self.heading_text = heading_text
+        self.description_text = description_text
         self.widget = widget
         self.button_dict = button_dict
         self.returnvalue = 0
         self.launch_dialog()
+        self.has_label = has_label
 
     def launch_dialog(self, widget=None, event=None):
         cssProvider = Gtk.CssProvider()
@@ -46,7 +48,6 @@ class KanoDialog():
 
         self.dialog = Gtk.Dialog()
         self.dialog.set_decorated(False)
-        self.dialog.set_size_request(300, 100)
         self.dialog.set_resizable(False)
         self.dialog.set_border_width(5)
 
@@ -55,7 +56,7 @@ class KanoDialog():
         background.get_style_context().add_class("white")
         content_area.reparent(background)
         self.dialog.add(background)
-        self.title = Heading(self.title_text, self.heading_text)
+        self.title = Heading(self.title_text, self.description_text)
         content_area.pack_start(self.title.container, False, False, 0)
         self.buttons = []
         button_box = Gtk.Box()
@@ -81,22 +82,57 @@ class KanoDialog():
 
     def exit_dialog(self, widget, event, return_value):
         if not hasattr(event, 'keyval') or event.keyval == 65293:
-            self.dialog.destroy()
             self.returnvalue = return_value
-            return return_value
+            # TODO: improve this logic
+            if self.has_label:
+                self.returnvalue = self.widget.get_text()
+            self.dialog.destroy()
+            return self.returnvalue
 
     def run(self):
         self.dialog.show_all()
         self.dialog.run()
         return self.returnvalue
 
-    def set_text(self, title_text, heading_text):
+    def set_text(self, title_text, description_text):
         self.title_text = title_text
-        self.heading_text = heading_text
-        self.title.set_text(title_text, heading_text)
+        self.description_text = description_text
+        self.title.set_text(title_text, description_text)
 
+
+def parse_items(args):
+    widget = None
+    title = ""
+    description = ""
+    has_label = False
+
+    for arg in args:
+        split = arg.split(':')
+        if split[0] == "entry":
+            widget = Gtk.Entry()
+            has_label = True
+            if split[1] == "hidden":
+                widget.set_visibility(False)
+        if split[0] == 'title':
+            title = split[1]
+        if split[0] == 'description':
+            description = split[1]
+
+    return title, description, widget, has_label
+
+
+def main():
+    text = sys.argv[1:]
+    title, description, entry, boolean = parse_items(text)
+    kdialog = KanoDialog(title_text=title, description_text=description, widget=entry, has_label=boolean)
+    response = kdialog.run()
+    # These lines mean we can read the return value in bash
+    print >> sys.stderr
+    print response
 
 # TEST DIALOG
 if __name__ == '__main__':
-    kdialog = KanoDialog("Here is a test dialog", "What do you think?")
-    kdialog.run()
+    if len(sys.argv) == 1:
+        sys.exit('Nothing to display!')
+    main()
+
