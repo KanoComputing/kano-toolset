@@ -7,19 +7,6 @@
 
 */
 
-/* Define colours */
-
-@define-color kano_green #7cc640;
-@define-color kano_orange #ff842A;
-
-@define-color title_color #323232;
-@define-color subheading_color #6e6e6e;
-@define-color inactive_writing #cdcdcd;
-@define-color inactive_border #e1e1e1;
-@define-color active_writing #323232;
-@define-color active_border #ababab;
-@define-color hover_color #eeeeee;
-
 /* All */
 * {
     -GtkButton-inner-border: 0;
@@ -116,9 +103,9 @@ GtkComboBox .separator {
 }
 
 GtkButton {
-    background:transparent;
+    background: transparent;
     border-style: none; /* Remove grey border on outside */
-    border-width:0px;
+    border-width: 0px;
     border-color: transparent;
 }
 
@@ -155,13 +142,13 @@ GtkScrolledWindow {
     padding-top:25px;
     font: Bariol Bold 16;
 }
+
 /* Description of current project */
 .description {
     color: @subheading_color;
     padding-bottom: 18px;
     font: Bariol 14;
 }
-
 
 /* Menu - relevent for settings and extras */
 

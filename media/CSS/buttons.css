@@ -1,8 +1,6 @@
 
 /* Button CSS */
 
-@define-color kano_green #7cc640;
-
 * {
     -unico-focus-border-color: transparent; /* Removes the annoying red outline on active buttons*/
     -GtkWidget-focus-line-width: 0px;

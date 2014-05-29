@@ -16,21 +16,32 @@ import sys
 
 class GreenButton(Gtk.Button):
     def __init__(self, text=""):
-        cssProvider = Gtk.CssProvider()
-        button_css = os.path.join(common_css_dir, 'buttons.css')
-        if not os.path.exists(button_css):
+        button_css = Gtk.CssProvider()
+        css_file = os.path.join(common_css_dir, 'buttons.css')
+        if not os.path.exists(css_file):
             sys.exit('CSS file missing!')
-        cssProvider.load_from_path(button_css)
+        colour_css = Gtk.CssProvider()
+        colour_file = os.path.join(common_css_dir, 'colours.css')
+        if not os.path.exists(colour_file):
+            sys.exit('CSS file missing!')
+        colour_css.load_from_path(colour_file)
+        button_css.load_from_path(css_file)
 
         screen = Gdk.Screen.get_default()
         styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        styleContext.add_provider_for_screen(screen, colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        styleContext.add_provider_for_screen(screen, button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         # Create button
         Gtk.Button.__init__(self)
         self.set_label(text)
         self.get_style_context().add_class("green_button")
+        self.align = None
 
+        cursor.attach_cursor_events(self)
+
+    # Pakcing in a box and within an Alignment
+    def pack_and_align(self):
         # This stops the button resizing to fit the size of it's container
         self.box = Gtk.Box()
         self.box.add(self)
@@ -41,7 +52,6 @@ class GreenButton(Gtk.Button):
         self.align = Gtk.Alignment()
         self.align.add(self.box)
 
-        cursor.attach_cursor_events(self)
-
     def set_padding(self, top, bottom, left, right):
-        self.align.set_padding(top, bottom, left, right)
+        if self.align is not None:
+            self.align.set_padding(top, bottom, left, right)

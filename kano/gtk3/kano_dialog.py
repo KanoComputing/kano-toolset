@@ -23,6 +23,7 @@ from gi.repository import Gtk, Gdk
 from kano.gtk3.green_button import GreenButton
 from kano.gtk3.heading import Heading
 from kano.paths import common_css_dir
+import os
 
 
 class KanoDialog():
@@ -37,7 +38,8 @@ class KanoDialog():
 
     def launch_dialog(self, widget=None, event=None):
         cssProvider = Gtk.CssProvider()
-        cssProvider.load_from_path(common_css_dir + "dialog.css")
+        path = os.path.join(common_css_dir, "dialog.css")
+        cssProvider.load_from_path(path)
         screen = Gdk.Screen.get_default()
         styleContext = Gtk.StyleContext()
         styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -65,8 +67,9 @@ class KanoDialog():
 
         for button_name, return_value in self.button_dict.iteritems():
             button = GreenButton(button_name)
+            button.connect("button-press-event", self.exit_dialog, return_value)
             self.buttons.append(button)
-            button_box.pack_end(button.align, False, False, 10)
+            button_box.pack_end(button, False, False, 10)
 
         alignment = Gtk.Alignment(xscale=0, yscale=1, xalign=0.5, yalign=1)
         alignment.add(button_box)

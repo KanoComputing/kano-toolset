@@ -1,0 +1,20 @@
+/*
+
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This controls the styles
+
+*/
+
+/* Define colours */
+
+@define-color kano_green #7cc640;
+@define-color kano_orange #ff842A;
+@define-color title_color #323232;
+@define-color subheading_color #6e6e6e;
+@define-color inactive_writing #cdcdcd;
+@define-color inactive_border #e1e1e1;
+@define-color active_writing #323232;
+@define-color active_border #ababab;
+@define-color hover_color #eeeeee;
