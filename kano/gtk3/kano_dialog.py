@@ -66,7 +66,7 @@ class KanoDialog():
         self.buttons = []
         button_box = Gtk.Box()
 
-        if self.button_dict is None:
+        if self.button_dict is None or self.button_dict == {}:
             button_name = "OK"
             return_value = 0
             self.button_dict = {button_name: return_value}
@@ -109,18 +109,29 @@ class KanoDialog():
 
 
 def parse_items(args):
+    global radio_returnvalue
+
     widget = None
     title = ""
     description = ""
     has_entry = False
     has_list = False
+    buttons = None
 
     for arg in args:
-        split = arg.split(':')
+        split = arg.split('=')
+        if split[0] == "buttons":
+            buttons = {}
+            for s in split[1:]:
+                button_name = s
+                button_return = s
+                buttons[button_name] = button_return
         if split[0] == "radiolist":
             widget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             has_list = True
             radio = Gtk.RadioButton.new_with_label_from_widget(None, split[1])
+            radio.connect("toggled", on_button_toggled)
+            radio_returnvalue = split[1]
             widget.pack_start(radio, False, False, 5)
             for i in split[2:]:
                 r = Gtk.RadioButton.new_with_label_from_widget(radio, i)
@@ -137,7 +148,7 @@ def parse_items(args):
         if split[0] == 'description':
             description = split[1]
 
-    return title, description, widget, has_entry, has_list
+    return title, description, buttons, widget, has_entry, has_list
 
 
 def on_button_toggled(button):
@@ -150,8 +161,8 @@ def on_button_toggled(button):
 
 def main():
     text = sys.argv[1:]
-    title, description, custom_widget, entry_bool, list_bool = parse_items(text)
-    kdialog = KanoDialog(title_text=title, description_text=description, widget=custom_widget, has_entry=entry_bool, has_list=list_bool)
+    title, description, buttons, custom_widget, entry_bool, list_bool = parse_items(text)
+    kdialog = KanoDialog(title_text=title, description_text=description, button_dict=buttons, widget=custom_widget, has_entry=entry_bool, has_list=list_bool)
     response = kdialog.run()
     # These lines mean we can read the return value in bash
     print >> sys.stderr

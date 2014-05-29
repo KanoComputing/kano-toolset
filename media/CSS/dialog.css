@@ -31,3 +31,27 @@ GtkEntry {
     padding: 10px;
     font: Bariol 13;
 }
+
+
+GtkCheckButton,
+GtkRadioButton {
+    border-style: solid;
+    border-color: @active_border;
+    border-width: 2px;
+    font: Bariol 13;
+    background: #ffffff;
+}
+
+GtkCheckButton:active,
+GtkRadioButton:active {
+    color: @kano_green;
+}
+
+GtkCheckButton:hover {
+    background: transparent;
+}
+
+GtkRadioButton
+GtkLabel{
+    color: @active_writing;
+}
