@@ -1,6 +1,6 @@
 bin /usr
 kano /usr/lib/python2.7/dist-packages
-CSS /usr/share/kano/
+media /usr/share/kano/
 
 js/backend-api.js /usr/share/kano-toolset
 
