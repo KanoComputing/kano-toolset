@@ -1,11 +1,13 @@
-bin /usr
-kano /usr/lib/python2.7/dist-packages
+bin usr
+kano usr/lib/python2.7/dist-packages
 media /usr/share/kano/
 
-js/backend-api.js /usr/share/kano-toolset
+js/backend-api.js usr/share/kano-toolset
 
-uinput/uinput /usr/bin
-uinput/pyinputevent.py /usr/lib/python2.7/dist-packages
-uinput/scancodes.py /usr/lib/python2.7/dist-packages
+uinput/uinput usr/bin
+uinput/pyinputevent.py usr/lib/python2.7/dist-packages
+uinput/scancodes.py usr/lib/python2.7/dist-packages
 
-udhcpc/kano.script /etc/udhcpc
+udhcpc/kano.script etc/udhcpc
+
+bash/logger.sh usr/share/kano-toolset/
