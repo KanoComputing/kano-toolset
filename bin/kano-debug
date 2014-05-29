@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# kano-debug
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+#
+# Enable/disable the debugging mode
+
+CONF="/etc/debug"
+
+# With no arguments, just print the current setting
+if [ -z "$1" ]; then
+    if [ -e "$CONF" ]; then
+        echo "on"
+    else
+        echo "off"
+    fi
+
+    exit 0
+fi
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    echo "Usage: kano-debug [on|off]" 2>&1
+    exit 0
+fi
+
+if [ "$(id -u)" != "0" ]; then
+    echo "ERROR: Must be root to enable the debugging mode" 2>&1
+    exit 1
+fi
+
+if [ "$1" == "on" ] || [ "$1" == "yes" ] || [ "$1" == "true" ] || [ "$1" == "1" ]; then
+    touch $CONF
+    echo "Debugging mode enabled."
+else
+    rm -rf $CONF
+    echo "Debugging mode disabled."
+fi
