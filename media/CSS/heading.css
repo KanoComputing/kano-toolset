@@ -1,0 +1,16 @@
+
+@define-color title_color #323232;
+@define-color subheading_color #6e6e6e;
+
+/* The title of the current level*/
+.title {
+    color: @title_color;
+    padding-top:25px;
+    font: Bariol Bold 16;
+}
+/* Description of current project */
+.description {
+    color: @subheading_color;
+    padding-bottom: 18px;
+    font: Bariol 14;
+}

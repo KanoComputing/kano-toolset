@@ -1,0 +1,57 @@
+/*
+
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This controls the dialog style
+
+*/
+
+* {
+    -GtkWidget-focus-line-width: 0px;
+}
+
+/* This is the border colour of the dialog box.
+   We draw the border by putting an event box on top of the window */
+GtkDialog {
+    background: #e7e7e7;
+}
+
+.white {
+    color: #ffffff;
+    background: #ffffff;
+}
+
+GtkEntry {
+    border-color: @active_border;
+    color: @active_writing;
+    border-style: solid;
+    border-width: 2px;
+    border-radius:3px;
+    padding: 10px;
+    font: Bariol 13;
+}
+
+
+GtkCheckButton,
+GtkRadioButton {
+    border-style: solid;
+    border-color: @active_border;
+    border-width: 2px;
+    font: Bariol 13;
+    background: #ffffff;
+}
+
+GtkCheckButton:active,
+GtkRadioButton:active {
+    color: @kano_green;
+}
+
+GtkCheckButton:hover {
+    background: transparent;
+}
+
+GtkRadioButton
+GtkLabel{
+    color: @active_writing;
+}

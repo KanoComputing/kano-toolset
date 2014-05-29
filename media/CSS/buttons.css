@@ -1,0 +1,28 @@
+
+/* Button CSS */
+
+* {
+    -unico-focus-border-color: transparent; /* Removes the annoying red outline on active buttons*/
+    -GtkWidget-focus-line-width: 0px;
+}
+
+/* The main button that updates the changes made in each level */
+.green_button {
+    background: @kano_green;
+    border-radius: 3px;
+    border-color: transparent;
+    padding: 10px 20px 10px 20px;
+}
+
+.green_button GtkLabel {
+    color: #ffffff;
+    font: Bariol Bold 13;
+}
+
+.green_button:insensitive {
+    background: #dddddd;
+}
+
+.green_button GtkLabel:insensitive {
+    color: #aaaaaa;
+}
