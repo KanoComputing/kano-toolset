@@ -18,6 +18,7 @@ USER_LOGS_DIR = "~/.logs/"
 logging_enabled = False
 log_file = None
 app_name = None
+pid = os.getpid()
 
 
 def enable():
@@ -37,9 +38,12 @@ def disable():
 def set_app_name(name):
     global app_name
     app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
-    print "`" + app_name+"`"
     if log_file != None:
         _init_log_file()
+
+def set_pid(p):
+    global pid
+    pid = p
 
 
 def write(msg, data=None):
@@ -57,7 +61,7 @@ def write(msg, data=None):
         log = data.copy() if data != None else {}
         log["message"] = msg
         log["time"] = time.time()
-        log["pid"] = os.getpid()
+        log["pid"] = pid
         log_file.write("{}\n".format(json.dumps(log)))
 
 

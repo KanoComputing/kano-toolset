@@ -44,7 +44,9 @@ import kano.logger as logger
 # Therefore, python will not check the CONF file again.
 logger.enable()
 
+logger.pid = $$
 logger.set_app_name("$APP_NAME")
+
 logger.write("$1")
 EOF
     fi
