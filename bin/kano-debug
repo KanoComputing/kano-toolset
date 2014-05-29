@@ -12,6 +12,7 @@ import os
 import sys
 import json
 import pydoc
+import datetime
 
 sys.path.insert(0, "..")
 from kano.logger import CONF, SYSTEM_LOGS_DIR, USER_LOGS_DIR
@@ -38,7 +39,11 @@ def show_logs(app=None):
         with open(log, "r") as f:
             for line in f:
                 data = json.loads(line)
-                output += "{} {} {}\n".format(data["time"], data["pid"], \
+
+                dt = datetime.datetime.fromtimestamp(date["time"])
+                time = dt.strftime('%Y-%m-%d %H:%M:%S')
+
+                output += "{} {} {}\n".format(time, data["pid"], \
                                               data["message"])
         output += "\n"
 
