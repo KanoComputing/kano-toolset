@@ -26,19 +26,23 @@ from kano.paths import common_css_dir
 import os
 import sys
 
+radio_returnvalue = None
+
 
 class KanoDialog():
     # button_dict includes the button text and button return values
-    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_label=False):
+    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False):
         self.title_text = title_text
         self.description_text = description_text
         self.widget = widget
         self.button_dict = button_dict
         self.returnvalue = 0
         self.launch_dialog()
-        self.has_label = has_label
+        self.has_entry = has_entry
+        self.has_list = has_list
 
     def launch_dialog(self, widget=None, event=None):
+
         cssProvider = Gtk.CssProvider()
         path = os.path.join(common_css_dir, "dialog.css")
         cssProvider.load_from_path(path)
@@ -84,8 +88,11 @@ class KanoDialog():
         if not hasattr(event, 'keyval') or event.keyval == 65293:
             self.returnvalue = return_value
             # TODO: improve this logic
-            if self.has_label:
+            if self.has_entry:
                 self.returnvalue = self.widget.get_text()
+            elif self.has_list:
+                # get selected radio button
+                self.returnvalue = radio_returnvalue
             self.dialog.destroy()
             return self.returnvalue
 
@@ -104,13 +111,24 @@ def parse_items(args):
     widget = None
     title = ""
     description = ""
-    has_label = False
+    has_entry = False
+    has_list = False
 
     for arg in args:
         split = arg.split(':')
-        if split[0] == "entry":
+        if split[0] == "radiolist":
+            widget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            has_list = True
+            radio = Gtk.RadioButton.new_with_label_from_widget(None, split[1])
+            widget.pack_start(radio, False, False, 5)
+            for i in split[2:]:
+                r = Gtk.RadioButton.new_with_label_from_widget(radio, i)
+                r.connect("toggled", on_button_toggled)
+                widget.pack_start(r, False, False, 5)
+
+        elif split[0] == "entry":
             widget = Gtk.Entry()
-            has_label = True
+            has_entry = True
             if split[1] == "hidden":
                 widget.set_visibility(False)
         if split[0] == 'title':
@@ -118,13 +136,21 @@ def parse_items(args):
         if split[0] == 'description':
             description = split[1]
 
-    return title, description, widget, has_label
+    return title, description, widget, has_entry, has_list
+
+
+def on_button_toggled(button):
+    global radio_returnvalue
+
+    if button.get_active():
+        label = button.get_label()
+        radio_returnvalue = label
 
 
 def main():
     text = sys.argv[1:]
-    title, description, entry, boolean = parse_items(text)
-    kdialog = KanoDialog(title_text=title, description_text=description, widget=entry, has_label=boolean)
+    title, description, custom_widget, entry_bool, list_bool = parse_items(text)
+    kdialog = KanoDialog(title_text=title, description_text=description, widget=custom_widget, has_entry=entry_bool, has_list=list_bool)
     response = kdialog.run()
     # These lines mean we can read the return value in bash
     print >> sys.stderr
