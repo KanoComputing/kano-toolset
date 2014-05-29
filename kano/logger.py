@@ -13,7 +13,7 @@ import time
 
 CONF = "/etc/debug"
 SYSTEM_LOGS_DIR = "/var/log/kano/"
-USER_LOGS_DIR = os.path.expanduser("~/.logs/")
+USER_LOGS_DIR = os.path.expanduser("~/.kano-logs/")
 
 logging_enabled = False
 log_file = None
