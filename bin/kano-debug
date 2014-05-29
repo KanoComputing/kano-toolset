@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env python
 
 # kano-debug
 #
@@ -8,33 +8,86 @@
 #
 # Enable/disable the debugging mode
 
-CONF="/etc/debug"
+import os
+import sys
+import json
+import pydoc
 
-# With no arguments, just print the current setting
-if [ -z "$1" ]; then
-    if [ -e "$CONF" ]; then
-        echo "on"
-    else
-        echo "off"
-    fi
+sys.path.insert(0, "..")
+from kano.logger import CONF, SYSTEM_LOGS_DIR, USER_LOGS_DIR
 
-    exit 0
-fi
 
-if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
-    echo "Usage: kano-debug [on|off]" 2>&1
-    exit 0
-fi
+def show_logs(app=None):
+    logfiles = []
+    if app != None:
+        for d in [SYSTEM_LOGS_DIR, USER_LOGS_DIR]:
+            path = os.path.join(d, app + ".log")
+            if os.path.exists(path):
+                logfiles.append(path)
 
-if [ "$(id -u)" != "0" ]; then
-    echo "ERROR: Must be root to enable the debugging mode" 2>&1
-    exit 1
-fi
+    else:
+        for d in [SYSTEM_LOGS_DIR, USER_LOGS_DIR]:
+            if os.path.exists(d):
+                print d
+                for log in os.listdir(d):
+                    logfiles.append(os.path.join(d, log))
 
-if [ "$1" == "on" ] || [ "$1" == "yes" ] || [ "$1" == "true" ] || [ "$1" == "1" ]; then
-    touch $CONF
-    echo "Debugging mode enabled."
-else
-    rm -rf $CONF
-    echo "Debugging mode disabled."
-fi
+    output = ""
+    for log in logfiles:
+        output += os.path.basename(log) + "\n"
+        with open(log, "r") as f:
+            for line in f:
+                data = json.loads(line)
+                output += "{} {} {}\n".format(data["time"], data["pid"], \
+                                              data["message"])
+        output += "\n"
+
+    if len(output) > 0:
+        pydoc.pager(output)
+
+def usage(rv):
+    print "Usage: kano-debug [on|off|show-logs]"
+    sys.exit(rv)
+
+def main():
+    # With no arguments, just print the current setting
+    if len(sys.argv) <= 1:
+        if os.file.exists(CONF):
+            print "on"
+        else:
+            print "off"
+        return 0
+
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ["-h", "--help", "help"]:
+            usage(0)
+
+        if sys.argv[1] in ["on", "yes", "true", "1", "enabled"]:
+            if os.getuid() != 0:
+                msg = "ERROR: Must be root to change the debugging mode\n"
+                sys.stderr.write(msg)
+                sys.exit(1)
+
+            with open(CONF, "a"):
+                pass
+            print "Debugging mode enabled."
+        elif sys.argv[1] in ["off", "no", "false", "0", "disabled"]:
+            if os.getuid() != 0:
+                msg = "ERROR: Must be root to change the debugging mode\n"
+                sys.stderr.write(msg)
+                sys.exit(1)
+
+            os.unlink(CONF)
+            print "Debugging mode disabled."
+        elif sys.argv[1] in ["show", "show-logs"]:
+            if len(sys.argv) > 2:
+                show_logs(sys.argv[2])
+            else:
+                show_logs()
+        else:
+            usage(1)
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

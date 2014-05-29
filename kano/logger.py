@@ -13,7 +13,7 @@ import time
 
 CONF = "/etc/debug"
 SYSTEM_LOGS_DIR = "/var/log/kano/"
-USER_LOGS_DIR = "~/.logs/"
+USER_LOGS_DIR = os.path.expanduser("~/.logs/")
 
 logging_enabled = False
 log_file = None
@@ -71,7 +71,7 @@ def _init_log_file():
     if log_file != None:
         log_file.close()
 
-    logs_dir = os.path.expanduser(USER_LOGS_DIR)
+    logs_dir = USER_LOGS_DIR
     if os.getuid() == 0:
         logs_dir = os.path.expanduser(SYSTEM_LOGS_DIR)
 
