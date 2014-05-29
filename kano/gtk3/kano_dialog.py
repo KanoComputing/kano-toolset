@@ -39,6 +39,7 @@ class KanoDialog():
         self.returnvalue = 0
         self.launch_dialog()
         self.has_entry = has_entry
+
         self.has_list = has_list
 
     def launch_dialog(self, widget=None, event=None):
