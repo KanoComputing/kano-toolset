@@ -34,7 +34,7 @@ def show_logs(app=None):
 
     output = ""
     for log in logfiles:
-        output += os.path.basename(log) + "\n"
+        output += log + "\n"
         with open(log, "r") as f:
             for line in f:
                 data = json.loads(line)
