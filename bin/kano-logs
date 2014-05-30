@@ -1,0 +1,114 @@
+#!/usr/bin/env python
+
+# kano-debug
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+#
+# Enable/disable the debugging mode
+
+import os
+import re
+import sys
+import json
+import pydoc
+import datetime
+
+sys.path.insert(0, "..")
+import kano.logger as logger
+from kano.colours import decorate_string, decorate_with_preset
+
+ENV_CONF = "/tmp/environment"
+
+def show_logs(app=None):
+    logfiles = []
+    for d in [logger.SYSTEM_LOGS_DIR, logger.USER_LOGS_DIR]:
+        if app != None:
+            path = os.path.join(d, app + ".log")
+            if os.path.exists(path):
+                logfiles.append(path)
+        else:
+            if os.path.exists(d):
+                for log in os.listdir(d):
+                    logfiles.append(os.path.join(d, log))
+
+    output = ""
+    for log in logfiles:
+        output += "{}: {}\n".format(decorate_string("LOGFILE", "green"), log)
+        app_name = re.sub(r"\.log$", "", log)
+        with open(log, "r") as f:
+            for line in f:
+                data = json.loads(line)
+
+                dt = datetime.datetime.fromtimestamp(data["time"])
+                time = dt.strftime('%Y-%m-%d %H:%M:%S')
+                output += "{} {}[{}] {} {}\n".format(
+                    decorate_string(time, "cyan"),
+                    os.path.basename(app_name),
+                    decorate_string(data["pid"], "yellow"),
+                    decorate_with_preset(data["level"], data["level"]),
+                    data["message"]
+                )
+        output += "\n"
+
+    if len(output) > 0:
+        pydoc.pipepager(output, cmd='less -R')
+
+def usage(rv):
+    print "Usage: kano-logs show [app]"
+    print "       kano-logs log-level:debug-level"
+    sys.exit(rv)
+
+def main():
+    # With no arguments, just print the current setting
+    if len(sys.argv) <= 1:
+        ll = logger.get_log_level()
+        dl = logger.get_debug_level()
+        print "Logging set to {}".format(decorate_with_preset(ll, ll))
+        print "Debugging set to {}".format(decorate_with_preset(dl, dl))
+        return 0
+
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ["-h", "--help", "help"]:
+            usage(0)
+
+        if sys.argv[1] in ["show", "show-logs"]:
+            if len(sys.argv) > 2:
+                show_logs(sys.argv[2])
+            else:
+                show_logs()
+
+        if os.getuid() != 0:
+            msg = "ERROR: Must be root to change the modes\n"
+            sys.stderr.write(msg)
+            sys.exit(1)
+
+        try:
+            log, debug = map(logger.normalise_level, sys.argv[1].split(":"))
+        except:
+            print "Error: Invalid log and debug levels '{}'".format(sys.argv[1])
+            return 1
+
+        output = []
+        if os.path.exists(ENV_CONF):
+            with open(ENV_CONF, "r") as f:
+                for line in f:
+                    if re.match(logger.LOG_ENV, line):
+                        output.append("{}={}\n".format(logger.LOG_ENV, log))
+                    elif re.match(logger.DEBUG_ENV, line):
+                        output.append("{}={}\n".format(logger.DEBUG_ENV, debug))
+                    else:
+                        output.append(line)
+        else:
+            output.append("{}={}\n".format(logger.LOG_ENV, log))
+            output.append("{}={}\n".format(logger.DEBUG_ENV, debug))
+
+        with open(ENV_CONF, "w") as f:
+            for line in output:
+                f.write(line)
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
