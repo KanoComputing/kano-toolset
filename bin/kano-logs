@@ -15,8 +15,8 @@ import json
 import pydoc
 import datetime
 
-sys.path.insert(0, "..")
-import kano.logger as logger
+#sys.path.insert(0, "..")
+from kano.logging import logger
 from kano.colours import decorate_string, decorate_with_preset
 
 ENV_CONF = "/tmp/environment"

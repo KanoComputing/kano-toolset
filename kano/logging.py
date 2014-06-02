@@ -34,11 +34,11 @@ class Logger:
         self._pid = os.getpid()
 
     def get_log_level(self):
-        return self._normalise_level(os.environ.get(self.LOG_ENV))
+        return self.normalise_level(os.environ.get(self.LOG_ENV))
 
 
     def get_debug_level(self):
-        return self._normalise_level(os.environ.get(self.DEBUG_ENV))
+        return self.normalise_level(os.environ.get(self.DEBUG_ENV))
 
 
     def set_app_name(self, name):
@@ -50,7 +50,7 @@ class Logger:
     def write(self, msg, **kwargs):
         lname = "info"
         if "level" in kwargs:
-            lname = self._normalise_level(kwargs["level"])
+            lname = self.normalise_level(kwargs["level"])
 
         level = self.LEVELS[lname]
 
@@ -109,7 +109,7 @@ class Logger:
 
         self._log_file = open("{}/{}.log".format(logs_dir, self._app_name), "a")
 
-    def _normalise_level(self, level):
+    def normalise_level(self, level):
         if level == None:
             return "none"
 
