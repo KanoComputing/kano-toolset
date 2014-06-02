@@ -34,6 +34,7 @@ def run_cmd_log(cmd, level='debug'):
     logger.write("Return value: {}".format(rv), level=level)
     logger.write(out, level=level)
     logger.error(err)
+    return out, err, rv
 
 def run_bg(cmd):
     subprocess.Popen(cmd, shell=True)
