@@ -53,31 +53,32 @@ class Logger:
             lname = self.normalise_level(kwargs["level"])
 
         level = self.LEVELS[lname]
-
-        log = {}
         if level > 0 and (level <= self._log_level or level <= self._debug_level):
             if self._app_name == None:
                 self.set_app_name(sys.argv[0])
 
-            log["time"] = time.time()
-            log["pid"] = self._pid
-            log.update(kwargs)
-            log["message"] = msg
-            log["level"] = lname
+            lines = msg.strip().split("\n")
+            for line in lines:
+                log = {}
+                log["time"] = time.time()
+                log["pid"] = self._pid
+                log.update(kwargs)
+                log["message"] = line
+                log["level"] = lname
 
-            if level <= self._log_level:
-                if self._log_file == None:
-                    self._init_log_file()
+                if level <= self._log_level:
+                    if self._log_file == None:
+                        self._init_log_file()
 
-                self._log_file.write("{}\n".format(json.dumps(log)))
+                    self._log_file.write("{}\n".format(json.dumps(log)))
 
-            if level <= self._debug_level:
-                print "{}[{}] {} {}".format(
-                    self._app_name,
-                    decorate_string(self._pid, "yellow"),
-                    decorate_with_preset(log["level"], log["level"]),
-                    log["message"]
-                )
+                if level <= self._debug_level:
+                    print "{}[{}] {} {}".format(
+                        self._app_name,
+                        decorate_string(self._pid, "yellow"),
+                        decorate_with_preset(log["level"], log["level"]),
+                        log["message"]
+                    )
 
     def error(self, msg, **kwargs):
         kwargs["level"] = "error"
