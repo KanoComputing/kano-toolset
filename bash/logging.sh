@@ -46,3 +46,6 @@ function logger_error { logger_write "$1" "error"; }
 function logger_info  { logger_write "$1" "info"; }
 function logger_warn  { logger_write "$1" "warning"; }
 function logger_debug { logger_write "$1" "debug"; }
+
+function logger_force_log_level { export LOG_LEVEL="$1"; }
+function logger_force_debug_level { export DEBUG_LEVEL="$1"; }

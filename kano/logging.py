@@ -40,6 +40,15 @@ class Logger:
     def get_debug_level(self):
         return self.normalise_level(os.environ.get(self.DEBUG_ENV))
 
+    def force_log_level(self, level):
+        level_no = self.LEVELS[self.normalise_level(level)]
+        if self._log_level < level_no:
+            self._log_level = level_no
+
+    def force_debug_level(self, level):
+        level_no = self.LEVELS[self.normalise_level(level)]
+        if self._debug_level < level_no:
+            self._debug_level = level_no
 
     def set_app_name(self, name):
         self._app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
