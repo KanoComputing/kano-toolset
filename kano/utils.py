@@ -28,16 +28,17 @@ def run_cmd(cmd):
     returncode = process.returncode
     return stdout, stderr, returncode
 
-def run_cmd_log(cmd, level='debug'):
+def run_cmd_log(cmd):
     out, err, rv = run_cmd(cmd)
-    logger.write("Command: {}".format(cmd), level=level)
-    logger.write("Return value: {}".format(rv), level=level)
+    logger.info("Command: {}".format(cmd))
 
     if len(out.strip()) > 0:
-        logger.write(out, level=level)
+        logger.debug(out)
 
     if len(err.strip()) > 0:
         logger.error(err)
+
+    logger.info("Return value: {}".format(rv))
 
     return out, err, rv
 
