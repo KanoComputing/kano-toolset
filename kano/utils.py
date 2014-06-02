@@ -32,8 +32,13 @@ def run_cmd_log(cmd, level='debug'):
     out, err, rv = run_cmd(cmd)
     logger.write("Command: {}".format(cmd), level=level)
     logger.write("Return value: {}".format(rv), level=level)
-    logger.write(out, level=level)
-    logger.error(err)
+
+    if len(out.strip()) > 0:
+        logger.write(out, level=level)
+
+    if len(err.strip()) > 0:
+        logger.error(err)
+
     return out, err, rv
 
 def run_bg(cmd):
