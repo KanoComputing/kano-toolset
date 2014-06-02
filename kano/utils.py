@@ -98,8 +98,13 @@ def delete_file(file):
 
 def zenity_show_progress(msg):
     if is_gui():
-        p = subprocess.Popen('yes | zenity --progress --text="{}" --pulsate --no-cancel --auto-close --title="kano-updater"'.format(msg),
-                             shell=True, preexec_fn=restore_signals)
+        cmd = 'yes | zenity --progress --text="{}" --pulsate --no-cancel ' + \
+              '--auto-close --title="kano-updater" 2>/dev/null'
+        p = subprocess.Popen(
+            cmd.format(msg),
+            shell=True,
+            preexec_fn=restore_signals
+        )
         return p.pid
 
 
