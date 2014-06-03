@@ -20,10 +20,8 @@ if __name__ == '__main__' and __package__ is None:
     if dir_path != '/usr':
         sys.path.insert(0, dir_path)
 
-from kano.logging import logger
+from kano.logging import logger, set_system_debug_level, set_system_log_level
 from kano.colours import decorate_string, decorate_with_preset
-
-ENV_CONF = "/etc/environment"
 
 def show_logs(app=None):
     logfiles = []
@@ -94,23 +92,8 @@ def main():
             print "Error: Invalid log and debug levels '{}'".format(sys.argv[1])
             return 1
 
-        output = []
-        if os.path.exists(ENV_CONF):
-            with open(ENV_CONF, "r") as f:
-                for line in f:
-                    if re.match(logger.LOG_ENV, line):
-                        output.append("{}={}\n".format(logger.LOG_ENV, log))
-                    elif re.match(logger.DEBUG_ENV, line):
-                        output.append("{}={}\n".format(logger.DEBUG_ENV, debug))
-                    else:
-                        output.append(line)
-        else:
-            output.append("{}={}\n".format(logger.LOG_ENV, log))
-            output.append("{}={}\n".format(logger.DEBUG_ENV, debug))
-
-        with open(ENV_CONF, "w") as f:
-            for line in output:
-                f.write(line)
+        set_system_log_level(log)
+        set_system_debug_level(debug)
 
     return 0
 

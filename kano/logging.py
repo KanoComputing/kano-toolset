@@ -16,6 +16,7 @@ class Logger:
     DEBUG_ENV = "DEBUG_LEVEL"
     SYSTEM_LOGS_DIR = "/var/log/kano/"
     USER_LOGS_DIR = os.path.expanduser("~/.kano-logs/")
+    ENV_CONF = "/etc/environment"
 
     LEVELS = {
         "none": 0,
@@ -136,3 +137,61 @@ class Logger:
         return "none"
 
 logger = Logger()
+
+def set_system_log_level(lvl):
+    _set_system_env_var(logger.LOG_ENV, lvl)
+
+
+def set_system_debug_level(lvl):
+    _set_system_env_var(logger.DEBUG_ENV, lvl)
+
+
+def _set_system_env_var(var, val):
+    output = []
+    var_replaced = False
+    if os.path.exists(logger.ENV_CONF):
+        with open(logger.ENV_CONF, "r") as f:
+            for line in f:
+                if re.match(var, line):
+                    output.append("{}={}\n".format(var, val))
+                    var_replaced = True
+                else:
+                    output.append(line)
+
+    if not os.path.exists(logger.ENV_CONF) or not var_replaced:
+        output.append("{}={}\n".format(var, val))
+
+    with open(logger.ENV_CONF, "w") as f:
+        for line in output:
+            f.write(line)
+
+def read_logs(app=None):
+    data = {}
+    for d in [logger.USER_LOGS_DIR, logger.SYSTEM_LOGS_DIR]:
+        if os.path.isdir(d):
+            for log in os.listdir(d):
+                log_path = os.path.join(d, log)
+                with open(log_path, "r") as f:
+                    data[log_path] = map(json.loads, f.readlines())
+
+    return data
+
+def cleanup(app=None):
+    for d in [logger.USER_LOGS_DIR, logger.SYSTEM_LOGS_DIR]:
+        if os.path.isdir(d):
+            for log in os.listdir(d):
+                log_path = os.path.join(d, log)
+                __tail_log_file(log_path, 10)
+
+def __tail_log_file(file_path, length):
+    data = None
+    with open(file_path, "r") as f:
+        data = f.readlines()
+
+    print len(data)
+    if len(data) <= length:
+        return
+
+    print len(data[(len(data) - length):])
+    with open(file_path, "w") as f:
+        f.write("".join(data[(len(data) - length):]))
