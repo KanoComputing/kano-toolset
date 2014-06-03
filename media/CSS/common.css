@@ -102,13 +102,6 @@ GtkComboBox .separator {
     -GtkWidget-wide-separators: true;
 }
 
-GtkButton {
-    background: transparent;
-    border-style: none; /* Remove grey border on outside */
-    border-width: 0px;
-    border-color: transparent;
-}
-
 GtkCheckButton,
 GtkRadioButton {
     border-style: solid;
@@ -156,6 +149,9 @@ GtkScrolledWindow {
 .appgrid_grey {
     background: @top_bar_color;
 }
+.appgrid_white {
+    background: #ffffff;
+}
 
 /* Title of menu button on default intro screen (Keyboard, Wfi etc) */
 .menu_intro_label {
@@ -180,4 +176,11 @@ GtkScrolledWindow {
 .white {
     color: #ffffff;
     background: #ffffff;
+}
+
+.transparent {
+    background: transparent;
+    border-style: none;
+    border-width: 0px;
+    border-color: transparent;
 }

@@ -55,3 +55,9 @@ class GreenButton(Gtk.Button):
     def set_padding(self, top, bottom, left, right):
         if self.align is not None:
             self.align.set_padding(top, bottom, left, right)
+
+    def set_red(self, bool_value):
+        if bool_value:
+            self.get_style_context().add_class("red")
+        else:
+            self.get_style_context().remove_class("red")

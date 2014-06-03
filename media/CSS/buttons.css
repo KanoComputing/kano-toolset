@@ -26,3 +26,7 @@
 .green_button GtkLabel:insensitive {
     color: #aaaaaa;
 }
+
+.red {
+    background: @kano_red;
+}
