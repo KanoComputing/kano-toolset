@@ -82,7 +82,6 @@ class TopBar():
         self.close_button.set_size_request(TOP_BAR_HEIGHT, TOP_BAR_HEIGHT)
         self.close_button.set_can_focus(False)
         self.close_button.get_style_context().add_class("top_bar_button")
-        self.close_button.connect('button-press-event', self.close_window)
 
         # Main container holding everything
         self.container = Gtk.Grid()
@@ -122,5 +121,5 @@ class TopBar():
     def set_next_callback(self, callback):
         self.next_button.connect("button_press_event", callback)
 
-    def close_window(self, button, event):
-        Gtk.main_quit()
+    def set_close_callback(self, callback):
+        self.close_button.connect("button_press_event", callback)
