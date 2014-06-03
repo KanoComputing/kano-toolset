@@ -15,11 +15,15 @@ import json
 import pydoc
 import datetime
 
-#sys.path.insert(0, "..")
+if __name__ == '__main__' and __package__ is None:
+    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if dir_path != '/usr':
+        sys.path.insert(0, dir_path)
+
 from kano.logging import logger
 from kano.colours import decorate_string, decorate_with_preset
 
-ENV_CONF = "/tmp/environment"
+ENV_CONF = "/etc/environment"
 
 def show_logs(app=None):
     logfiles = []
