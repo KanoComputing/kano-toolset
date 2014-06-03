@@ -177,11 +177,18 @@ def read_logs(app=None):
     return data
 
 def cleanup(app=None):
-    for d in [logger.USER_LOGS_DIR, logger.SYSTEM_LOGS_DIR]:
+    dirs = [logger.USER_LOGS_DIR]
+    if os.getuid() == 0:
+        dirs.append(logger.SYSTEM_LOGS_DIR)
+
+    for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
                 log_path = os.path.join(d, log)
-                __tail_log_file(log_path, 10)
+                try:
+                    __tail_log_file(log_path, 100)
+                except IOError as f:
+                    print f
 
 def __tail_log_file(file_path, length):
     data = None
