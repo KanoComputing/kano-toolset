@@ -181,7 +181,7 @@ def cleanup(app=None):
     if os.getuid() == 0:
         dirs.append(logger.SYSTEM_LOGS_DIR)
 
-    for d in :
+    for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
                 log_path = os.path.join(d, log)
