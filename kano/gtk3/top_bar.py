@@ -19,8 +19,8 @@ SPACE_TAKEN = 150
 HEADER_SPACE = 25
 
 
-class TopBar():
-    def __init__(self, WINDOW_WIDTH):
+class TopBar(Gtk.EventBox):
+    def __init__(self, title, window_width=-1):
 
         cssProvider = Gtk.CssProvider()
         top_bar_css = os.path.join(common_css_dir, 'top_bar.css')
@@ -32,28 +32,25 @@ class TopBar():
         styleContext = Gtk.StyleContext()
         styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        # Makes it easier to centre other widgets even if we change this
+        Gtk.EventBox.__init__(self)
+        self.set_size_request(window_width, TOP_BAR_HEIGHT)
+        background_style = self.get_style_context()
+        background_style.add_class('top_bar_container')
+
         self.height = TOP_BAR_HEIGHT
 
-        # This is to give the correct colour of the top bar as Event Boxes are the only containers that we can colour
-        # This contains everything, but can't pack directly into as is only a simple container
-        self.background = Gtk.EventBox()
-        self.background.set_size_request(WINDOW_WIDTH, TOP_BAR_HEIGHT)
-        self.background.style = self.background.get_style_context()
-        self.background.style.add_class('top_bar_container')
-
-        # Main title of the window bar.
-        self.header = Gtk.Label("Kano")
+        self.header = Gtk.Label(title)
         self.header.get_style_context().add_class("top_bar_title")
+        print window_width
+        if window_width == -1:
+            self.align_header = Gtk.Alignment(xalign=0.5, yalign=0.5, xscale=1, yscale=1)
+        else:
+            self.align_header = Gtk.Alignment(xalign=0, yalign=0.5, xscale=0, yscale=0)
+            padding_left = (window_width - SPACE_TAKEN) / 2 - HEADER_SPACE
+            padding_right = (window_width - SPACE_TAKEN) / 2 + HEADER_SPACE
+            self.align_header.set_padding(0, 0, padding_left, padding_right)
 
-        self.align_header = Gtk.Alignment(xalign=1, yalign=0, xscale=0, yscale=0)
         self.align_header.add(self.header)
-        # space of buttons and header text takes up about 220
-        # so we have WINDOW_WIDTH - 220 of space to play with
-        # move header 50 to the left
-        padding_left = (WINDOW_WIDTH - SPACE_TAKEN) / 2 - HEADER_SPACE
-        padding_right = (WINDOW_WIDTH - SPACE_TAKEN) / 2 + HEADER_SPACE
-        self.align_header.set_padding(13, 0, padding_left, padding_right)
 
         # Icons of the buttons
         self.pale_prev_arrow = icons.set_from_name("pale_left_arrow")
@@ -84,13 +81,14 @@ class TopBar():
         self.close_button.get_style_context().add_class("top_bar_button")
 
         # Main container holding everything
-        self.container = Gtk.Grid()
-        self.container.attach(self.prev_button, 0, 0, 1, 1)
-        self.container.attach(self.next_button, 1, 0, 1, 1)
-        self.container.attach(self.align_header, 2, 0, 1, 1)
-        self.container.attach(self.close_button, 3, 0, 1, 1)
-        self.container.set_size_request(WINDOW_WIDTH, 44)
-        self.background.add(self.container)
+        self.box = Gtk.Box()
+        self.box.pack_start(self.prev_button, False, False, 0)
+        self.box.pack_start(self.next_button, False, False, 0)
+        self.box.pack_start(self.align_header, False, False, 0)
+        self.box.pack_end(self.close_button, False, False, 0)
+        self.box.set_size_request(window_width, 44)
+
+        self.add(self.box)
 
         attach_cursor_events(self.prev_button)
         attach_cursor_events(self.next_button)

@@ -40,6 +40,10 @@ class GreenButton(Gtk.Button):
 
         cursor.attach_cursor_events(self)
 
+    def pack(self):
+        self.box = Gtk.Box()
+        self.box.add(self)
+
     # Pakcing in a box and within an Alignment
     def pack_and_align(self):
         # This stops the button resizing to fit the size of it's container
