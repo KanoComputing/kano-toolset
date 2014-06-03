@@ -15,8 +15,8 @@ import os
 import sys
 
 TOP_BAR_HEIGHT = 44
-SPACE_TAKEN = 150
-HEADER_SPACE = 25
+SPACE_TAKEN = 44 * 4
+HEADER_WIDTH = 100
 
 
 class TopBar(Gtk.EventBox):
@@ -39,16 +39,17 @@ class TopBar(Gtk.EventBox):
 
         self.height = TOP_BAR_HEIGHT
 
-        self.header = Gtk.Label(title)
+        self.header = Gtk.Label(title, halign=Gtk.Align.CENTER)
+        self.header.set_size_request(HEADER_WIDTH, TOP_BAR_HEIGHT)
         self.header.get_style_context().add_class("top_bar_title")
-        print window_width
+
         if window_width == -1:
             self.align_header = Gtk.Alignment(xalign=0.5, yalign=0.5, xscale=1, yscale=1)
         else:
             self.align_header = Gtk.Alignment(xalign=0, yalign=0.5, xscale=0, yscale=0)
-            padding_left = (window_width - SPACE_TAKEN) / 2 - HEADER_SPACE
-            padding_right = (window_width - SPACE_TAKEN) / 2 + HEADER_SPACE
-            self.align_header.set_padding(0, 0, padding_left, padding_right)
+            padding_left = (window_width - SPACE_TAKEN - HEADER_WIDTH) / 2
+            #padding_right = (window_width - SPACE_TAKEN) / 2 + HEADER_WIDTH
+            self.align_header.set_padding(0, 0, padding_left, 0)
 
         self.align_header.add(self.header)
 
