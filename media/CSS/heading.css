@@ -6,7 +6,7 @@
 .title {
     color: @title_color;
     padding-top:25px;
-    font: Bariol Bold 16;
+    font: Bariol Bold 20;
 }
 /* Description of current project */
 .description {
