@@ -39,11 +39,12 @@ function logger_write
     # Optimisation: Don't launch python unless logging is enabled
     if [ "$LOG_LEVEL" != "none" ] || [ "$DEBUG_LEVEL" != "none" ]; then
         python <<EOF
-from kano.logging import logger
+from kano.logging import logger, normalise_level
 
 logger._pid = $$
-logger._cached_log_level = "$LOG_LEVEL"
-logger._cached_debug_level = "$DEBUG_LEVEL"
+logger._cached_log_level = normalise_level("$LOG_LEVEL")
+logger._cached_debug_level = normalise_level("$DEBUG_LEVEL")
+
 logger.set_app_name("$APP_NAME")
 
 logger.write("$msg" $kwargs)

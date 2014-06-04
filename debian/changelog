@@ -1,3 +1,9 @@
+kano-toolset (1.0.4-5) unstable; urgency=low
+
+  * New kano-logs interface
+
+ -- Team Kano <dev@kano.me>  Wed, 4 Jun 2014 17:10:11 +0100
+
 kano-toolset (1.0.4-4) unstable; urgency=low
 
   * A fairly stable version of the logger

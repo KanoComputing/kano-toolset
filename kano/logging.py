@@ -50,8 +50,8 @@ class Logger:
         self._app_name = None
         self._pid = os.getpid()
 
-        self._cached_log_level = os.getenv(LOG_ENV)
-        self._cached_debug_level = os.getenv(DEBUG_ENV)
+        self._cached_log_level = normalise_level(os.getenv(LOG_ENV))
+        self._cached_debug_level = normalise_level(os.getenv(DEBUG_ENV))
 
     def _load_conf(self):
         conf = None
