@@ -7,26 +7,46 @@
 }
 
 /* The main button that updates the changes made in each level */
-.green_button {
-    background: @kano_green;
+.kano_button {
     border-radius: 3px;
     border-color: transparent;
     padding: 10px 20px 10px 20px;
 }
 
-.green_button GtkLabel {
+.kano_button GtkLabel {
     color: #ffffff;
     font: Bariol Bold 13;
 }
 
-.green_button:insensitive {
+.kano_button:insensitive {
     background: #dddddd;
 }
 
-.green_button GtkLabel:insensitive {
+.kano_button GtkLabel:insensitive {
     color: #aaaaaa;
 }
 
-.red {
+.green_background {
+    background: @kano_green;
+}
+
+.red_background {
     background: @kano_red;
+}
+
+.orange_background {
+    background: @kano_orange;
+}
+
+.grey_background {
+    background: #b7b7b7;
+}
+
+.small_orange_button {
+    background: #ffffff;
+}
+
+.small_orange_button GtkLabel {
+    color: @kano_orange;
+    font: Bariol Bold 13px;
 }
