@@ -9,47 +9,76 @@ import sys
 import re
 import json
 import time
+import yaml
 from kano.colours import decorate_string, decorate_with_preset
 
+LOG_ENV = "LOG_LEVEL"
+DEBUG_ENV = "DEBUG_LEVEL"
+SYSTEM_LOGS_DIR = "/var/log/kano/"
+
+# get_user_unsudoed() cannot be used due to a circular dependency
+if 'SUDO_USER' in os.environ:
+    usr = os.environ['SUDO_USER']
+else:
+    usr = os.environ['LOGNAME']
+USER_LOGS_DIR = "/home/{}/.kano-logs/".format(usr)
+
+CONF_FILE = "/etc/kano-logs.conf"
+
+LEVELS = {
+    "none": 0,
+    "error": 1,
+    "warning": 2,
+    "info": 3,
+    "debug": 4
+}
+
+def normalise_level(level):
+    if level == None:
+        return "none"
+
+    level = level.lower()
+    for l in LEVELS.iterkeys():
+        if level == l[0:len(level)]:
+            return l
+
+    return "none"
+
 class Logger:
-    LOG_ENV = "LOG_LEVEL"
-    DEBUG_ENV = "DEBUG_LEVEL"
-    SYSTEM_LOGS_DIR = "/var/log/kano/"
-    USER_LOGS_DIR = os.path.expanduser("~/.kano-logs/")
-    ENV_CONF = "/etc/environment"
-
-    LEVELS = {
-        "none": 0,
-        "error": 1,
-        "warning": 2,
-        "info": 3,
-        "debug": 4
-    }
-
     def __init__(self):
-        self._log_level = self.LEVELS[self.get_log_level()]
-        self._debug_level = self.LEVELS[self.get_debug_level()]
-
         self._log_file = None
         self._app_name = None
         self._pid = os.getpid()
 
-    def get_log_level(self):
-        return self.normalise_level(os.environ.get(self.LOG_ENV))
+        self._cached_log_level = normalise_level(os.getenv(LOG_ENV))
+        self._cached_debug_level = normalise_level(os.getenv(DEBUG_ENV))
 
+    def _load_conf(self):
+        conf = None
+        if os.path.exists(CONF_FILE):
+            with open(CONF_FILE, "r") as f:
+                conf = yaml.load(f)
+
+        if conf is None:
+            conf = {"log_level": "none", "debug_level": "none"}
+
+        if self._cached_log_level is None:
+            self._cached_log_level = normalise_level(conf["log_level"])
+
+        if self._cached_debug_level is None:
+            self._cached_debug_level = normalise_level(conf["debug_level"])
+
+    def get_log_level(self):
+        if self._cached_log_level is None:
+            self._load_conf()
+
+        return self._cached_log_level
 
     def get_debug_level(self):
-        return self.normalise_level(os.environ.get(self.DEBUG_ENV))
+        if self._cached_debug_level is None:
+            self._load_conf()
 
-    def force_log_level(self, level):
-        level_no = self.LEVELS[self.normalise_level(level)]
-        if self._log_level < level_no:
-            self._log_level = level_no
-
-    def force_debug_level(self, level):
-        level_no = self.LEVELS[self.normalise_level(level)]
-        if self._debug_level < level_no:
-            self._debug_level = level_no
+        return self._cached_debug_level
 
     def set_app_name(self, name):
         self._app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
@@ -60,10 +89,13 @@ class Logger:
     def write(self, msg, **kwargs):
         lname = "info"
         if "level" in kwargs:
-            lname = self.normalise_level(kwargs["level"])
+            lname = normalise_level(kwargs["level"])
 
-        level = self.LEVELS[lname]
-        if level > 0 and (level <= self._log_level or level <= self._debug_level):
+        level = LEVELS[lname]
+        sys_log_level = LEVELS[self.get_log_level()]
+        sys_debug_level = LEVELS[self.get_debug_level()]
+
+        if level > 0 and (level <= sys_log_level or level <= sys_debug_level):
             if self._app_name == None:
                 self.set_app_name(sys.argv[0])
 
@@ -76,13 +108,12 @@ class Logger:
                 log["message"] = line
                 log["level"] = lname
 
-                if level <= self._log_level:
+                if level <= sys_log_level:
                     if self._log_file == None:
                         self._init_log_file()
-
                     self._log_file.write("{}\n".format(json.dumps(log)))
 
-                if level <= self._debug_level:
+                if level <= sys_debug_level:
                     print "{}[{}] {} {}".format(
                         self._app_name,
                         decorate_string(self._pid, "yellow"),
@@ -106,99 +137,74 @@ class Logger:
         kwargs["level"] = "info"
         self.write(msg, **kwargs)
 
-
     def _init_log_file(self):
         if self._log_file != None:
             self._log_file.close()
 
-        logs_dir = self.USER_LOGS_DIR
-        if os.getuid() == 0:
-            logs_dir = os.path.expanduser(self.SYSTEM_LOGS_DIR)
+        logs_dir = USER_LOGS_DIR
+        if os.getuid() == 0 and os.getenv("SUDO_USER") == None:
+            logs_dir = SYSTEM_LOGS_DIR
 
         if not os.path.exists(logs_dir):
             os.makedirs(logs_dir)
 
         self._log_file = open("{}/{}.log".format(logs_dir, self._app_name), "a")
 
-    def normalise_level(self, level):
-        if level == None:
-            return "none"
-
-        level = level.lower()
-        if level == "error"[0:len(level)]:
-            return "error"
-        elif level == "warning"[0:len(level)]:
-            return "warning"
-        elif level == "info"[0:len(level)]:
-            return "info"
-        elif level == "debug"[0:len(level)]:
-            return "debug"
-
-        return "none"
-
 logger = Logger()
 
 def set_system_log_level(lvl):
-    _set_system_env_var(logger.LOG_ENV, lvl)
-
+    _set_conf_var("log_level", lvl)
 
 def set_system_debug_level(lvl):
-    _set_system_env_var(logger.DEBUG_ENV, lvl)
+    _set_conf_var("debug_level", lvl)
 
+def _set_conf_var(var, value):
+    conf = None
+    if os.path.isfile(CONF_FILE):
+        with open(CONF_FILE, "r") as f:
+            conf = yaml.load(f)
+    if conf is None:
+        conf = {}
 
-def _set_system_env_var(var, val):
-    output = []
-    var_replaced = False
-    if os.path.exists(logger.ENV_CONF):
-        with open(logger.ENV_CONF, "r") as f:
-            for line in f:
-                if re.match(var, line):
-                    output.append("{}={}\n".format(var, val))
-                    var_replaced = True
-                else:
-                    output.append(line)
+    conf[var] = normalise_level(str(value))
 
-    if not os.path.exists(logger.ENV_CONF) or not var_replaced:
-        output.append("{}={}\n".format(var, val))
-
-    with open(logger.ENV_CONF, "w") as f:
-        for line in output:
-            f.write(line)
+    with open(CONF_FILE, "w") as f:
+        f.write(yaml.dump(conf, default_flow_style=False))
 
 def read_logs(app=None):
     data = {}
-    for d in [logger.USER_LOGS_DIR, logger.SYSTEM_LOGS_DIR]:
+    for d in [USER_LOGS_DIR, SYSTEM_LOGS_DIR]:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                log_path = os.path.join(d, log)
-                with open(log_path, "r") as f:
-                    data[log_path] = map(json.loads, f.readlines())
+                if app == None or re.match("^{}\.log".format(app), log):
+                    log_path = os.path.join(d, log)
+                    with open(log_path, "r") as f:
+                        data[log_path] = map(json.loads, f.readlines())
 
     return data
 
 def cleanup(app=None):
-    dirs = [logger.USER_LOGS_DIR]
+    dirs = [USER_LOGS_DIR]
     if os.getuid() == 0:
-        dirs.append(logger.SYSTEM_LOGS_DIR)
+        dirs.append(SYSTEM_LOGS_DIR)
 
     for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                log_path = os.path.join(d, log)
-                try:
-                    __tail_log_file(log_path, 100)
-                except IOError as f:
-                    print f
+                if app != None or re.match("^{}\.log".format(app), log):
+                    log_path = os.path.join(d, log)
+                    try:
+                        __tail_log_file(log_path, 100)
+                    except IOError:
+                        pass
 
 def __tail_log_file(file_path, length):
     data = None
     with open(file_path, "r") as f:
         data = f.readlines()
 
-    print len(data)
     if len(data) <= length:
         return
 
-    print len(data[(len(data) - length):])
     with open(file_path, "w") as f:
         f.write("".join(data[(len(data) - length):]))
