@@ -28,13 +28,22 @@ function logger_write
         kwargs="$kwargs, level=\"$level\""
     fi
 
+    if [ -z "$LOG_LEVEL" ]; then
+        export LOG_LEVEL="`kano-logs -l`"
+    fi
+
+    if [ -z "$DEBUG_LEVEL" ]; then
+        export DEBUG_LEVEL="`kano-logs -d`"
+    fi
+
     # Optimisation: Don't launch python unless logging is enabled
-    if ( [ -n "$LOG_LEVEL" ] && [ "$LOG_LEVEL" != "none" ] ) \
-        || ( [ -n "$DEBUG_LEVEL" ] && [ "$DEBUG_LEVEL" != "none" ] ); then
+    if [ "$LOG_LEVEL" != "none" ] || [ "$DEBUG_LEVEL" != "none" ]; then
         python <<EOF
 from kano.logging import logger
 
 logger._pid = $$
+logger._cached_log_level = "$LOG_LEVEL"
+logger._cached_debug_level = "$DEBUG_LEVEL"
 logger.set_app_name("$APP_NAME")
 
 logger.write("$msg" $kwargs)

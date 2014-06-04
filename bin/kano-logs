@@ -20,12 +20,13 @@ if __name__ == '__main__' and __package__ is None:
     if dir_path != '/usr':
         sys.path.insert(0, dir_path)
 
-from kano.logging import logger, set_system_debug_level, set_system_log_level
+import kano.logging as logging
+from kano.logging import logger
 from kano.colours import decorate_string, decorate_with_preset
 
 def show_logs(app=None):
     logfiles = []
-    for d in [logger.SYSTEM_LOGS_DIR, logger.USER_LOGS_DIR]:
+    for d in [logging.SYSTEM_LOGS_DIR, logging.USER_LOGS_DIR]:
         if app != None:
             path = os.path.join(d, app + ".log")
             if os.path.exists(path):
@@ -57,9 +58,17 @@ def show_logs(app=None):
     if len(output) > 0:
         pydoc.pipepager(output, cmd='less -R')
 
+
+def must_be_root():
+    if os.getuid() != 0:
+        msg = "ERROR: Must be root to change the modes\n"
+        sys.stderr.write(msg)
+        sys.exit(1)
+
 def usage(rv):
     print "Usage: kano-logs show [app]"
-    print "       kano-logs log-level:debug-level"
+    print "       kano-logs -l | --log-level [level]"
+    print "       kano-logs -d | --debug-level [level]"
     sys.exit(rv)
 
 def main():
@@ -80,20 +89,23 @@ def main():
                 show_logs(sys.argv[2])
             else:
                 show_logs()
+            return 0
 
-        if os.getuid() != 0:
-            msg = "ERROR: Must be root to change the modes\n"
-            sys.stderr.write(msg)
-            sys.exit(1)
+        if sys.argv[1] in ["-l", "--log-level"]:
+            if len(sys.argv) > 2:
+                must_be_root()
+                logging.set_system_log_level(sys.argv[2])
+            else:
+                print logger.get_log_level()
+            return 0
 
-        try:
-            log, debug = map(logger.normalise_level, sys.argv[1].split(":"))
-        except:
-            print "Error: Invalid log and debug levels '{}'".format(sys.argv[1])
-            return 1
-
-        set_system_log_level(log)
-        set_system_debug_level(debug)
+        if sys.argv[1] in ["-d", "--debug-level"]:
+            if len(sys.argv) > 2:
+                must_be_root()
+                logging.set_system_debug_level(sys.argv[2])
+            else:
+                print logger.get_debug_level()
+            return 0
 
     return 0
 
