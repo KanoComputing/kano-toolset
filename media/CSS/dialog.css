@@ -22,6 +22,10 @@ GtkDialog {
     background: #ffffff;
 }
 
+.grey {
+    background: #e5e5e5;
+}
+
 GtkEntry {
     border-color: @active_border;
     color: @active_writing;

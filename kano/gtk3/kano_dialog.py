@@ -28,6 +28,7 @@ import os
 
 radio_returnvalue = None
 button_defaults = {'return_value': 0, 'color': 'green'}
+background_colors = ['grey', 'white']
 
 
 class KanoDialog():
@@ -40,10 +41,6 @@ class KanoDialog():
         self.returnvalue = 0
         self.has_entry = has_entry
         self.has_list = has_list
-
-        self.launch_dialog()
-
-    def launch_dialog(self, widget=None, event=None):
 
         cssProvider = Gtk.CssProvider()
         path = os.path.join(common_css_dir, "dialog.css")
@@ -58,10 +55,21 @@ class KanoDialog():
         self.dialog.set_border_width(5)
 
         content_area = self.dialog.get_content_area()
-        background = Gtk.EventBox()
-        background.get_style_context().add_class("white")
-        content_area.reparent(background)
-        self.dialog.add(background)
+        self.content_background = Gtk.EventBox()
+        self.content_background.get_style_context().add_class("white")
+        self.content_background.set_size_request(140, 140)
+        content_area.reparent(self.content_background)
+        action_area = self.dialog.get_action_area()
+        self.action_background = Gtk.EventBox()
+        self.action_background.get_style_context().add_class("white")
+        action_area.reparent(self.action_background)
+        action_area.set_layout(Gtk.ButtonBoxStyle.CENTER)
+
+        container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        container.add(self.content_background)
+        container.add(self.action_background)
+        self.dialog.add(container)
+
         self.title = Heading(self.title_text, self.description_text)
         content_area.pack_start(self.title.container, False, False, 0)
         self.buttons = []
@@ -83,15 +91,17 @@ class KanoDialog():
             button.set_color(color)
             button.connect("button-press-event", self.exit_dialog, return_value)
             self.buttons.append(button)
-            button_box.pack_end(button, False, False, 10)
+            button_box.pack_start(button, False, False, 6)
 
-        alignment = Gtk.Alignment(xscale=0, yscale=1, xalign=0.5, yalign=1)
+        alignment = Gtk.Alignment()
         alignment.add(button_box)
+        # annoying uneven alignment - cannot seem to centre y position
+        alignment.set_padding(6, 3, 0, 0)
 
         if self.widget is not None:
             content_area.pack_start(self.widget, False, False, 0)
 
-        content_area.pack_start(alignment, False, False, 10)
+        action_area.pack_start(alignment, False, False, 0)
 
     def exit_dialog(self, widget, event, return_value):
         # 65293 is the ENTER keycode
@@ -115,6 +125,11 @@ class KanoDialog():
         self.title_text = title_text
         self.description_text = description_text
         self.title.set_text(title_text, description_text)
+
+    def set_action_background(self, color):
+        for c in background_colors:
+            self.action_background.get_style_context().add_class(c)
+        self.action_background.get_style_context().add_class(color)
 
 
 def parse_items(args):
@@ -145,7 +160,7 @@ def parse_items(args):
             radio_list = split[1].split(",")
             radio = Gtk.RadioButton.new_with_label_from_widget(None, radio_list[0])
             radio.connect("toggled", on_button_toggled)
-            radio_returnvalue = split[1]
+            radio_returnvalue = radio_list[0]
             widget.pack_start(radio, False, False, 5)
             for i in radio_list[1:]:
                 r = Gtk.RadioButton.new_with_label_from_widget(radio, i)
