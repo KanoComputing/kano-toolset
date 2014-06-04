@@ -20,7 +20,7 @@
 
 
 from gi.repository import Gtk, Gdk
-from kano.gtk3.green_button import GreenButton
+from kano.gtk3.buttons import KanoButton
 from kano.gtk3.heading import Heading
 from kano.paths import common_css_dir
 import os
@@ -72,7 +72,7 @@ class KanoDialog():
             self.button_dict = {button_name: return_value}
 
         for button_name, return_value in self.button_dict.iteritems():
-            button = GreenButton(button_name)
+            button = KanoButton(button_name)
             button.connect("button-press-event", self.exit_dialog, return_value)
             self.buttons.append(button)
             button_box.pack_end(button, False, False, 10)
@@ -86,6 +86,7 @@ class KanoDialog():
         content_area.pack_start(alignment, False, False, 10)
 
     def exit_dialog(self, widget, event, return_value):
+        # 65293 is the ENTER keycode
         if not hasattr(event, 'keyval') or event.keyval == 65293:
             self.returnvalue = return_value
             # TODO: improve this logic
