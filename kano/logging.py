@@ -7,6 +7,8 @@
 import os
 import sys
 import re
+import pwd
+import grp
 import json
 import time
 import yaml
@@ -50,8 +52,15 @@ class Logger:
         self._app_name = None
         self._pid = os.getpid()
 
-        self._cached_log_level = normalise_level(os.getenv(LOG_ENV))
-        self._cached_debug_level = normalise_level(os.getenv(DEBUG_ENV))
+        log = os.getenv(LOG_ENV)
+        if log is not None:
+            log = normalise_level(log)
+        self._cached_log_level = log
+
+        debug = os.getenv(DEBUG_ENV)
+        if debug is not None:
+            debug = normalise_level(debug)
+        self._cached_debug_level = debug
 
     def _load_conf(self):
         conf = None
@@ -141,12 +150,30 @@ class Logger:
         if self._log_file != None:
             self._log_file.close()
 
-        logs_dir = USER_LOGS_DIR
-        if os.getuid() == 0 and os.getenv("SUDO_USER") == None:
+        sudo_user = os.getenv("SUDO_USER")
+        uid = pwd.getpwnam(sudo_user).pw_uid
+        gid = grp.getgrnam(sudo_user).gr_gid
+
+        if os.getuid() == 0 and sudo_user == None:
             logs_dir = SYSTEM_LOGS_DIR
+        else:
+            logs_dir = USER_LOGS_DIR
 
         if not os.path.exists(logs_dir):
             os.makedirs(logs_dir)
+
+            # Fix permissions in case we need to create the dir with sudo
+            if sudo_user:
+                os.chown(logs_dir, uid, gid)
+
+        log_fn = "{}/{}.log".format(logs_dir, self._app_name)
+
+        # Fix permissions in case we need to create the file with sudo
+        if not os.path.isfile(log_fn) and sudo_user:
+            # touch
+            with open(log_fn, 'a'):
+                pass
+            os.chown(log_fn, uid, gid)
 
         self._log_file = open("{}/{}.log".format(logs_dir, self._app_name), "a")
 
