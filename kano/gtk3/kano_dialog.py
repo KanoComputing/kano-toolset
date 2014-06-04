@@ -27,20 +27,21 @@ import os
 
 
 radio_returnvalue = None
+button_defaults = {'return_value': 0, 'color': 'green'}
 
 
 class KanoDialog():
-    # button_dict includes the button text and button return values
+    # button_dict includes the button text, color and button return values
     def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False):
         self.title_text = title_text
         self.description_text = description_text
         self.widget = widget
         self.button_dict = button_dict
         self.returnvalue = 0
-        self.launch_dialog()
         self.has_entry = has_entry
-
         self.has_list = has_list
+
+        self.launch_dialog()
 
     def launch_dialog(self, widget=None, event=None):
 
@@ -67,12 +68,19 @@ class KanoDialog():
         button_box = Gtk.Box()
 
         if self.button_dict is None or self.button_dict == {}:
-            button_name = "OK"
-            return_value = 0
-            self.button_dict = {button_name: return_value}
+            self.button_dict = {"OK": button_defaults}
 
-        for button_name, return_value in self.button_dict.iteritems():
+        # Replace the empty arguments with the defaults
+        for button_name, button_arguments in self.button_dict.iteritems():
+            for argument, value in button_defaults.iteritems():
+                if not argument in button_arguments:
+                    button_arguments[argument] = value
+
+            color = button_arguments['color']
+            return_value = button_arguments['return_value']
+
             button = KanoButton(button_name)
+            button.set_color(color)
             button.connect("button-press-event", self.exit_dialog, return_value)
             self.buttons.append(button)
             button_box.pack_end(button, False, False, 10)
@@ -117,24 +125,29 @@ def parse_items(args):
     description = ""
     has_entry = False
     has_list = False
-    buttons = None
+    buttons = {}
 
     for arg in args:
         split = arg.split('=')
-        if split[0] == "buttons":
-            buttons = {}
-            for s in split[1:]:
-                button_name = s
-                button_return = s
-                buttons[button_name] = button_return
+        if split[0] == "button":
+            button_options = {}
+            button_values = split[1].split(',')
+            button_name = button_values[0]
+            buttons[button_name] = button_options
+            for name, default in button_defaults.iteritems():
+                for value in button_values:
+                    if name in value:
+                        pair = value.split(':')
+                        button_options[pair[0]] = pair[1]
         if split[0] == "radiolist":
             widget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             has_list = True
-            radio = Gtk.RadioButton.new_with_label_from_widget(None, split[1])
+            radio_list = split[1].split(",")
+            radio = Gtk.RadioButton.new_with_label_from_widget(None, radio_list[0])
             radio.connect("toggled", on_button_toggled)
             radio_returnvalue = split[1]
             widget.pack_start(radio, False, False, 5)
-            for i in split[2:]:
+            for i in radio_list[1:]:
                 r = Gtk.RadioButton.new_with_label_from_widget(radio, i)
                 r.connect("toggled", on_button_toggled)
                 widget.pack_start(r, False, False, 5)
@@ -158,3 +171,12 @@ def on_button_toggled(button):
     if button.get_active():
         label = button.get_label()
         radio_returnvalue = label
+
+
+def main():
+    kd = KanoDialog("hello", "blah", {"OK": {"return_value": 1, "color": "orange"}})
+    response = kd.run()
+    print response
+
+if __name__ == '__main__':
+    main()

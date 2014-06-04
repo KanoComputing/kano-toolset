@@ -261,3 +261,19 @@ def chown_path(path, user=None, group=None):
     os.chown(path, uid, gid)
 
 
+def play_sound(audio_file):
+
+    # Check if file exists
+    if not os.path.isfile(audio_file):
+        return False
+    # Find out if we use HDMI or analogue
+    cmd = "omxplayer "
+    try:
+        from kano_settings.config_file import get_setting
+        if get_setting('Audio') == 'HDMI':
+            cmd += "-o hdmi "
+    except Exception:
+        pass
+
+    _, _, rc = run_cmd(cmd + audio_file + " > null")
+    return rc == 0
