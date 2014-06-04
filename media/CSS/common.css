@@ -164,15 +164,6 @@ GtkScrolledWindow {
     font: Bariol 12;
 }
 
-.orange_button {
-    background: #ffffff;
-}
-
-.orange_button GtkLabel {
-    color: @kano_orange;
-    font: Bariol Bold 13px;
-}
-
 .white {
     color: #ffffff;
     background: #ffffff;
