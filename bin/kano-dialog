@@ -17,7 +17,6 @@ if __name__ == '__main__' and __package__ is None:
 
 from kano.gtk3.kano_dialog import KanoDialog, button_defaults
 
-
 radio_returnvalue = None
 
 

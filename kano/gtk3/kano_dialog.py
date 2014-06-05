@@ -25,7 +25,6 @@ from kano.gtk3.heading import Heading
 from kano.paths import common_css_dir
 import os
 
-
 radio_returnvalue = None
 button_defaults = {'return_value': 0, 'color': 'green'}
 background_colors = ['grey', 'white']
