@@ -50,7 +50,7 @@ def parse_items(args):
                 name, color, rc = button_arg.split(':')
                 buttons[name] = {
                     'color': color,
-                    'return_value': rc,
+                    'return_value': int(rc),
                 }
 
         if split[0] == "radiolist":
