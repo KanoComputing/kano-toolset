@@ -102,6 +102,7 @@ def main():
     response = kdialog.run()
     # These lines mean we can read the return value in bash
     print >> sys.stderr, response
+    sys.exit(response)
 
 
 if __name__ == '__main__':
