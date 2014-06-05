@@ -69,7 +69,13 @@ class Logger:
                 conf = yaml.load(f)
 
         if conf is None:
-            conf = {"log_level": "none", "debug_level": "none"}
+            conf = {}
+
+        if "log_level" not in conf:
+            conf["log_level"] = "none"
+
+        if "debug_level" not in conf:
+            conf["debug_level"] = "none"
 
         if self._cached_log_level is None:
             self._cached_log_level = normalise_level(conf["log_level"])
