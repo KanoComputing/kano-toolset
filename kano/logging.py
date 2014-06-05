@@ -20,9 +20,9 @@ SYSTEM_LOGS_DIR = "/var/log/kano/"
 
 # get_user_unsudoed() cannot be used due to a circular dependency
 if 'SUDO_USER' in os.environ:
-    usr = os.environ['SUDO_USER']
+    usr = os.getenv("SUDO_USER")
 else:
-    usr = os.environ['LOGNAME']
+    usr = pwd.getpwuid(os.getuid())[0]
 USER_LOGS_DIR = "/home/{}/.kano-logs/".format(usr)
 
 CONF_FILE = "/etc/kano-logs.conf"
@@ -151,9 +151,6 @@ class Logger:
             self._log_file.close()
 
         sudo_user = os.getenv("SUDO_USER")
-        uid = pwd.getpwnam(sudo_user).pw_uid
-        gid = grp.getgrnam(sudo_user).gr_gid
-
         if os.getuid() == 0 and sudo_user == None:
             logs_dir = SYSTEM_LOGS_DIR
         else:
@@ -164,6 +161,8 @@ class Logger:
 
             # Fix permissions in case we need to create the dir with sudo
             if sudo_user:
+                uid = pwd.getpwnam(sudo_user).pw_uid
+                gid = grp.getgrnam(sudo_user).gr_gid
                 os.chown(logs_dir, uid, gid)
 
         log_fn = "{}/{}.log".format(logs_dir, self._app_name)
@@ -173,6 +172,9 @@ class Logger:
             # touch
             with open(log_fn, 'a'):
                 pass
+
+            uid = pwd.getpwnam(sudo_user).pw_uid
+            gid = grp.getgrnam(sudo_user).gr_gid
             os.chown(log_fn, uid, gid)
 
         self._log_file = open("{}/{}.log".format(logs_dir, self._app_name), "a")
