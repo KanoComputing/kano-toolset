@@ -275,5 +275,5 @@ def play_sound(audio_file):
     except Exception:
         pass
 
-    _, _, rc = run_cmd(cmd + audio_file + " > /dev/null 2>&1)
+    _, _, rc = run_cmd(cmd + audio_file)
     return rc == 0
