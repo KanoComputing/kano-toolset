@@ -101,8 +101,7 @@ def main():
         has_list=list_bool)
     response = kdialog.run()
     # These lines mean we can read the return value in bash
-    print >> sys.stderr
-    print response
+    print >> sys.stderr, response
 
 
 if __name__ == '__main__':
