@@ -114,7 +114,7 @@ class Logger:
             if self._app_name == None:
                 self.set_app_name(sys.argv[0])
 
-            lines = msg.strip().split("\n")
+            lines = str(msg).strip().split("\n")
             for line in lines:
                 log = {}
                 log["time"] = time.time()
