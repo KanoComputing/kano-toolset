@@ -261,7 +261,7 @@ def chown_path(path, user=None, group=None):
     os.chown(path, uid, gid)
 
 
-def play_sound(audio_file):
+def play_sound(audio_file, background=False):
 
     # Check if file exists
     if not os.path.isfile(audio_file):
@@ -275,5 +275,12 @@ def play_sound(audio_file):
     except Exception:
         pass
 
-    _, _, rc = run_cmd(cmd + audio_file)
+    cmd += audio_file
+
+    if background:
+        run_bg(cmd)
+        rc = 0
+    else:
+        _, _, rc = run_cmd(cmd)
+
     return rc == 0
