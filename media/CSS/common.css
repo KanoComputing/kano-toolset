@@ -17,7 +17,6 @@
     -unico-focus-border-color: transparent; /* Removes the annoying red outline on active buttons*/
     engine: none; /* Turns off annoying borders */
     border-width: 0px;
-    -GtkScrolledWindow-scrollbar-spacing: 0;
     -GtkWidget-focus-line-width: 0px;
     -GtkTreeView-vertical-separator: 0;
     -GtkWidget-separator-width: 0;
@@ -123,10 +122,6 @@ GtkCheckButton:hover {
 GtkRadioButton
 GtkLabel{
     color: @active_writing;
-}
-
-GtkScrolledWindow {
-    padding: 10px;
 }
 
 /* The title of the current level*/
