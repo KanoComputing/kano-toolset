@@ -43,7 +43,8 @@
 }
 
 .small_orange_button {
-    background: #ffffff;
+    background: transparent;
+    padding: 0px;
 }
 
 .small_orange_button GtkLabel {

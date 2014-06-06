@@ -1,4 +1,14 @@
 
+
+* {
+    -GtkScrolledWindow-scrollbar-spacing: 0;
+    -GtkScrolledWindow-scrollbars-within-bevel: 1;
+}
+
+GtkScrolledWindow {
+    padding: 10px;
+}
+
 /********************************************************
  * Scrollbars                                           *
  * The design was taken from the UN5 gtk-3.0 theme      *
