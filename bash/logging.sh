@@ -20,7 +20,7 @@ function logger_set_app_name
 
 function logger_write
 {
-    local msg=$1
+    local msg="$1"
     local level=$2
 
     local kwargs=""
@@ -47,7 +47,7 @@ logger._cached_debug_level = normalise_level("$DEBUG_LEVEL")
 
 logger.set_app_name("$APP_NAME")
 
-logger.write("$msg" $kwargs)
+logger.write("""$msg""" $kwargs)
 EOF
     fi
 }

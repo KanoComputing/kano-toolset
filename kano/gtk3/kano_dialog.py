@@ -130,3 +130,71 @@ class KanoDialog():
             self.action_background.get_style_context().add_class(c)
         self.action_background.get_style_context().add_class(color)
 
+
+def parse_items(args):
+    global radio_returnvalue
+
+    widget = None
+    title = ""
+    description = ""
+    has_entry = False
+    has_list = False
+    buttons = {}
+
+    for arg in args:
+        split = arg.split('=')
+
+        if split[0] == "button":
+            button_options = {}
+            button_values = split[1].split(',')
+            button_name = button_values[0]
+            buttons[button_name] = button_options
+            for name, default in button_defaults.iteritems():
+                for value in button_values:
+                    if name in value:
+                        pair = value.split(':')
+                        button_options[pair[0]] = pair[1]
+
+        if split[0] == "buttons":
+            buttons_arg = split[1].split(',')
+            for button_arg in buttons_arg:
+                name, color, rc = button_arg.split(':')
+                buttons[name] = {
+                    'color': color,
+                    'return_value': int(rc),
+                }
+
+        if split[0] == "radiolist":
+            widget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            has_list = True
+            radio_list = split[1].split(",")
+            radio = Gtk.RadioButton.new_with_label_from_widget(None, radio_list[0])
+            radio.connect("toggled", on_button_toggled)
+            radio_returnvalue = radio_list[0]
+            widget.pack_start(radio, False, False, 5)
+            for i in radio_list[1:]:
+                r = Gtk.RadioButton.new_with_label_from_widget(radio, i)
+                r.connect("toggled", on_button_toggled)
+                widget.pack_start(r, False, False, 5)
+
+        elif split[0] == "entry":
+            widget = Gtk.Entry()
+            has_entry = True
+            if len(split) == 2 and split[1] == "hidden":
+                widget.set_visibility(False)
+
+        if split[0] == 'title':
+            title = split[1]
+
+        if split[0] == 'description':
+            description = split[1]
+
+    return title, description, buttons, widget, has_entry, has_list
+
+
+def on_button_toggled(button):
+    global radio_returnvalue
+
+    if button.get_active():
+        label = button.get_label()
+        radio_returnvalue = label

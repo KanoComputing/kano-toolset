@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 # Busybox udhcpc dispatcher script. Copyright (C) 2009 by Axel Beckert.
 #
 # Based on the busybox example scripts and the old udhcp source
 # package default.* scripts.
 
 RESOLV_CONF="/etc/resolv.conf"
+
+. /usr/share/kano-toolset/logging.sh
 
 case $1 in
     bound|renew)
@@ -44,20 +46,24 @@ case $1 in
         # save the result of this work in small log files under /var/log
 	tzupdated=`/usr/local/bin/tzupdate 2>&1`
 	if [ "$?" -eq 0 ]; then
-	  echo "SUCCESS: $tzupdated" > /var/log/tzupdate.log
+	    logger_info "tzupdate SUCCESS: $tzupdated"
 	else
-	  echo "FAIL: $tzupdated" > /var/log/tzupdate.log
+	    IFS=$'\n'
+	    for line in ${tzupdated}; do
+		logger_error "tzupdate FAIL: $line"
+	    done
 	fi
-	echo $tzupdated | logger -t tzupdate -i
 
 	# set time from a network NTP server
 	dated=`/usr/bin/rdate -cv $(cat /etc/timeserver.conf) 2>&1`
 	if [ "$?" -eq 0 ]; then
-	  echo "SUCCESS: $dated" > /var/log/rdate.log
+	    logger_info "rdate SUCCESS: $dated"
 	else
-	  echo "FAIL: $dated" > /var/log/rdate.log
+	    IFS=$'\n'
+	    for line in ${dated}; do
+		logger_error "rdate FAIL: $line"
+	    done
 	fi
-	echo $dated | logger -t rdate -i
 
 	;;
 

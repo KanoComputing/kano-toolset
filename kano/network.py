@@ -16,7 +16,7 @@
 import os
 import time
 import subprocess
-import syslog
+from kano.logging import logger
 import shlex
 import json
 import re
@@ -278,7 +278,7 @@ def execute(cmdline):
     (out, err) = p.communicate()
     rc = p.returncode
     if not rc == 0:
-        syslog.syslog('FAIL: "%s" rc=%s, out="%s", err="%s"' % (cmdline, rc, out, err))
+        logger.error('FAIL: "%s" rc=%s, out="%s", err="%s"' % (cmdline, rc, out, err))
         raise Exception(cmdline, 'rc=%s, out="%s", err="%s"' % (rc, out, err))
     else:
         return out, err
@@ -422,7 +422,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     execute("ifconfig %s up" % iface)
 
     if wpa_custom_file:
-        syslog.syslog("Starting wpa_supplicant with custom config: %s" % wpa_custom_file)
+        logger.info("Starting wpa_supplicant with custom config: %s" % wpa_custom_file)
         try:
             # wpa_supplicant might complain even if it goes ahead doing its job
             execute("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
@@ -433,17 +433,17 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         # WEP encryption keys have to be either 5, 13 or 58 ASCII chars in length (40/104/232 bits)
         # plus 24 bits for IV giving 64,128,256-bit encryption modes
         if len(seckey) not in (5, 13, 58):
-            syslog.syslog("WEP encryption key lenght incorrect (%d) has to be one of 5/13/58 chars" % (len(seckey)))
+            logger.error("WEP encryption key lenght incorrect (%d) has to be one of 5/13/58 chars" % (len(seckey)))
             return False
         else:
             try:
-                syslog.syslog("Setting WEP encryption key for network '%s' to interface %s" % (essid, iface))
+                logger.info("Setting WEP encryption key for network '%s' to interface %s" % (essid, iface))
                 execute("iwconfig %s key 's:%s'" % (iface, seckey))
             except:
                 pass
 
     elif encrypt == 'wpa':
-        syslog.syslog("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
+        logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
         wpafile = '/etc/kano_wpa_connect.conf'
         wpa_conf(essid, seckey, confile=wpafile)
 
@@ -454,6 +454,9 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             pass
 
     try:
+        # gratious time for wireless association to happen
+        time.sleep(3)
+        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
         execute(udhcpc_cmdline)
     except:
         pass
