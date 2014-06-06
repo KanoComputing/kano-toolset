@@ -31,5 +31,5 @@ class ScrolledWindow(Gtk.ScrolledWindow):
         styleContext.add_provider_for_screen(screen, colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         styleContext.add_provider_for_screen(screen, scrollbar_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        Gtk.ScrolledWindow.__init__(self, hexpand, vexpand)
+        Gtk.ScrolledWindow.__init__(self, hexpand=hexpand, vexpand=vexpand)
 
