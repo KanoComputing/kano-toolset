@@ -19,6 +19,7 @@ import json
 
 from kano.logging import logger
 
+
 def run_cmd(cmd):
     process = subprocess.Popen(cmd, shell=True,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -27,6 +28,7 @@ def run_cmd(cmd):
     stdout, stderr = process.communicate()
     returncode = process.returncode
     return stdout, stderr, returncode
+
 
 def run_cmd_log(cmd):
     out, err, rv = run_cmd(cmd)
@@ -41,6 +43,7 @@ def run_cmd_log(cmd):
     logger.info("Return value: {}".format(rv))
 
     return out, err, rv
+
 
 def run_bg(cmd):
     subprocess.Popen(cmd, shell=True)
@@ -283,4 +286,10 @@ def play_sound(audio_file, background=False):
     else:
         _, _, rc = run_cmd(cmd)
 
+    return rc == 0
+
+
+def is_running(program):
+    cmd = "pidof {}".format(program)
+    _, _, rc = run_cmd(cmd)
     return rc == 0
