@@ -5,43 +5,59 @@
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# Create a green button with white text inside
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 from kano.gtk3 import cursor
 from kano.paths import common_css_dir
 import os
 import sys
 
 
-class KanoButton(Gtk.Button):
+class GenericButton(Gtk.Button):
+    def __init__(self, text=""):
+
+        Gtk.Button.__init__(self)
+
+        self.button_css = Gtk.CssProvider()
+        css_file = os.path.join(common_css_dir, 'buttons.css')
+        if not os.path.exists(css_file):
+            sys.exit('CSS file missing!')
+        self.button_css.load_from_path(css_file)
+
+        self.colour_css = Gtk.CssProvider()
+        colour_file = os.path.join(common_css_dir, 'colours.css')
+        if not os.path.exists(colour_file):
+            sys.exit('CSS file missing!')
+        self.colour_css.load_from_path(colour_file)
+
+        style_context = self.get_style_context()
+        style_context.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        style_context.add_provider(self.colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        self.label = Gtk.Label(text)
+        self.add(self.label)
+        style = self.label.get_style_context()
+        style.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        cursor.attach_cursor_events(self)
+
+    def set_label(self, text):
+        self.label.set_text(text)
+
+
+class KanoButton(GenericButton):
     def __init__(self, text="", color="green"):
         # Keep this updated - useful for set_color function
         self.available_colors = ["orange", "green", "red", "grey"]
 
-        button_css = Gtk.CssProvider()
-        css_file = os.path.join(common_css_dir, 'buttons.css')
-        if not os.path.exists(css_file):
-            sys.exit('CSS file missing!')
-        colour_css = Gtk.CssProvider()
-        colour_file = os.path.join(common_css_dir, 'colours.css')
-        if not os.path.exists(colour_file):
-            sys.exit('CSS file missing!')
-        colour_css.load_from_path(colour_file)
-        button_css.load_from_path(css_file)
-
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        styleContext.add_provider_for_screen(screen, button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         # Create button
-        Gtk.Button.__init__(self)
-        self.set_label(text)
-        self.get_style_context().add_class("kano_button")
-        self.get_style_context().add_class(color + "_background")
-        self.align = None
+        GenericButton.__init__(self, text)
 
+        style_context = self.get_style_context()
+        style_context.add_class("kano_button")
+        style_context.add_class(color + "_background")
+
+        self.align = None
         cursor.attach_cursor_events(self)
 
     def pack(self):
@@ -70,28 +86,9 @@ class KanoButton(Gtk.Button):
         self.get_style_context().add_class(color + "_background")
 
 
-class OrangeButton(Gtk.Button):
+class OrangeButton(GenericButton):
     def __init__(self, text=""):
 
-        button_css = Gtk.CssProvider()
-        css_file = os.path.join(common_css_dir, 'buttons.css')
-        if not os.path.exists(css_file):
-            sys.exit('CSS file missing!')
-        colour_css = Gtk.CssProvider()
-        colour_file = os.path.join(common_css_dir, 'colours.css')
-        if not os.path.exists(colour_file):
-            sys.exit('CSS file missing!')
-        colour_css.load_from_path(colour_file)
-        button_css.load_from_path(css_file)
-
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        styleContext.add_provider_for_screen(screen, button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         # Create button
-        Gtk.Button.__init__(self)
-        self.set_label(text)
+        GenericButton.__init__(self, text)
         self.get_style_context().add_class("small_orange_button")
-
-        cursor.attach_cursor_events(self)

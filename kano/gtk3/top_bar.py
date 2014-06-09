@@ -7,7 +7,7 @@
 #
 # This controls the styling of the (pretend) top window bar.
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 from kano.gtk3 import icons
 from kano.gtk3.cursor import attach_cursor_events
 from kano.paths import common_css_dir
@@ -22,26 +22,14 @@ HEADER_WIDTH = 100
 class TopBar(Gtk.EventBox):
     def __init__(self, title, window_width=-1):
 
-        cssProvider = Gtk.CssProvider()
-        top_bar_css = os.path.join(common_css_dir, 'top_bar.css')
-        if not os.path.exists(top_bar_css):
-            sys.exit('CSS file missing!')
-        cssProvider.load_from_path(top_bar_css)
-
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         Gtk.EventBox.__init__(self)
+
         self.set_size_request(window_width, TOP_BAR_HEIGHT)
-        background_style = self.get_style_context()
-        background_style.add_class('top_bar_container')
 
         self.height = TOP_BAR_HEIGHT
 
         self.header = Gtk.Label(title, halign=Gtk.Align.CENTER)
         self.header.set_size_request(HEADER_WIDTH, TOP_BAR_HEIGHT)
-        self.header.get_style_context().add_class("top_bar_title")
 
         if window_width == -1:
             self.align_header = Gtk.Alignment(xalign=0.5, yalign=0.5, xscale=1, yscale=1)
@@ -64,14 +52,12 @@ class TopBar(Gtk.EventBox):
         self.prev_button = Gtk.Button()
         self.prev_button.set_size_request(TOP_BAR_HEIGHT, TOP_BAR_HEIGHT)
         self.prev_button.set_can_focus(False)
-        self.prev_button.get_style_context().add_class("top_bar_button")
         self.prev_button.set_image(self.pale_prev_arrow)
 
         # Next button
         self.next_button = Gtk.Button()
         self.next_button.set_size_request(TOP_BAR_HEIGHT, TOP_BAR_HEIGHT)
         self.next_button.set_can_focus(False)
-        self.next_button.get_style_context().add_class("top_bar_button")
         self.next_button.set_image(self.pale_next_arrow)
 
         # Close button
@@ -79,7 +65,6 @@ class TopBar(Gtk.EventBox):
         self.close_button.set_image(self.cross)
         self.close_button.set_size_request(TOP_BAR_HEIGHT, TOP_BAR_HEIGHT)
         self.close_button.set_can_focus(False)
-        self.close_button.get_style_context().add_class("top_bar_button")
 
         # Main container holding everything
         self.box = Gtk.Box()
@@ -97,6 +82,27 @@ class TopBar(Gtk.EventBox):
         # On start, disable the prev and next buttons
         self.disable_prev()
         self.disable_next()
+
+        # Styling
+        self.cssProvider = Gtk.CssProvider()
+        top_bar_css = os.path.join(common_css_dir, 'top_bar.css')
+        if not os.path.exists(top_bar_css):
+            sys.exit('CSS file missing!')
+        self.cssProvider.load_from_path(top_bar_css)
+
+        styleContext = self.get_style_context()
+        styleContext.add_provider(self.cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        styleContext.add_class('top_bar_container')
+        self.add_style(self.header, "top_bar_title")
+        self.add_style(self.prev_button, "top_bar_button")
+        self.add_style(self.next_button, "top_bar_button")
+        self.add_style(self.close_button, "top_bar_button")
+
+    def add_style(self, widget, app_class):
+        style = widget.get_style_context()
+        style.add_provider(self.cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        style.add_class(app_class)
 
     def disable_prev(self):
         self.prev_button.set_sensitive(False)
