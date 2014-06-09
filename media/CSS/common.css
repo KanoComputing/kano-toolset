@@ -142,7 +142,7 @@ GtkLabel{
 
 /* Used for the stripy grid */
 .appgrid_grey {
-    background: @top_bar_color;
+    background: @appgrid_grey;
 }
 .appgrid_white {
     background: #ffffff;
