@@ -17,8 +17,6 @@ import pwd
 import grp
 import json
 
-from kano.logging import logger
-
 
 def run_cmd(cmd):
     process = subprocess.Popen(cmd, shell=True,
@@ -31,6 +29,8 @@ def run_cmd(cmd):
 
 
 def run_cmd_log(cmd):
+    from kano.logging import logger
+
     out, err, rv = run_cmd(cmd)
     logger.info("Command: {}".format(cmd))
 
