@@ -279,6 +279,7 @@ def play_sound(audio_file, background=False):
         pass
 
     cmd += audio_file
+    cmd += " 2>/dev/null >/dev/null"
 
     if background:
         run_bg(cmd)
