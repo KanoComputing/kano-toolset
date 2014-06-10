@@ -294,3 +294,9 @@ def is_running(program):
     cmd = "pidof {}".format(program)
     _, _, rc = run_cmd(cmd)
     return rc == 0
+
+
+def enforce_root(msg):
+    if os.getuid() != 0:
+        sys.stderr.write(msg + "\n")
+        sys.exit(1)

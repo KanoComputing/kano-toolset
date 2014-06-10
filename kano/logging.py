@@ -16,7 +16,7 @@ from kano.colours import decorate_string, decorate_with_preset
 from kano.utils import get_home_by_username
 
 LOG_ENV = "LOG_LEVEL"
-DEBUG_ENV = "DEBUG_LEVEL"
+OUTPUT_ENV = "OUTPUT_LEVEL"
 SYSTEM_LOGS_DIR = "/var/log/kano/"
 
 # get_user_unsudoed() cannot be used due to a circular dependency
@@ -60,10 +60,10 @@ class Logger:
             log = normalise_level(log)
         self._cached_log_level = log
 
-        debug = os.getenv(DEBUG_ENV)
-        if debug is not None:
-            debug = normalise_level(debug)
-        self._cached_debug_level = debug
+        output = os.getenv(OUTPUT_ENV)
+        if output is not None:
+            output = normalise_level(output)
+        self._cached_output_level = output
 
     def _load_conf(self):
         conf = None
@@ -77,14 +77,14 @@ class Logger:
         if "log_level" not in conf:
             conf["log_level"] = "none"
 
-        if "debug_level" not in conf:
-            conf["debug_level"] = "none"
+        if "output_level" not in conf:
+            conf["output_level"] = "none"
 
         if self._cached_log_level is None:
             self._cached_log_level = normalise_level(conf["log_level"])
 
-        if self._cached_debug_level is None:
-            self._cached_debug_level = normalise_level(conf["debug_level"])
+        if self._cached_output_level is None:
+            self._cached_output_level = normalise_level(conf["output_level"])
 
     def get_log_level(self):
         if self._cached_log_level is None:
@@ -92,11 +92,11 @@ class Logger:
 
         return self._cached_log_level
 
-    def get_debug_level(self):
-        if self._cached_debug_level is None:
+    def get_output_level(self):
+        if self._cached_output_level is None:
             self._load_conf()
 
-        return self._cached_debug_level
+        return self._cached_output_level
 
     def set_app_name(self, name):
         self._app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
@@ -111,9 +111,9 @@ class Logger:
 
         level = LEVELS[lname]
         sys_log_level = LEVELS[self.get_log_level()]
-        sys_debug_level = LEVELS[self.get_debug_level()]
+        sys_output_level = LEVELS[self.get_output_level()]
 
-        if level > 0 and (level <= sys_log_level or level <= sys_debug_level):
+        if level > 0 and (level <= sys_log_level or level <= sys_output_level):
             if self._app_name == None:
                 self.set_app_name(sys.argv[0])
 
@@ -131,7 +131,7 @@ class Logger:
                         self._init_log_file()
                     self._log_file.write("{}\n".format(json.dumps(log)))
 
-                if level <= sys_debug_level:
+                if level <= sys_output_level:
                     print "{}[{}] {} {}".format(
                         self._app_name,
                         decorate_string(self._pid, "yellow"),
@@ -193,8 +193,8 @@ logger = Logger()
 def set_system_log_level(lvl):
     _set_conf_var("log_level", lvl)
 
-def set_system_debug_level(lvl):
-    _set_conf_var("debug_level", lvl)
+def set_system_output_level(lvl):
+    _set_conf_var("output_level", lvl)
 
 def _set_conf_var(var, value):
     conf = None
