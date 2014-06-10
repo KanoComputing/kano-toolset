@@ -44,6 +44,9 @@ class GenericButton(Gtk.Button):
     def set_label(self, text):
         self.label.set_text(text)
 
+    def get_label(self):
+        return self.label.get_text()
+
 
 class KanoButton(GenericButton):
     def __init__(self, text="", color="green"):

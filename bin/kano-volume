@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+#
+#  This script increases and decreases the analog audio volume output level
+#
+#  TODO: How to increase/decrease volume for HDMI output?
+#
+
+# First parameter is either "up" or "down"
+updown=$1
+
+# percentage to increase / decrease the volume
+factor=5
+
+case $updown in
+    "up")
+        amixer set PCM -- $[$(amixer get PCM|grep -o [0-9]*%|sed 's/%//')+$factor]% > /dev/null 2>&1
+        ;;
+    "down")
+        amixer set PCM -- $[$(amixer get PCM|grep -o [0-9]*%|sed 's/%//')-$factor]% > /dev/null 2>&1
+        ;;
+
+    *)
+        echo "Syntax error: kano-volume < up | down >"
+        exit -1
+esac
+exit 0
