@@ -29,11 +29,11 @@ function logger_write
     fi
 
     if [ -z "$LOG_LEVEL" ]; then
-        export LOG_LEVEL="`kano-logs -l`"
+        LOG_LEVEL="`kano-logs -l`"
     fi
 
     if [ -z "$DEBUG_LEVEL" ]; then
-        export DEBUG_LEVEL="`kano-logs -d`"
+        DEBUG_LEVEL="`kano-logs -d`"
     fi
 
     # Optimisation: Don't launch python unless logging is enabled
