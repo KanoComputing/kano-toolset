@@ -9,12 +9,14 @@
 import os
 import sys
 
+
 if __name__ == '__main__' and __package__ is None:
     dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if dir_path != '/usr':
         sys.path.insert(1, dir_path)
 
 from kano.gtk3.kano_dialog import parse_items, KanoDialog
+from kano.utils import is_number
 
 
 def main():
@@ -33,6 +35,9 @@ def main():
     # var = $(kano-dialog button=ok,return_value:ok)
     # echo $var
     print response
+
+    if is_number(response):
+        sys.exit(response)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
