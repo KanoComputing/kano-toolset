@@ -89,6 +89,13 @@ class KanoDialog():
                 if not argument in button_arguments:
                     button_arguments[argument] = value
 
+                    # Create default return values for OK and CANCEL buttons
+                    if argument == "return_value":
+                        if button_name.upper() == "OK":
+                            button_arguments["return_value"] = 0
+                        if button_name.upper() == "CANCEL":
+                            button_arguments["return_value"] = 1
+
             color = button_arguments['color']
             return_value = button_arguments['return_value']
 
@@ -116,13 +123,16 @@ class KanoDialog():
         style.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         style.add_class(app_class)
 
-    def exit_dialog(self, widget, event, return_value):
+    def exit_dialog(self, button, event, return_value):
         # 65293 is the ENTER keycode
         if not hasattr(event, 'keyval') or event.keyval == 65293:
             self.returnvalue = return_value
-            # TODO: improve this logic
+            # If we have an entry
             if self.has_entry:
-                self.returnvalue = self.widget.get_text()
+                # We have to click an OK button to get entry value
+                # May want to change this logic later to be more flexible
+                if return_value == 0 and button.get_label().upper() == "OK":
+                    self.returnvalue = self.widget.get_text()
             elif self.has_list:
                 # get selected radio button
                 self.returnvalue = radio_returnvalue
