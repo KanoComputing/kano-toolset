@@ -83,12 +83,20 @@ def process_args():
     config.add_argument(
         "-l", "--log-level",
         help="set log level",
-        type=str
+        type=str,
+        nargs="?"
     )
 
     config.add_argument(
         "-o", "--output-level",
         help="set output level",
+        type=str,
+        nargs="?"
+    )
+
+    config.add_argument(
+        "-s", "--show-value",
+        help="print a configuration option",
         type=str
     )
 
@@ -101,11 +109,19 @@ def main():
     if args["which"] == "show":
         show_logs(args["app"])
     elif args["which"] == "config":
-        if args["log_level"] == None and args["output_level"] == None:
+        if args["log_level"] == None and args["output_level"] == None and \
+           args["show_value"] == None:
             ll = logger.get_log_level()
             dl = logger.get_output_level()
             print "Logging set to {}".format(decorate_with_preset(ll, ll))
             print "Debugging set to {}".format(decorate_with_preset(dl, dl))
+            return 0
+
+        if args["show_value"] is not None:
+            if args["show_value"] == "log_level":
+                print logger.get_log_level()
+            elif args["show_value"] == "output_level":
+                print logger.get_output_level()
             return 0
 
         enforce_root("ERROR: Must be root to change the modes")
