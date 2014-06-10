@@ -43,11 +43,17 @@ class KanoDialog():
 
         self.dialog = Gtk.Dialog()
 
-        self.cssProvider = Gtk.CssProvider()
-        path = os.path.join(common_css_dir, "dialog.css")
-        self.cssProvider.load_from_path(path)
+        self.dialog_provider = Gtk.CssProvider()
+        dialog_path = os.path.join(common_css_dir, "dialog.css")
+        self.dialog_provider.load_from_path(dialog_path)
+
+        self.colour_provider = Gtk.CssProvider()
+        colours_path = os.path.join(common_css_dir, "colours.css")
+        self.colour_provider.load_from_path(colours_path)
+
         styleContext = self.dialog.get_style_context()
-        styleContext.add_provider(self.cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.dialog.set_decorated(False)
         self.dialog.set_resizable(False)
@@ -99,12 +105,15 @@ class KanoDialog():
 
         if self.widget is not None:
             content_area.pack_start(self.widget, False, False, 0)
+            styleContext = self.widget.get_style_context()
+            styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         action_area.pack_start(alignment, False, False, 0)
 
     def add_style(self, widget, app_class):
         style = widget.get_style_context()
-        style.add_provider(self.cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        style.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         style.add_class(app_class)
 
     def exit_dialog(self, widget, event, return_value):
