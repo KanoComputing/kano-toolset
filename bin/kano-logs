@@ -14,6 +14,7 @@ import sys
 import json
 import pydoc
 import datetime
+import argparse
 
 if __name__ == '__main__' and __package__ is None:
     dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -23,6 +24,7 @@ if __name__ == '__main__' and __package__ is None:
 import kano.logging as logging
 from kano.logging import logger
 from kano.colours import decorate_string, decorate_with_preset
+from kano.utils import enforce_root
 
 def show_logs(app=None):
     logfiles = []
@@ -58,54 +60,61 @@ def show_logs(app=None):
     if len(output) > 0:
         pydoc.pipepager(output, cmd='less -R')
 
+def process_args():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(
+        title="Subcommands",
+        description="These are the commands you can use with kano-logs",
+        help="the available subcommands"
+    )
 
-def must_be_root():
-    if os.getuid() != 0:
-        msg = "ERROR: Must be root to change the modes\n"
-        sys.stderr.write(msg)
-        sys.exit(1)
+    show = subparsers.add_parser("show", help="display logs")
+    show.set_defaults(which="show")
+    show.add_argument(
+        "app",
+        type=str,
+        help="the application to show logs for",
+        default=None,
+        nargs="?"
+    )
 
-def usage(rv):
-    print "Usage: kano-logs show [app]"
-    print "       kano-logs -l | --log-level [level]"
-    print "       kano-logs -d | --debug-level [level]"
-    sys.exit(rv)
+    config = subparsers.add_parser("config", help="configure logging")
+    config.set_defaults(which="config")
+    config.add_argument(
+        "-l", "--log-level",
+        help="set log level",
+        type=str
+    )
+
+    config.add_argument(
+        "-d", "--debug-level",
+        help="set debug level",
+        type=str
+    )
+
+    args = parser.parse_args()
+    return vars(args)
 
 def main():
-    # With no arguments, just print the current setting
-    if len(sys.argv) <= 1:
-        ll = logger.get_log_level()
-        dl = logger.get_debug_level()
-        print "Logging set to {}".format(decorate_with_preset(ll, ll))
-        print "Debugging set to {}".format(decorate_with_preset(dl, dl))
-        return 0
+    args = process_args()
 
-    if len(sys.argv) > 1:
-        if sys.argv[1] in ["-h", "--help", "help"]:
-            usage(0)
-
-        if sys.argv[1] in ["show", "show-logs"]:
-            if len(sys.argv) > 2:
-                show_logs(sys.argv[2])
-            else:
-                show_logs()
+    if args["which"] == "show":
+        show_logs(args["app"])
+    elif args["which"] == "config":
+        if args["log_level"] == None and args["debug_level"] == None:
+            ll = logger.get_log_level()
+            dl = logger.get_debug_level()
+            print "Logging set to {}".format(decorate_with_preset(ll, ll))
+            print "Debugging set to {}".format(decorate_with_preset(dl, dl))
             return 0
 
-        if sys.argv[1] in ["-l", "--log-level"]:
-            if len(sys.argv) > 2:
-                must_be_root()
-                logging.set_system_log_level(sys.argv[2])
-            else:
-                print logger.get_log_level()
-            return 0
+        enforce_root("ERROR: Must be root to change the modes")
 
-        if sys.argv[1] in ["-d", "--debug-level"]:
-            if len(sys.argv) > 2:
-                must_be_root()
-                logging.set_system_debug_level(sys.argv[2])
-            else:
-                print logger.get_debug_level()
-            return 0
+        if "log_level" in args and args["log_level"] is not None:
+            logging.set_system_log_level(args["log_level"])
+
+        if "debug_level" in args and args["debug_level"] is not None:
+            logging.set_system_debug_level(args["debug_level"])
 
     return 0
 
