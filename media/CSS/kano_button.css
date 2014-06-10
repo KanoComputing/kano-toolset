@@ -1,4 +1,3 @@
-
 /* Button CSS */
 
 * {
@@ -7,22 +6,22 @@
 }
 
 /* The main button that updates the changes made in each level */
-.kano_button {
+GtkButton {
     border-radius: 3px;
     border-color: transparent;
     padding: 10px 20px 10px 20px;
 }
 
-.kano_button GtkLabel {
+GtkButton GtkLabel {
     color: #ffffff;
     font: Bariol Bold 13;
 }
 
-.kano_button:insensitive {
+GtkButton:insensitive {
     background: #dddddd;
 }
 
-.kano_button GtkLabel:insensitive {
+GtkButton GtkLabel:insensitive {
     color: #aaaaaa;
 }
 
@@ -40,18 +39,4 @@
 
 .grey_background {
     background: #b7b7b7;
-}
-
-.small_orange_button {
-    background: transparent;
-    padding: 0px;
-}
-
-.small_orange_button GtkLabel {
-    color: @kano_orange;
-    font: Bariol Bold 13px;
-}
-
-.small_orange_button:hover {
-    background: transparent;
 }

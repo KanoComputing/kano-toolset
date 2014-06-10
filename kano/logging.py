@@ -13,6 +13,7 @@ import json
 import time
 import yaml
 from kano.colours import decorate_string, decorate_with_preset
+from kano.utils import get_home_by_username
 
 LOG_ENV = "LOG_LEVEL"
 DEBUG_ENV = "DEBUG_LEVEL"
@@ -23,7 +24,9 @@ if 'SUDO_USER' in os.environ:
     usr = os.getenv("SUDO_USER")
 else:
     usr = pwd.getpwuid(os.getuid())[0]
-USER_LOGS_DIR = "/home/{}/.kano-logs/".format(usr)
+
+home_folder = get_home_by_username(usr)
+USER_LOGS_DIR = os.path.join(home_folder, '.kano-logs')
 
 CONF_FILE = "/etc/kano-logs.conf"
 

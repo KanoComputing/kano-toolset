@@ -7,7 +7,7 @@
 #
 # Create a green button with white text inside
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 from kano.paths import common_css_dir
 import os
 import sys
@@ -26,10 +26,13 @@ class ScrolledWindow(Gtk.ScrolledWindow):
         colour_css.load_from_path(colour_file)
         scrollbar_css.load_from_path(css_file)
 
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        styleContext.add_provider_for_screen(screen, scrollbar_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         Gtk.ScrolledWindow.__init__(self, hexpand=hexpand, vexpand=vexpand)
 
+        styleContext = self.get_style_context()
+        styleContext.add_provider(colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        styleContext.add_provider(scrollbar_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        for bar in [self.get_vscrollbar(), self.get_hscrollbar()]:
+            style = bar.get_style_context()
+            style.add_provider(colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            style.add_provider(scrollbar_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)

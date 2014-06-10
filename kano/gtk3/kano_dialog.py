@@ -19,7 +19,7 @@
 #   print "CANCEL button was clicked"
 
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 from kano.gtk3.buttons import KanoButton
 from kano.gtk3.heading import Heading
 from kano.paths import common_css_dir
@@ -41,26 +41,32 @@ class KanoDialog():
         self.has_entry = has_entry
         self.has_list = has_list
 
-        cssProvider = Gtk.CssProvider()
-        path = os.path.join(common_css_dir, "dialog.css")
-        cssProvider.load_from_path(path)
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         self.dialog = Gtk.Dialog()
+
+        self.dialog_provider = Gtk.CssProvider()
+        dialog_path = os.path.join(common_css_dir, "dialog.css")
+        self.dialog_provider.load_from_path(dialog_path)
+
+        self.colour_provider = Gtk.CssProvider()
+        colours_path = os.path.join(common_css_dir, "colours.css")
+        self.colour_provider.load_from_path(colours_path)
+
+        styleContext = self.dialog.get_style_context()
+        styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
         self.dialog.set_decorated(False)
         self.dialog.set_resizable(False)
         self.dialog.set_border_width(5)
 
         content_area = self.dialog.get_content_area()
         self.content_background = Gtk.EventBox()
-        self.content_background.get_style_context().add_class("white")
+        self.add_style(self.content_background, "white")
         self.content_background.set_size_request(140, 140)
         content_area.reparent(self.content_background)
         action_area = self.dialog.get_action_area()
         self.action_background = Gtk.EventBox()
-        self.action_background.get_style_context().add_class("white")
+        self.add_style(self.action_background, "white")
         action_area.reparent(self.action_background)
         action_area.set_layout(Gtk.ButtonBoxStyle.CENTER)
 
@@ -99,8 +105,16 @@ class KanoDialog():
 
         if self.widget is not None:
             content_area.pack_start(self.widget, False, False, 0)
+            styleContext = self.widget.get_style_context()
+            styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         action_area.pack_start(alignment, False, False, 0)
+
+    def add_style(self, widget, app_class):
+        style = widget.get_style_context()
+        style.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        style.add_class(app_class)
 
     def exit_dialog(self, widget, event, return_value):
         # 65293 is the ENTER keycode

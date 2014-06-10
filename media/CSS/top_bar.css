@@ -11,6 +11,10 @@
     background: @top_bar_color;
 }
 
+.top_bar_button:hover {
+    background: @top_bar_color;
+}
+
 /* Header in top bar (title of window) */
 .top_bar_title {
     color: #222222;
