@@ -300,3 +300,19 @@ def enforce_root(msg):
     if os.getuid() != 0:
         sys.stderr.write(msg + "\n")
         sys.exit(1)
+
+
+def detect_kano_keyboard():
+
+    # Get information of all devices
+    o, _, _ = run_cmd('lsusb -v')
+    # Kano keyboard has the following information:
+    # Vendor id:  0x1997
+    # Product id: 0x2433
+    try:
+        o.index('0x1997')
+        o.index('0x2433')
+    except:
+        return False
+
+    return True
