@@ -23,7 +23,9 @@
     -GtkWidget-separator-height: 0;
 }
 
-/* This is to remove padding */
+/**
+  * This is to remove padding
+  */
 GtkBox GtkEventBox,
 GtkBox GtkFixed,
 GtkBox GtkGrid,
@@ -38,11 +40,19 @@ GtkWindow GtkEventBox {
     padding: 0;
 }
 
+
+/**
+ * Standard window
+ */
+
 GtkWindow {
     color: #ffffff;
     background: #ffffff;
 }
 
+/**
+ * Standard entry
+ */
 GtkEntry {
     border-color: @active_border;
     color: @active_writing;
@@ -60,6 +70,9 @@ GtkEntry:insensitive {
     border-radius:3px;
 }
 
+/**
+ * Standard images - remove background colours
+ */
 GtkImage {
     border-style:none;
     background: transparent;
@@ -70,6 +83,9 @@ GtkImage:hover {
     background: transparent;
 }
 
+/**
+ * Standard dropdown lists
+ */
 GtkComboBox {
     /* font effect arrow size */
     font: Bariol 5;
@@ -101,6 +117,9 @@ GtkComboBox .separator {
     -GtkWidget-wide-separators: true;
 }
 
+/**
+ * Standard checkbuttons/radio-buttons
+ */
 GtkCheckButton,
 GtkRadioButton {
     border-style: solid;
@@ -124,21 +143,27 @@ GtkLabel{
     color: @active_writing;
 }
 
-/* The title of the current level*/
+/**
+  * The title of the current level
+  */
 .title {
     color: @title_color;
     padding-top:25px;
     font: Bariol Bold 16;
 }
 
-/* Description of current project */
+/**
+  * Description of current project
+  */
 .description {
     color: @subheading_color;
     padding-bottom: 18px;
     font: Bariol 14;
 }
 
-/* Menu - relevent for settings and extras */
+/**
+  * Menu - relevent for settings and extras
+  */
 
 /* Used for the stripy grid */
 .appgrid_grey {
