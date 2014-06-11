@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# kano-signal
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Sends a signal to a Kano app (save, load, share, make)
+#
+
+# pipe name to send javascript code
+pipe_name=/tmp/webapp.pipe
+app="none"
+signal="none"
+
+# syntax sanity check
+if [ "$1" == "" ]; then
+    echo "Usage: make-signal < save | load | share | make >"
+    exit 1
+else
+    signal=$1
+fi
+
+# if there is no pipe, webkit is not running
+if [ ! -p $pipe_name ]; then
+    # nor Pong nor Minecraft are running, byebye
+    exit 1
+else
+    # which one is running? 
+    xwininfo -tree -root|grep -i pong > /dev/null 2>&1
+    if [ $? == 0 ]; then
+	app="pong"
+    else 
+	xwininfo -tree -root|grep -i minecraft > /dev/null 2>&1
+	if [ $? == 0 ]; then
+	    app="minecraft"
+	fi
+    fi
+
+    if [ $app == "" ]; then
+	exit 1
+    fi
+fi
+
+# Specific application -> signal functions to deliver Javascript code
+function pong-save {
+    jscmd="IO.updateScreenshotSrc(); location.href='#saveDialog'; IO.addListeners();"
+    echo $jscmd > $pipe_name
+}
+
+# construct an application name, append a signal name, then dispatch to the specific function
+appsignal="$app-$signal"
+if [ "$2" == "debug" ]; then
+    echo "Dispatching signal: $appsignal"
+fi
+
+eval $appsignal
+exit $?
