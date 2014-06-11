@@ -17,7 +17,6 @@ import warnings
 import subprocess
 
 import thread
-import time
 import atexit
 
 from kano.window import gdk_window_settings
