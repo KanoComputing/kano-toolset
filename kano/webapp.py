@@ -7,6 +7,7 @@
 #
 
 import gtk
+import gobject
 import webkit
 import sys
 import re
@@ -15,7 +16,46 @@ import urllib
 import warnings
 import subprocess
 
+import thread
+import time
+import atexit
+
 from kano.window import gdk_window_settings
+
+def asynchronous_gtk_message(fun):
+
+    def worker((function, args, kwargs)):
+        apply(function, args, kwargs)
+
+    def fun2(*args, **kwargs):
+        gobject.idle_add(worker, (fun, args, kwargs))
+
+    return fun2
+
+
+def atexit_pipe_cleanup(pipe_file):
+    os.unlink (pipe_file)
+
+
+def thr_inject_javascript (browser, pipe_file):
+    '''
+    This function reads from a pipe, a plain message interpreted as Javascript code.
+    It then injects that code into the Webkit browser instance.
+    From a bash script test it like this:
+
+    $ echo "alert(\"Hello Kano\")" > /tmp/webapp.pipe
+
+    TODO: collect and return synchronous error level? what about pipe security?
+    '''
+    if os.path.exists (pipe_file):
+        os.unlink (pipe_file)
+
+    os.mkfifo (pipe_file)
+    while True:
+        f = open (pipe_file, 'r')
+        pipe_data = f.read().strip('\n')
+        asynchronous_gtk_message (browser.execute_script)(pipe_data)
+        f.close()
 
 
 class WebApp(object):
@@ -42,6 +82,8 @@ class WebApp(object):
                       "--text=Loading...",
                       "--width=300", "--height=90", "--auto-close",
                       "--timeout=10", "--auto-kill"]
+
+        self._pipe_name = '/tmp/webapp.pipe'
 
         self._zenity = subprocess.Popen(zenity_cmd, stdin=subprocess.PIPE)
         zin = self._zenity.stdin
@@ -100,6 +142,10 @@ class WebApp(object):
         view.open(self._index)
 
         zin.write("99\n")
+
+        # Start a thread that injects Javascript code coming from a filesystem pipe.
+        atexit.register (atexit_pipe_cleanup, self._pipe_name)
+        thread.start_new_thread (thr_inject_javascript, (self._view, self._pipe_name))
 
         gtk.main()
 
