@@ -11,7 +11,7 @@
 # Example usage:
 # from kano.gtk3 import kano_dialog
 #
-# kdialog = kano_dialog.KanoDialog("title", "description", {"OK": 0,"CANCEL": -1})
+# kdialog = kano_dialog.KanoDialog("title", "description", {"OK": {"return_value": 0, "color": "orange"},"CANCEL": {"return_value": -1, "color": "red"}})
 # response = kdialog.run()
 # if response == 0:
 #   print "OK button was clicked"
@@ -102,6 +102,7 @@ class KanoDialog():
             button = KanoButton(button_name)
             button.set_color(color)
             button.connect("button-press-event", self.exit_dialog, return_value)
+            button.connect("key-release-event", self.exit_dialog, return_value)
             self.buttons.append(button)
             button_box.pack_start(button, False, False, 6)
 

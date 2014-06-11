@@ -1,15 +1,12 @@
 
 /* Button CSS */
 
-* {
-    -unico-focus-border-color: transparent; /* Removes the annoying red outline on active buttons*/
-    -GtkWidget-focus-line-width: 0px;
-}
-
 /* The main button that updates the changes made in each level */
 .kano_button {
+    -GtkWidget-focus-line-width: 0;
     border-radius: 3px;
     border-color: transparent;
+    border-width: 2px;
     padding: 10px 20px 10px 20px;
 }
 
@@ -30,16 +27,36 @@
     background: @kano_green;
 }
 
+.green_background:focus {
+    border-color: mix(@kano_green, #ffffff, 0.4);
+    border-style: solid;
+}
+
 .red_background {
     background: @kano_red;
+}
+
+.red_background:focus {
+    border-color: mix(@kano_red, #ffffff, 0.4);
+    border-style: solid;
 }
 
 .orange_background {
     background: @kano_orange;
 }
 
+.orange_background:focus {
+    border-color: mix(@kano_orange, #ffffff, 0.4);
+    border-style: solid;
+}
+
 .grey_background {
     background: #b7b7b7;
+}
+
+.grey_background:focus {
+    border-color: mix(#b7b7b7, #ffffff, 0.4);
+    border-style: solid;
 }
 
 .small_orange_button {
