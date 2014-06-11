@@ -20,12 +20,20 @@ OUTPUT_ENV = "OUTPUT_LEVEL"
 SYSTEM_LOGS_DIR = "/var/log/kano/"
 
 # get_user_unsudoed() cannot be used due to a circular dependency
-if 'SUDO_USER' in os.environ:
-    usr = os.getenv("SUDO_USER")
-else:
-    usr = pwd.getpwuid(os.getuid())[0]
+is_sudoed = 'SUDO_USER' in os.environ
+usr = os.getenv("SUDO_USER") if is_sudoed else pwd.getpwuid(os.getuid())[0]
 
-home_folder = get_home_by_username(usr)
+try:
+    home_folder = get_home_by_username(usr)
+except KeyError: # user doesn't exist
+    if is_sudoed:
+        # something weird happened with sudo
+        # fall back to the root user
+        usr = "root"
+        home_folder = "/root/"
+    else:
+        raise
+
 USER_LOGS_DIR = os.path.join(home_folder, '.kano-logs')
 
 CONF_FILE = "/etc/kano-logs.conf"
