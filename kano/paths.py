@@ -7,7 +7,7 @@
 import os
 
 # setting up directories
-dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../kano-toolset'))
 
 # media dir
 media_local = os.path.join(dir_path, 'media')
