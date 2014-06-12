@@ -48,6 +48,21 @@ function pong-save {
     echo $jscmd > $pipe_name
 }
 
+function pong-load {
+    jscmd="location.href='#loadSource'"
+    echo $jscmd > $pipe_name
+}
+
+function pong-share {
+    jscmd="IO.updateScreenshotSrc(); location.href='#shareDialog'; IO.addListeners();"
+    echo $jscmd > $pipe_name
+}
+
+function pong-make {
+    jscmd="SoundFX.make.play(); Stats.update(); IO.screenshot(); Pong.savePythonScript()"
+    echo $jscmd > $pipe_name
+}
+
 # construct an application name, append a signal name, then dispatch to the specific function
 appsignal="$app-$signal"
 if [ "$2" == "debug" ]; then
