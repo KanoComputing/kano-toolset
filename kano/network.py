@@ -395,7 +395,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     of the wireless network AP.
     '''
 
-    udhcpc_cmdline = 'udhcpc -S -t 3 -A 10 -n -a --script=/etc/udhcpc/kano.script -i %s' % iface
+    udhcpc_cmdline = 'udhcpc -S -t 70 -A 20 -n -a --script=/etc/udhcpc/kano.script -i %s' % iface
     time.sleep(1)
 
     #
