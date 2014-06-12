@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
+# kano-window-tool
+#
 # Copyright (C) 2013, 2014 Kano Computing Ltd.
 # License: GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
 #
-# Author: Radek Pazdera <radek@kano.me>
-# Description: A tool used to manipulate window properties
+# A tool used to manipulate window properties
 
 import sys
 import re
