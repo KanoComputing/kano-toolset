@@ -236,7 +236,7 @@ def cleanup(app=None):
     for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                if app != None or re.match("^{}\.log".format(app), log):
+                if app == None or re.match("^{}\.log".format(app), log):
                     log_path = os.path.join(d, log)
                     try:
                         __tail_log_file(log_path, 100)
