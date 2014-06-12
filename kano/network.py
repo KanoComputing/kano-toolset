@@ -368,10 +368,12 @@ def is_internet():
 
 def wpa_conf(essid, psk, confile):
     wpa_conf = '''
+      ctrl_interface=/var/run/wpa_supplicant
       network={
              ssid="%s"
              scan_ssid=1
-             key_mgmt=WPA-PSK
+             key_mgmt=WPA-EAP WPA-PSK IEEE8021X NONE
+             pairwise=CCMP TKIP
              psk="%s"
       }
     ''' % (essid, psk)
@@ -454,14 +456,28 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             pass
 
     try:
-        # gratious time for wireless association to happen
-        time.sleep(3)
-        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
-        execute(udhcpc_cmdline)
+        # Wait for wpa_supplicant to become associated to the AP
+        # or give up if it takes too long
+        assoc_timeout = 20 # seconds
+        assoc_start = time.time()
+        while time.time() - assoc_start < 15:
+            r = os.popen('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
+            wpa_state = r.read().strip('\n')
+            print wpa_state
+            if wpa_state.split('=')[1] == 'COMPLETED':
+                logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
+                execute(udhcpc_cmdline)
+                return True
+            
+            r.close()
+            time.sleep (0.5)
+
+        logger.info("Giving up wireless association, T/O=%d" % assoc_timeout)
+
     except:
         pass
 
-    return True
+    return False
 
 
 def disconnect(iface):
