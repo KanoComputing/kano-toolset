@@ -19,6 +19,9 @@ LOG_ENV = "LOG_LEVEL"
 OUTPUT_ENV = "OUTPUT_LEVEL"
 SYSTEM_LOGS_DIR = "/var/log/kano/"
 
+# The length to which will the log files be cut to when cleaned up
+TAIL_LENGTH = 500
+
 # get_user_unsudoed() cannot be used due to a circular dependency
 is_sudoed = 'SUDO_USER' in os.environ
 usr = os.getenv("SUDO_USER") if is_sudoed else pwd.getpwuid(os.getuid())[0]
@@ -105,6 +108,12 @@ class Logger:
             self._load_conf()
 
         return self._cached_output_level
+
+    def force_log_level(self, level):
+        self._cached_log_level = normalise_level(level)
+
+    def force_debug_level(self, level):
+        self._cached_output_level = normalise_level(level)
 
     def set_app_name(self, name):
         self._app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
@@ -236,10 +245,10 @@ def cleanup(app=None):
     for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                if app != None or re.match("^{}\.log".format(app), log):
+                if app == None or re.match("^{}\.log".format(app), log):
                     log_path = os.path.join(d, log)
                     try:
-                        __tail_log_file(log_path, 100)
+                        __tail_log_file(log_path, TAIL_LENGTH)
                     except IOError:
                         pass
 
