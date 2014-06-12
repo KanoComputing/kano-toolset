@@ -37,7 +37,7 @@ else
 	fi
     fi
 
-    if [ $app == "" ]; then
+    if [ $app == "none" ]; then
 	exit 1
     fi
 fi
