@@ -310,8 +310,8 @@ def detect_kano_keyboard():
     # Vendor id:  0x1997
     # Product id: 0x2433
     try:
-        o.index('0x1997')
-        o.index('0x2433')
+        o.index('1997')
+        o.index('2433')
     except:
         return False
 
