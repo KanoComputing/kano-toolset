@@ -316,3 +316,17 @@ def detect_kano_keyboard():
         return False
 
     return True
+
+
+def percent_to_millibel(percent):
+    from math import log10
+
+    multiplier = 2.5
+
+    percent *= multiplier
+    percent = min(percent, 100. * multiplier)
+    percent = max(percent, 0.000001)
+
+    millibel = 1000 * log10(percent / 100.)
+
+    return int(millibel)
