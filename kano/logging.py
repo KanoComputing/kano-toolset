@@ -167,8 +167,7 @@ class Logger:
         if self._log_file != None:
             self._log_file.close()
 
-        sudo_user = os.getenv("SUDO_USER")
-        if os.getuid() == 0 and sudo_user == None:
+        if os.getuid() == 0 and not is_sudoed:
             logs_dir = SYSTEM_LOGS_DIR
         else:
             logs_dir = USER_LOGS_DIR
@@ -177,21 +176,21 @@ class Logger:
             os.makedirs(logs_dir)
 
             # Fix permissions in case we need to create the dir with sudo
-            if sudo_user:
-                uid = pwd.getpwnam(sudo_user).pw_uid
-                gid = grp.getgrnam(sudo_user).gr_gid
+            if is_sudoed:
+                uid = pwd.getpwnam(usr).pw_uid
+                gid = grp.getgrnam(usr).gr_gid
                 os.chown(logs_dir, uid, gid)
 
         log_fn = "{}/{}.log".format(logs_dir, self._app_name)
 
         # Fix permissions in case we need to create the file with sudo
-        if not os.path.isfile(log_fn) and sudo_user:
+        if not os.path.isfile(log_fn) and is_sudoed:
             # touch
             with open(log_fn, 'a'):
                 pass
 
-            uid = pwd.getpwnam(sudo_user).pw_uid
-            gid = grp.getgrnam(sudo_user).gr_gid
+            uid = pwd.getpwnam(usr).pw_uid
+            gid = grp.getgrnam(usr).gr_gid
             os.chown(log_fn, uid, gid)
 
         self._log_file = open("{}/{}.log".format(logs_dir, self._app_name), "a")
