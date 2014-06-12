@@ -1,8 +1,9 @@
 #!/bin/bash
 
+# kano-volume
+#
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
 #
 #  This script increases and decreases the analog audio volume output level
 #
