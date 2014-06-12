@@ -1,7 +1,12 @@
+/* 
+# buttons.css
+# 
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# The main button that updates the changes made in each level
+*/
 
-/* Button CSS */
-
-/* The main button that updates the changes made in each level */
 .kano_button {
     -GtkWidget-focus-line-width: 0;
     border-radius: 3px;
