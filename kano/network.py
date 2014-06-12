@@ -463,7 +463,6 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         while time.time() - assoc_start < 15:
             r = os.popen('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
             wpa_state = r.read().strip('\n')
-            print wpa_state
             if wpa_state.split('=')[1] == 'COMPLETED':
                 logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
                 execute(udhcpc_cmdline)
