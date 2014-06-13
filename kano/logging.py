@@ -110,10 +110,14 @@ class Logger:
         return self._cached_output_level
 
     def force_log_level(self, level):
-        self._cached_log_level = normalise_level(level)
+        normalised = normalise_level(level)
+        if LEVELS[self._cached_log_level] < LEVELS[normalised]:
+            self._cached_log_level = normalised
 
     def force_debug_level(self, level):
-        self._cached_output_level = normalise_level(level)
+        normalised = normalise_level(level)
+        if LEVELS[self._cached_output_level] < LEVELS[normalised]:
+            self._cached_output_level = normalised
 
     def set_app_name(self, name):
         self._app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
