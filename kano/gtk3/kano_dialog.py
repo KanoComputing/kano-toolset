@@ -57,6 +57,7 @@ class KanoDialog():
 
         self.dialog.set_decorated(False)
         self.dialog.set_resizable(False)
+        self.set_keep_above(True)
         self.dialog.set_border_width(5)
 
         content_area = self.dialog.get_content_area()
