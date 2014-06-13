@@ -1,3 +1,9 @@
+kano-toolset (1.0.4-6) unstable; urgency=low
+
+  * Added force_level methods to logging
+
+ -- Team Kano <dev@kano.me>  Fri, 13 Jun 2014 14:30:17 +0100
+
 kano-toolset (1.0.4-5) unstable; urgency=low
 
   * New kano-logs interface
