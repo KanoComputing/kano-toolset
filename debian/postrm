@@ -11,11 +11,6 @@ case "$1" in
         # Remove config file
         rm /etc/sudoers.d/kano-toolset_conf
 
-        # Remove kano-logs config
-        if [ -f /etc/kano-logs.conf ]; then
-            rm -rf /etc/kano-logs.conf
-        fi
-
         ;;
 esac
 
