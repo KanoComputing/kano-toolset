@@ -19,12 +19,13 @@ class ScrolledWindow(Gtk.ScrolledWindow):
         css_file = os.path.join(common_css_dir, 'scrollbar.css')
         if not os.path.exists(css_file):
             sys.exit('CSS file missing!')
+        scrollbar_css.load_from_path(css_file)
+
         colour_css = Gtk.CssProvider()
         colour_file = os.path.join(common_css_dir, 'colours.css')
         if not os.path.exists(colour_file):
             sys.exit('CSS file missing!')
         colour_css.load_from_path(colour_file)
-        scrollbar_css.load_from_path(css_file)
 
         Gtk.ScrolledWindow.__init__(self, hexpand=hexpand, vexpand=vexpand)
 

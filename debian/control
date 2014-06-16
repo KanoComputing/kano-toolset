@@ -12,3 +12,4 @@ Depends: ${misc:Depends}, python-gtk2, python-webkit,
 Replaces: kano-init (<< 1.0-46)
 Breaks: kano-init (<< 1.0-46)
 Description: Collection of tools for Kanux
+ Contains mostly generic tools that are used at many places in Kano OS.
