@@ -243,7 +243,7 @@ def read_logs(app=None):
 
     return data
 
-def cleanup(app=None):
+def cleanup(app=None, line_limit=TAIL_LENGTH):
     dirs = [USER_LOGS_DIR]
     if os.getuid() == 0:
         dirs.append(SYSTEM_LOGS_DIR)
@@ -254,7 +254,7 @@ def cleanup(app=None):
                 if app == None or re.match("^{}\.log".format(app), log):
                     log_path = os.path.join(d, log)
                     try:
-                        __tail_log_file(log_path, TAIL_LENGTH)
+                        __tail_log_file(log_path, line_limit)
                     except IOError:
                         pass
 
