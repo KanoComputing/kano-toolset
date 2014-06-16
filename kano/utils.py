@@ -265,10 +265,12 @@ def chown_path(path, user=None, group=None):
 
 
 def play_sound(audio_file, background=False):
+    from kano.logging import logger
 
     # Check if file exists
     if not os.path.isfile(audio_file):
         return False
+
     # Find out if we use HDMI or analogue
     cmd = "omxplayer "
     try:
@@ -278,8 +280,13 @@ def play_sound(audio_file, background=False):
     except Exception:
         pass
 
+    volume_percent, _ = get_volume()
+
     cmd += audio_file
+    cmd += ' --vol {}'.format(percent_to_millibel(volume_percent, raspberry_mod=True))
     cmd += " 2>/dev/null >/dev/null"
+
+    logger.debug('cmd: {}'.format(cmd))
 
     if background:
         run_bg(cmd)
@@ -318,15 +325,51 @@ def detect_kano_keyboard():
     return True
 
 
-def percent_to_millibel(percent):
-    from math import log10
+def percent_to_millibel(percent, raspberry_mod=False):
+    if not raspberry_mod:
+        from math import log10
 
-    multiplier = 2.5
+        multiplier = 2.5
 
-    percent *= multiplier
-    percent = min(percent, 100. * multiplier)
-    percent = max(percent, 0.000001)
+        percent *= multiplier
+        percent = min(percent, 100. * multiplier)
+        percent = max(percent, 0.000001)
 
-    millibel = 1000 * log10(percent / 100.)
+        millibel = 1000 * log10(percent / 100.)
+
+    else:
+        min_allowed = -4000
+        max_allowed = 400
+        percent = percent / 100.
+        millibel = min_allowed + (max_allowed - min_allowed) * percent
 
     return int(millibel)
+
+
+def get_volume(raspberry_mod=True):
+    from kano.logging import logger
+
+    percent = 100
+    millibel = 400
+
+    cmd = "amixer | grep %"
+    o, _, _ = run_cmd(cmd)
+    o = o.strip().split(' ')
+
+    try:
+        millibel = int(o[2])
+    except Exception:
+        msg = 'asmixer format bad for millibel, o: {}'.format(o)
+        logger.error(msg)
+        pass
+
+    try:
+        percent = int(o[3].translate(None, '[]%'))
+    except Exception:
+        msg = 'asmixer format bad for percent, o: {}'.format(o)
+        logger.error(msg)
+        pass
+
+    # logger.debug('percent: {}, millibel: {}'.format(percent, millibel))
+
+    return percent, millibel
