@@ -19,13 +19,24 @@ LOG_ENV = "LOG_LEVEL"
 OUTPUT_ENV = "OUTPUT_LEVEL"
 SYSTEM_LOGS_DIR = "/var/log/kano/"
 
-# get_user_unsudoed() cannot be used due to a circular dependency
-if 'SUDO_USER' in os.environ:
-    usr = os.getenv("SUDO_USER")
-else:
-    usr = pwd.getpwuid(os.getuid())[0]
+# The length to which will the log files be cut to when cleaned up
+TAIL_LENGTH = 500
 
-home_folder = get_home_by_username(usr)
+# get_user_unsudoed() cannot be used due to a circular dependency
+is_sudoed = 'SUDO_USER' in os.environ
+usr = os.getenv("SUDO_USER") if is_sudoed else pwd.getpwuid(os.getuid())[0]
+
+try:
+    home_folder = get_home_by_username(usr)
+except KeyError: # user doesn't exist
+    if is_sudoed:
+        # something weird happened with sudo
+        # fall back to the root user
+        usr = "root"
+        home_folder = "/root/"
+    else:
+        raise
+
 USER_LOGS_DIR = os.path.join(home_folder, '.kano-logs')
 
 CONF_FILE = "/etc/kano-logs.conf"
@@ -98,6 +109,18 @@ class Logger:
 
         return self._cached_output_level
 
+    def force_log_level(self, level):
+        normalised = normalise_level(level)
+        if not self._cached_log_level or \
+           LEVELS[self._cached_log_level] < LEVELS[normalised]:
+            self._cached_log_level = normalised
+
+    def force_debug_level(self, level):
+        normalised = normalise_level(level)
+        if not self._cached_output_level or \
+           LEVELS[self._cached_output_level] < LEVELS[normalised]:
+            self._cached_output_level = normalised
+
     def set_app_name(self, name):
         self._app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
         if self._log_file != None:
@@ -159,8 +182,7 @@ class Logger:
         if self._log_file != None:
             self._log_file.close()
 
-        sudo_user = os.getenv("SUDO_USER")
-        if os.getuid() == 0 and sudo_user == None:
+        if os.getuid() == 0 and not is_sudoed:
             logs_dir = SYSTEM_LOGS_DIR
         else:
             logs_dir = USER_LOGS_DIR
@@ -169,21 +191,21 @@ class Logger:
             os.makedirs(logs_dir)
 
             # Fix permissions in case we need to create the dir with sudo
-            if sudo_user:
-                uid = pwd.getpwnam(sudo_user).pw_uid
-                gid = grp.getgrnam(sudo_user).gr_gid
+            if is_sudoed:
+                uid = pwd.getpwnam(usr).pw_uid
+                gid = grp.getgrnam(usr).gr_gid
                 os.chown(logs_dir, uid, gid)
 
         log_fn = "{}/{}.log".format(logs_dir, self._app_name)
 
         # Fix permissions in case we need to create the file with sudo
-        if not os.path.isfile(log_fn) and sudo_user:
+        if not os.path.isfile(log_fn) and is_sudoed:
             # touch
             with open(log_fn, 'a'):
                 pass
 
-            uid = pwd.getpwnam(sudo_user).pw_uid
-            gid = grp.getgrnam(sudo_user).gr_gid
+            uid = pwd.getpwnam(usr).pw_uid
+            gid = grp.getgrnam(usr).gr_gid
             os.chown(log_fn, uid, gid)
 
         self._log_file = open("{}/{}.log".format(logs_dir, self._app_name), "a")
@@ -229,10 +251,10 @@ def cleanup(app=None):
     for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                if app != None or re.match("^{}\.log".format(app), log):
+                if app == None or re.match("^{}\.log".format(app), log):
                     log_path = os.path.join(d, log)
                     try:
-                        __tail_log_file(log_path, 100)
+                        __tail_log_file(log_path, TAIL_LENGTH)
                     except IOError:
                         pass
 

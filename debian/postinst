@@ -23,6 +23,14 @@ case "$1" in
         # Move the file to the sudoers directory
         mv $TMP_FILE /etc/sudoers.d/
 
+        # Configure kano.logging
+        if [ ! -f /etc/kano-logs.conf ]; then
+            cat >/etc/kano-logs.conf <<EOF
+log_level: error
+debug_level: none
+EOF
+        fi
+
         ;;
 esac
 

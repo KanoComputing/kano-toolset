@@ -70,6 +70,7 @@ class WebApp(object):
     _maximized = False
     _decoration = True
     _taskbar = True
+    _pipe = True
 
     _zenity = None
 
@@ -143,8 +144,9 @@ class WebApp(object):
         zin.write("99\n")
 
         # Start a thread that injects Javascript code coming from a filesystem pipe.
-        atexit.register (atexit_pipe_cleanup, self._pipe_name)
-        thread.start_new_thread (thr_inject_javascript, (self._view, self._pipe_name))
+        if self._pipe == True:
+            atexit.register (atexit_pipe_cleanup, self._pipe_name)
+            thread.start_new_thread (thr_inject_javascript, (self._view, self._pipe_name))
 
         gtk.main()
 

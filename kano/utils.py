@@ -310,9 +310,23 @@ def detect_kano_keyboard():
     # Vendor id:  0x1997
     # Product id: 0x2433
     try:
-        o.index('0x1997')
-        o.index('0x2433')
+        o.index('1997')
+        o.index('2433')
     except:
         return False
 
     return True
+
+
+def percent_to_millibel(percent):
+    from math import log10
+
+    multiplier = 2.5
+
+    percent *= multiplier
+    percent = min(percent, 100. * multiplier)
+    percent = max(percent, 0.000001)
+
+    millibel = 1000 * log10(percent / 100.)
+
+    return int(millibel)

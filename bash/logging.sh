@@ -1,8 +1,9 @@
-# bash wrapper for kano.logging
+# logging.sh
 #
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
+# bash wrapper for kano.logging
 # Usage:
 #
 # . /usr/share/kano-toolset/logger.sh
