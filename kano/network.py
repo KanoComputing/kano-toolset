@@ -447,6 +447,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     elif encrypt == 'wpa':
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
         wpafile = '/etc/kano_wpa_connect.conf'
+        associated = False
         wpa_conf(essid, seckey, confile=wpafile)
 
         try:
