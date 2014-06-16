@@ -127,7 +127,6 @@ class KanoDialog():
             styleContext = text.get_style_context()
             styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
             styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-            styleContext.add_provider(self.common_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
             scrolledwindow.set_size_request(400, 200)
             content_area.pack_start(scrolledwindow, False, False, 0)
