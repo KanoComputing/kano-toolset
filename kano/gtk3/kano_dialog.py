@@ -53,10 +53,6 @@ class KanoDialog():
         colours_path = os.path.join(common_css_dir, "colours.css")
         self.colour_provider.load_from_path(colours_path)
 
-        self.common_provider = Gtk.CssProvider()
-        common_path = os.path.join(common_css_dir, "common.css")
-        self.common_provider.load_from_path(common_path)
-
         styleContext = self.dialog.get_style_context()
         styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -120,18 +116,22 @@ class KanoDialog():
 
         # Add scrolled window
         if self.scrolled_text is not None:
+            scrolledwindow = ScrolledWindow()
+            scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+
             text = Gtk.TextView()
             text.get_buffer().set_text(self.scrolled_text)
             text.set_wrap_mode(Gtk.WrapMode.WORD)
             text.set_editable(False)
-            scrolledwindow = ScrolledWindow()
-            scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
             scrolledwindow.add_with_viewport(text)
+            styleContext = text.get_style_context()
+            styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            styleContext.add_provider(self.common_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
             scrolledwindow.set_size_request(400, 200)
             content_area.pack_start(scrolledwindow, False, False, 0)
-            styleContext = scrolledwindow.get_style_context()
-            styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-            styleContext.add_provider(self.common_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
         # or add widget
         elif self.widget is not None:
             content_area.pack_start(self.widget, False, False, 0)
@@ -236,7 +236,10 @@ def parse_items(args):
         if split[0] == 'description':
             description = split[1]
 
-    return title, description, buttons, widget, has_entry, has_list
+        if split[0] == "scrolled_text":
+            scrolled_text = split[1]
+
+    return title, description, buttons, widget, has_entry, has_list, scrolled_text
 
 
 def on_button_toggled(button):

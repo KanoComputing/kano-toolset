@@ -7,8 +7,6 @@
 # This controls the dialog style
 */
 
-/* This is the border colour of the dialog box.
-   We draw the border by putting an event box on top of the window */
 GtkDialog {
     background: #e7e7e7;
 }
