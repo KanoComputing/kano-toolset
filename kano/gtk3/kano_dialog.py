@@ -22,6 +22,7 @@
 from gi.repository import Gtk
 from kano.gtk3.buttons import KanoButton
 from kano.gtk3.heading import Heading
+from kano.gtk3.scrolled_window import ScrolledWindow
 from kano.paths import common_css_dir
 import os
 
@@ -32,7 +33,7 @@ background_colors = ['grey', 'white']
 
 class KanoDialog():
     # button_dict includes the button text, color and button return values
-    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False):
+    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False, scrolled_text=None):
         self.title_text = title_text
         self.description_text = description_text
         self.widget = widget
@@ -40,6 +41,7 @@ class KanoDialog():
         self.returnvalue = 0
         self.has_entry = has_entry
         self.has_list = has_list
+        self.scrolled_text = scrolled_text
 
         self.dialog = Gtk.Dialog()
 
@@ -50,6 +52,10 @@ class KanoDialog():
         self.colour_provider = Gtk.CssProvider()
         colours_path = os.path.join(common_css_dir, "colours.css")
         self.colour_provider.load_from_path(colours_path)
+
+        self.common_provider = Gtk.CssProvider()
+        common_path = os.path.join(common_css_dir, "common.css")
+        self.common_provider.load_from_path(common_path)
 
         styleContext = self.dialog.get_style_context()
         styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -111,7 +117,22 @@ class KanoDialog():
         # annoying uneven alignment - cannot seem to centre y position
         alignment.set_padding(6, 3, 0, 0)
 
-        if self.widget is not None:
+        # Add scrolled window
+        if self.scrolled_text is not None:
+            text = Gtk.TextView()
+            text.get_buffer().set_text(self.scrolled_text)
+            text.set_wrap_mode(Gtk.WrapMode.WORD)
+            text.set_editable(False)
+            scrolledwindow = ScrolledWindow()
+            scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            scrolledwindow.add_with_viewport(text)
+            scrolledwindow.set_size_request(400, 200)
+            content_area.pack_start(scrolledwindow, False, False, 0)
+            styleContext = scrolledwindow.get_style_context()
+            styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            styleContext.add_provider(self.common_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        # or add widget
+        elif self.widget is not None:
             content_area.pack_start(self.widget, False, False, 0)
             styleContext = self.widget.get_style_context()
             styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
