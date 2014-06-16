@@ -452,31 +452,32 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         try:
             # wpa_supplicant might complain even if it goes ahead doing its job
             execute("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+
+            # Wait for wpa_supplicant to become associated to the AP
+            # or give up if it takes too long
+            assoc_timeout = 20 # seconds
+            assoc_start = time.time()
+            while (time.time() - assoc_start) < assoc_timeout:
+                r = os.popen('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
+                wpa_state = r.read().strip('\n')
+                if wpa_state.split('=')[1] == 'COMPLETED':
+                    associated = True
+                    break
+            
+                r.close()
+                time.sleep (0.5)
         except:
             pass
 
+        if not associated:
+            return False
+
     try:
-        # Wait for wpa_supplicant to become associated to the AP
-        # or give up if it takes too long
-        assoc_timeout = 20 # seconds
-        assoc_start = time.time()
-        while time.time() - assoc_start < 15:
-            r = os.popen('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
-            wpa_state = r.read().strip('\n')
-            if wpa_state.split('=')[1] == 'COMPLETED':
-                logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
-                execute(udhcpc_cmdline)
-                return True
-            
-            r.close()
-            time.sleep (0.5)
-
-        logger.info("Giving up wireless association, T/O=%d" % assoc_timeout)
-
+        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
+        execute(udhcpc_cmdline)
+        return True
     except:
-        pass
-
-    return False
+        return False
 
 
 def disconnect(iface):
