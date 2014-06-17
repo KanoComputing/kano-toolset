@@ -281,7 +281,7 @@ def execute(cmdline):
     (out, err) = p.communicate()
     rc = p.returncode
     if not rc == 0:
-        logger.error('FAIL: "%s" rc=%s, out="%s", err="%s"' % (cmdline, rc, out, err))
+        logger.debug('FAIL: "%s" rc=%s, out="%s", err="%s"' % (cmdline, rc, out, err))
         raise Exception(cmdline, 'rc=%s, out="%s", err="%s"' % (rc, out, err))
     else:
         return out, err
