@@ -123,6 +123,8 @@ class KanoDialog():
             text.get_buffer().set_text(self.scrolled_text)
             text.set_wrap_mode(Gtk.WrapMode.WORD)
             text.set_editable(False)
+            # Stop a cursor appearing in the textview
+            text.set_can_focus(False)
             scrolledwindow.add_with_viewport(text)
             styleContext = text.get_style_context()
             styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
