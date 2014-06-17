@@ -395,7 +395,7 @@ def reload_kernel_module (device_vendor='148f', device_product='5370', module='r
 
     # Terminate wpa_supplicant daemon
     try:
-        rc = os.system('wpa_cli terminate ; sleep .5 > /dev/null 2>&1')
+        rc = os.system('wpa_cli terminate > /dev/null 2>&1 ; sleep .5')
         logger.info ('wpa_cli has been terminated')
     except:
         logger.error ('wpa_cli terminate failed - probably supplicant is not running rc=%d' % rc)
