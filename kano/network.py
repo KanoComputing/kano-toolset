@@ -392,10 +392,20 @@ def reload_kernel_module (device_vendor='148f', device_product='5370', module='r
     FIXME: This procedure should be called prior to connect() to circumvent current kernel module random problems.
     '''
     reloaded = False
+
+    # Terminate wpa_supplicant daemon
+    try:
+        rc = os.system('wpa_cli terminate ; sleep .5 > /dev/null 2>&1')
+        logger.info ('wpa_cli has been terminated')
+    except:
+        logger.error ('wpa_cli terminate failed - probably supplicant is not running rc=%d' & rc)
+        pass
+
+
     rc = os.system('lsusb -d %s:%s > /dev/null 2>&1' % (device_vendor, device_product))
     if rc == 0:
         # The device id is matched, reload the kernel driver
-        rc_load = os.system ('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1' % (module, module))
+        rc_load = os.system ('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1 ; sleep 5' % (module, module))
         logger.info ('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' % 
                      (module, device_vendor, device_product, rc_load))
         if rc_load == 0:
