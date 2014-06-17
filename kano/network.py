@@ -382,6 +382,27 @@ def wpa_conf(essid, psk, confile):
     f.write(wpa_conf)
     f.close()
 
+def reload_kernel_module (device_vendor='148f', device_product='5370', module='rt2800usb'):
+    '''
+    If the Kano USB deviceID is connected to the system, reload the kernel module. Returns True if reloaded.
+    Works silently and ok even if the module is not currently loaded in the kernel.
+    FIXME: This procedure should be called prior to connect() to circumvent current kernel module random problems.
+    '''
+    reloaded = False
+    rc = os.system('lsusb -d %s:%s > /dev/null 2>&1' % (device_vendor, device_product))
+    if rc == 0:
+        # The device id is matched, reload the kernel driver
+        rc_load = os.system ('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1' % (module, module))
+        logger.info ('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' % 
+                     (module, device_vendor, device_product, rc_load))
+        if rc_load == 0:
+            reloaded = True
+    else:
+        logger.info ('Not reloading kernel module because device not found (%s:%s)' % (device_vendor, device_product))
+
+    return reloaded
+
+
 def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     '''
     Attempts a wireless association with provided parameters.
