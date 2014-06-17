@@ -185,6 +185,7 @@ def parse_items(args):
     widget = None
     title = ""
     description = ""
+    scrolled_text = ""
     has_entry = False
     has_list = False
     buttons = {}

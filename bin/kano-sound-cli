@@ -9,17 +9,13 @@
 
 import os
 import sys
+
 if __name__ == '__main__' and __package__ is None:
     dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if dir_path != '/usr':
         sys.path.insert(1, dir_path)
 
-import os.path
-
-def check_arg_len(number):
-    if len(sys.argv) != number + 1:
-        print 'Command entered was {}'.format(sys.argv)
-        sys.exit("Wrong usage, need {} arguments".format(number))
+from kano.utils import play_sound
 
 
 if __name__ != '__main__':
@@ -37,13 +33,5 @@ audio_file = sys.argv[1]
 if not os.path.isfile(audio_file):
     sys.exit("Audio file could not be found")
 
-# Find out if we use HDMI or analogue
-cmd = "omxplayer "
-try:
-    from kano_settings.config_file import get_setting
-    if get_setting('Audio') == 'HDMI':
-        cmd += "-o hdmi "
-except Exception:
-    pass
+play_sound(audio_file)
 
-os.system(cmd + audio_file + " > /dev/null 2>&1")
