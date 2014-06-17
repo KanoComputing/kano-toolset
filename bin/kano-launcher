@@ -11,6 +11,9 @@
 # Make sure there are no other projects running at the same time
 killall -q python
 killall -q minecraft-pi
+killall -q make-minecraft
+killall -q splash.py
+killall -q make-pong
 killall -q make-music
 killall -q make-video
 killall -q make-snake
@@ -23,14 +26,8 @@ eval "$1 &"
 
 # Apply window presets
 case "$2" in
-    make-video)
-        kano-window-tool -t "Make Video" -dno -w0.8 -h0.6 -c -f ;;
     make-snake)
         kano-window-tool -t "Make Snake" -dno -m -f ;;
-    feedback)
-        kano-window-tool -t "Kano Feedback" -dno -c -f ;;
-    settings)
-        kano-window-tool -t "Kano-Settings" -dno -c -f ;;
     pcmanfm)
         if [ -e /usr/bin/kano-profile-cli ]; then
             kano-profile-cli increment_app_state_variable pcmanfm starts 1
