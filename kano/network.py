@@ -398,9 +398,7 @@ def reload_kernel_module (device_vendor='148f', device_product='5370', module='r
         rc = os.system('wpa_cli terminate > /dev/null 2>&1 ; sleep .5')
         logger.info ('wpa_cli has been terminated')
     except:
-        logger.error ('wpa_cli terminate failed - probably supplicant is not running rc=%d' % rc)
         pass
-
 
     rc = os.system('lsusb -d %s:%s > /dev/null 2>&1' % (device_vendor, device_product))
     if rc == 0:
@@ -435,17 +433,16 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     #
     # kill previous connection daemons
     #
+
     try:
-        execute("pkill -f '%s' > /dev/null 2>&1" % (udhcpc_cmdline))
+        execute("pkill -f '%s'" % (udhcpc_cmdline))
     except:
-        logger.error ('could not kill udhcpc daemon')
         pass
 
     # and wpa supllicant daemon, politely through wpa_cli
     try:
         execute("wpa_cli terminate > /dev/null 2>&1")
     except:
-        logger.error ('could not kill wpa_supplicant daemon')
         pass
 
     #
