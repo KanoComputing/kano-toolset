@@ -398,7 +398,7 @@ def reload_kernel_module (device_vendor='148f', device_product='5370', module='r
         rc = os.system('wpa_cli terminate ; sleep .5 > /dev/null 2>&1')
         logger.info ('wpa_cli has been terminated')
     except:
-        logger.error ('wpa_cli terminate failed - probably supplicant is not running rc=%d' & rc)
+        logger.error ('wpa_cli terminate failed - probably supplicant is not running rc=%d' % rc)
         pass
 
 
