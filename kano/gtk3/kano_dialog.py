@@ -103,6 +103,9 @@ class KanoDialog():
                             button_arguments["return_value"] = 0
                         if button_name.upper() == "CANCEL":
                             button_arguments["return_value"] = 1
+                    if argument == "color":
+                        if button_name.upper() == "CANCEL":
+                            button_arguments["color"] = "red"
 
             color = button_arguments['color']
             return_value = button_arguments['return_value']
@@ -155,11 +158,12 @@ class KanoDialog():
             if self.has_entry:
                 # We have to click an OK button to get entry value
                 # May want to change this logic later to be more flexible
-                if return_value == 0 and button.get_label().upper() == "OK":
+                if button.get_label().upper() == "OK":
                     self.returnvalue = self.widget.get_text()
             elif self.has_list:
-                # get selected radio button
-                self.returnvalue = radio_returnvalue
+                # get selected radio button only if press the OK button
+                if button.get_label().upper() == "OK":
+                    self.returnvalue = radio_returnvalue
             self.dialog.destroy()
             return self.returnvalue
 
