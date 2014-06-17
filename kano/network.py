@@ -402,7 +402,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     # kill previous connection daemons
     #
     try:
-        execute("pkill %s" % (udhcpc_cmdline))
+        execute("pkill -f '%s'" % (udhcpc_cmdline))
     except:
         pass
 
