@@ -115,7 +115,7 @@ class KanoDialog():
         alignment.set_padding(6, 3, 0, 0)
 
         # Add scrolled window
-        if self.scrolled_text is not None:
+        if self.scrolled_text != "":
             scrolledwindow = ScrolledWindow()
             scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
