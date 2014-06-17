@@ -23,7 +23,7 @@ from kano.utils import is_number
 
 def main():
     text = sys.argv[1:]
-    title, description, buttons, custom_widget, entry_bool, list_bool, scrolled_text = parse_items(text)
+    title, description, buttons, custom_widget, entry_bool, list_bool, scrolled_text, global_style = parse_items(text)
     kdialog = KanoDialog(
         title_text=title,
         description_text=description,
@@ -31,7 +31,8 @@ def main():
         widget=custom_widget,
         has_entry=entry_bool,
         has_list=list_bool,
-        scrolled_text=scrolled_text)
+        scrolled_text=scrolled_text,
+        global_style=global_style)
     response = kdialog.run()
 
     # Printing out response means we can read the return value in bash via

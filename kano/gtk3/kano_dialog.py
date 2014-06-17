@@ -23,6 +23,7 @@ from gi.repository import Gtk
 from kano.gtk3.buttons import KanoButton
 from kano.gtk3.heading import Heading
 from kano.gtk3.scrolled_window import ScrolledWindow
+from kano.gtk3.apply_styles import apply_styles
 from kano.paths import common_css_dir
 import os
 
@@ -33,7 +34,7 @@ background_colors = ['grey', 'white']
 
 class KanoDialog():
     # button_dict includes the button text, color and button return values
-    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False, scrolled_text=None):
+    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False, scrolled_text="", global_style=""):
         self.title_text = title_text
         self.description_text = description_text
         self.widget = widget
@@ -42,6 +43,7 @@ class KanoDialog():
         self.has_entry = has_entry
         self.has_list = has_list
         self.scrolled_text = scrolled_text
+        self.global_style = global_style
 
         self.dialog = Gtk.Dialog()
 
@@ -52,6 +54,9 @@ class KanoDialog():
         self.colour_provider = Gtk.CssProvider()
         colours_path = os.path.join(common_css_dir, "colours.css")
         self.colour_provider.load_from_path(colours_path)
+
+        if global_style:
+            apply_styles()
 
         styleContext = self.dialog.get_style_context()
         styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -115,7 +120,7 @@ class KanoDialog():
         alignment.set_padding(6, 3, 0, 0)
 
         # Add scrolled window
-        if self.scrolled_text != "":
+        if self.scrolled_text:
             scrolledwindow = ScrolledWindow()
             scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
@@ -126,9 +131,6 @@ class KanoDialog():
             # Stop a cursor appearing in the textview
             text.set_can_focus(False)
             scrolledwindow.add_with_viewport(text)
-            styleContext = text.get_style_context()
-            styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-            styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
             scrolledwindow.set_size_request(400, 200)
             content_area.pack_start(scrolledwindow, False, False, 0)
@@ -136,9 +138,6 @@ class KanoDialog():
         # or add widget
         elif self.widget is not None:
             content_area.pack_start(self.widget, False, False, 0)
-            styleContext = self.widget.get_style_context()
-            styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-            styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         action_area.pack_start(alignment, False, False, 0)
 
@@ -189,6 +188,7 @@ def parse_items(args):
     has_entry = False
     has_list = False
     buttons = {}
+    global_style = False
 
     for arg in args:
         split = arg.split('=')
@@ -241,7 +241,10 @@ def parse_items(args):
         if split[0] == "scrolled_text":
             scrolled_text = split[1]
 
-    return title, description, buttons, widget, has_entry, has_list, scrolled_text
+        if split[0] == "global_style":
+            global_style = True
+
+    return title, description, buttons, widget, has_entry, has_list, scrolled_text, global_style
 
 
 def on_button_toggled(button):
