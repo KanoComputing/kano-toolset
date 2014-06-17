@@ -128,8 +128,6 @@ class KanoDialog():
             text.get_buffer().set_text(self.scrolled_text)
             text.set_wrap_mode(Gtk.WrapMode.WORD)
             text.set_editable(False)
-            # Stop a cursor appearing in the textview
-            text.set_can_focus(False)
             scrolledwindow.add_with_viewport(text)
 
             scrolledwindow.set_size_request(400, 200)
@@ -140,6 +138,9 @@ class KanoDialog():
             content_area.pack_start(self.widget, False, False, 0)
 
         action_area.pack_start(alignment, False, False, 0)
+
+        # Set keyboard focus on first button
+        self.buttons[0].grab_focus()
 
     def add_style(self, widget, app_class):
         style = widget.get_style_context()
