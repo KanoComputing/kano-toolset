@@ -142,8 +142,9 @@ class KanoDialog():
 
         action_area.pack_start(alignment, False, False, 0)
 
-        # Set keyboard focus on first button
-        self.buttons[0].grab_focus()
+        # Set keyboard focus on first button if no entry
+        if not has_entry:
+            self.buttons[0].grab_focus()
 
     def add_style(self, widget, app_class):
         style = widget.get_style_context()
