@@ -48,6 +48,9 @@ class IWList():
         '''
         outdata = ''
         retries = 3
+
+        # Make sure the wlan interface is up, otherwise the network scan will not proceed
+        os.system ('ifconfig %s up' % interface)
         if iwlist:
             outdata = open(iwlist, 'r').read()
         else:
@@ -389,10 +392,20 @@ def reload_kernel_module (device_vendor='148f', device_product='5370', module='r
     FIXME: This procedure should be called prior to connect() to circumvent current kernel module random problems.
     '''
     reloaded = False
+
+    # Terminate wpa_supplicant daemon
+    try:
+        rc = os.system('wpa_cli terminate > /dev/null 2>&1 ; sleep .5')
+        logger.info ('wpa_cli has been terminated')
+    except:
+        logger.error ('wpa_cli terminate failed - probably supplicant is not running rc=%d' % rc)
+        pass
+
+
     rc = os.system('lsusb -d %s:%s > /dev/null 2>&1' % (device_vendor, device_product))
     if rc == 0:
         # The device id is matched, reload the kernel driver
-        rc_load = os.system ('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1' % (module, module))
+        rc_load = os.system ('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1 ; sleep 5' % (module, module))
         logger.info ('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' % 
                      (module, device_vendor, device_product, rc_load))
         if rc_load == 0:
@@ -423,14 +436,16 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     # kill previous connection daemons
     #
     try:
-        execute("pkill -f '%s'" % (udhcpc_cmdline))
+        execute("pkill -f '%s' > /dev/null 2>&1" % (udhcpc_cmdline))
     except:
+        logger.error ('could not kill udhcpc daemon')
         pass
 
-    # and wpa supllicant daemons
+    # and wpa supllicant daemon, politely through wpa_cli
     try:
-        execute("pkill -f 'wpa_supplicant'")
+        execute("wpa_cli terminate > /dev/null 2>&1")
     except:
+        logger.error ('could not kill wpa_supplicant daemon')
         pass
 
     #
@@ -439,9 +454,10 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     escaped_essid = essid.replace('\'', '\\\'')
     escaped_essid = escaped_essid.replace('\"', '\\\"')
 
+    execute("iwconfig %s power off" % iface)
     execute("ifconfig %s down" % iface)
-    execute("iwconfig %s mode managed" % iface)
     execute("iwconfig %s essid \"%s\"" % (iface, escaped_essid))
+    execute("iwconfig %s mode managed" % iface)
     execute("ifconfig %s up" % iface)
 
     if wpa_custom_file:
