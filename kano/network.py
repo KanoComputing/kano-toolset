@@ -48,6 +48,9 @@ class IWList():
         '''
         outdata = ''
         retries = 3
+
+        # Make sure the wlan interface is up, otherwise the network scan will not proceed
+        os.system ('ifconfig %s up' % interface)
         if iwlist:
             outdata = open(iwlist, 'r').read()
         else:
@@ -423,14 +426,16 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     # kill previous connection daemons
     #
     try:
-        execute("pkill -f '%s'" % (udhcpc_cmdline))
+        execute("pkill -f '%s' > /dev/null 2>&1" % (udhcpc_cmdline))
     except:
+        logger.error ('could not kill udhcpc daemon')
         pass
 
-    # and wpa supllicant daemons
+    # and wpa supllicant daemon, politely through wpa_cli
     try:
-        execute("pkill -f 'wpa_supplicant'")
+        execute("wpa_cli terminate > /dev/null 2>&1")
     except:
+        logger.error ('could not kill wpa_supplicant daemon')
         pass
 
     #
@@ -439,9 +444,10 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     escaped_essid = essid.replace('\'', '\\\'')
     escaped_essid = escaped_essid.replace('\"', '\\\"')
 
+    execute("iwconfig %s power off" % iface)
     execute("ifconfig %s down" % iface)
-    execute("iwconfig %s mode managed" % iface)
     execute("iwconfig %s essid \"%s\"" % (iface, escaped_essid))
+    execute("iwconfig %s mode managed" % iface)
     execute("ifconfig %s up" % iface)
 
     if wpa_custom_file:
