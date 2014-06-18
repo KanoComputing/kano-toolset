@@ -27,7 +27,7 @@ case "$1" in
         if [ ! -f /etc/kano-logs.conf ]; then
             cat >/etc/kano-logs.conf <<EOF
 log_level: error
-debug_level: none
+output_level: none
 EOF
         fi
 
