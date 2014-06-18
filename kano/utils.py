@@ -298,9 +298,9 @@ def play_sound(audio_file, background=False):
 
 
 def is_running(program):
-    cmd = "pidof {}".format(program)
-    _, _, rc = run_cmd(cmd)
-    return rc == 0
+    cmd = "pgrep -f '{}' -l | grep -v pgrep | wc -l".format(program)
+    o, _, _ = run_cmd(cmd)
+    return int(o)
 
 
 def enforce_root(msg):
