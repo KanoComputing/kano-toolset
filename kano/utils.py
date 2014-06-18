@@ -338,6 +338,10 @@ def percent_to_millibel(percent, raspberry_mod=False):
         millibel = 1000 * log10(percent / 100.)
 
     else:
+        # special case for mute
+        if percent == 0:
+            return -11000
+
         min_allowed = -4000
         max_allowed = 400
         percent = percent / 100.
@@ -346,7 +350,7 @@ def percent_to_millibel(percent, raspberry_mod=False):
     return int(millibel)
 
 
-def get_volume(raspberry_mod=True):
+def get_volume():
     from kano.logging import logger
 
     percent = 100
