@@ -284,7 +284,6 @@ def play_sound(audio_file, background=False):
 
     cmd += audio_file
     cmd += ' --vol {}'.format(percent_to_millibel(volume_percent, raspberry_mod=True))
-    cmd += " 2>/dev/null >/dev/null"
 
     logger.debug('cmd: {}'.format(cmd))
 
@@ -292,7 +291,7 @@ def play_sound(audio_file, background=False):
         run_bg(cmd)
         rc = 0
     else:
-        _, _, rc = run_cmd(cmd)
+        _, _, rc = run_cmd_log(cmd)
 
     return rc == 0
 
