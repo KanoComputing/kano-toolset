@@ -269,6 +269,7 @@ def play_sound(audio_file, background=False):
 
     # Check if file exists
     if not os.path.isfile(audio_file):
+        logger.error('audio file not found: {}'.format(audio_file))
         return False
 
     cmd = 'aplay -q {}'.format(audio_file)
