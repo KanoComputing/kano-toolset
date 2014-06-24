@@ -271,20 +271,7 @@ def play_sound(audio_file, background=False):
     if not os.path.isfile(audio_file):
         return False
 
-    # Find out if we use HDMI or analogue
-    cmd = "omxplayer "
-    try:
-        from kano_settings.config_file import get_setting
-        if get_setting('Audio') == 'HDMI':
-            cmd += "-o hdmi "
-    except Exception:
-        pass
-
-    volume_percent, _ = get_volume()
-
-    cmd += audio_file
-    cmd += ' --vol {}'.format(percent_to_millibel(volume_percent, raspberry_mod=True))
-
+    cmd = 'aplay -q {}'.format(audio_file)
     logger.debug('cmd: {}'.format(cmd))
 
     if background:
