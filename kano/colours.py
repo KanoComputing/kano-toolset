@@ -12,7 +12,6 @@ __author__ = """
 rpazdera@redhat.com (Radek Pazdera)
 """
 
-import os
 import re
 import sys
 
@@ -52,13 +51,16 @@ PRESETS = {
 
 enabled = True
 
+
 def enable():
     global enabled
     enabled = True
 
+
 def disable():
     global enabled
     enabled = False
+
 
 def name_to_fg_colour(name):
     """ Convert name to foreground colour code.
@@ -69,6 +71,7 @@ def name_to_fg_colour(name):
 
     return COLOURS[name]
 
+
 def name_to_bg_colour(name):
     """ Convert name to background color code.
         Returns None if the colour name isn't supported. """
@@ -78,14 +81,15 @@ def name_to_bg_colour(name):
 
     return COLOURS[name] + 10
 
+
 def colourize16(string, fg_num=None, bg_num=None, bold=False):
     """ Paint the text with foreground/background colours using the
         old 16 colour model. """
 
-    if fg_num != None:
+    if fg_num is not None:
         string = "\033[%dm%s\033[0m" % (fg_num, string)
 
-    if bg_num != None:
+    if bg_num is not None:
         string = "\033[%dm%s\033[0m" % (bg_num, string)
 
     if bold:
@@ -93,20 +97,31 @@ def colourize16(string, fg_num=None, bg_num=None, bold=False):
 
     return string
 
+
 def colourize256(string, fg_num=None, bg_num=None, bold=False):
     """ Paint the text with foreground/background colours using the
         newer 256 colour model. """
 
-    if fg_num != None:
+    if fg_num is not None:
         string = "\033[38;5;%dm%s\033[0m" % (fg_num, string)
 
-    if bg_num != None:
+    if bg_num is not None:
         string = "\033[48;5;%dm%s\033[0m" % (bg_num, string)
 
     if bold:
         string = "\033[1m%s\033[0m" % string
 
     return string
+
+
+def decorate_string_only_terminal(string, fg_colour=None, bg_colour=None, bold=False):
+    """ Return unmodified string if not called from terminal """
+
+    if not sys.stdout.isatty() or not enabled:
+        return string
+
+    return decorate_string(string, fg_colour, bg_colour, bold)
+
 
 def decorate_string(string, fg_colour=None, bg_colour=None, bold=False):
     """ Decorate a string using colours specified as strings. You can
@@ -122,8 +137,6 @@ def decorate_string(string, fg_colour=None, bg_colour=None, bold=False):
             decorate_string(s, "red", None, False)
             decorate_string(s, "red", "light-gray")
     """
-    if not sys.stdout.isatty() or not enabled:
-        return string
 
     extended_re = "^extended\(([0-9]+)\)$"
 
@@ -136,7 +149,7 @@ def decorate_string(string, fg_colour=None, bg_colour=None, bold=False):
     # We use a for loop here to avoid code duplication
     fg = True
     for colour_def in [fg_colour, bg_colour]:
-        if colour_def != None:
+        if colour_def is not None:
             # Extended definition
             match = re.match(extended_re, colour_def)
             if match:
@@ -167,6 +180,7 @@ def decorate_string(string, fg_colour=None, bg_colour=None, bold=False):
     string = colourize16(string, params16[0], params16[1], bold)
     string = colourize256(string, params256[0], params256[1])
     return string
+
 
 def decorate_with_preset(string, preset):
     """ Decorate a string using a specified colour preset. """
