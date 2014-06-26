@@ -12,8 +12,8 @@
 
 TEST_PING=8.8.8.8
 
-# FIXME: below address points to dev.kano.me, ip addres to avoid DNS
-TEST_CURL="http://80.243.184.98/public"
+# Google logo img
+TEST_CURL="http://173.194.34.81/images/logos/google_logo_41.png"
 rc=255
 
 # Kanux provides networking through either Ethernet or Wireless
