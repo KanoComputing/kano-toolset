@@ -50,7 +50,7 @@ class IWList():
         retries = 3
 
         # Make sure the wlan interface is up, otherwise the network scan will not proceed
-        os.system ('ifconfig %s up' % interface)
+        os.system('ifconfig %s up' % interface)
         if iwlist:
             outdata = open(iwlist, 'r').read()
         else:
@@ -385,7 +385,8 @@ def wpa_conf(essid, psk, confile):
     f.write(wpa_conf)
     f.close()
 
-def reload_kernel_module (device_vendor='148f', device_product='5370', module='rt2800usb'):
+
+def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt2800usb'):
     '''
     If the Kano USB deviceID is connected to the system, reload the kernel module. Returns True if reloaded.
     Works silently and ok even if the module is not currently loaded in the kernel.
@@ -396,20 +397,20 @@ def reload_kernel_module (device_vendor='148f', device_product='5370', module='r
     # Terminate wpa_supplicant daemon
     try:
         rc = os.system('wpa_cli terminate > /dev/null 2>&1 ; sleep .5')
-        logger.info ('wpa_cli has been terminated')
+        logger.info('wpa_cli has been terminated')
     except:
         pass
 
     rc = os.system('lsusb -d %s:%s > /dev/null 2>&1' % (device_vendor, device_product))
     if rc == 0:
         # The device id is matched, reload the kernel driver
-        rc_load = os.system ('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1 ; sleep 5' % (module, module))
-        logger.info ('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' % 
-                     (module, device_vendor, device_product, rc_load))
+        rc_load = os.system('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1 ; sleep 5' % (module, module))
+        logger.info('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' %
+                    (module, device_vendor, device_product, rc_load))
         if rc_load == 0:
             reloaded = True
     else:
-        logger.info ('Not reloading kernel module because device not found (%s:%s)' % (device_vendor, device_product))
+        logger.info('Not reloading kernel module because device not found (%s:%s)' % (device_vendor, device_product))
 
     return reloaded
 
@@ -490,7 +491,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
 
             # Wait for wpa_supplicant to become associated to the AP
             # or give up if it takes too long
-            assoc_timeout = 20 # seconds
+            assoc_timeout = 20  # seconds
             assoc_start = time.time()
             while (time.time() - assoc_start) < assoc_timeout:
                 r = os.popen('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
@@ -498,9 +499,9 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
                 if wpa_state.split('=')[1] == 'COMPLETED':
                     associated = True
                     break
-            
+
                 r.close()
-                time.sleep (0.5)
+                time.sleep(0.5)
         except:
             pass
 
@@ -508,7 +509,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             return False
 
     try:
-        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
+        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))
         execute(udhcpc_cmdline)
         return True
     except:
