@@ -16,10 +16,10 @@
 import os
 import time
 import subprocess
-from kano.logging import logger
 import shlex
 import json
 import re
+from kano.logging import logger
 
 
 class IWList():
@@ -572,28 +572,3 @@ class KwifiCache:
         wdata = json.loads(lastknown)
         return wdata
 
-
-if __name__ == '__main__':
-    import sys
-    import pprint
-
-    pp = pprint.PrettyPrinter(indent=4, depth=6)
-    wiface = 'wlan0'
-
-    print 'Read wireless networks from a dump file (iwlist scan output)'
-    if len(sys.argv) < 2:
-        print 'Syntax: network.py <iwlist dump file>'
-        sys.exit(1)
-    else:
-        iwlist = sys.argv[1]
-
-    print 'Parsing info from file: %s\n' % iwlist
-    iwl = IWList(wiface, iwlist=iwlist)
-
-    print '>>> Raw parsed data follows:'
-    pp.pprint(iwl.data)
-
-    print '>>> Compact parsed data follows:'
-    pp.pprint(iwl.getList())
-
-    sys.exit(0)
