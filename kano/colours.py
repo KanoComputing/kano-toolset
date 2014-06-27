@@ -35,6 +35,9 @@ COLOURS = {
 }
 
 PRESETS = {
+    "code":       ["green", "dark-gray", True],
+    "key":        ["red", "dark-gray", True],
+
     "faded":      ["yellow", None, False],
     "alert":      ["red", None, True],
     "highlight":  ["blue", None, True],

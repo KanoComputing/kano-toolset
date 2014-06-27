@@ -28,30 +28,32 @@ if len(sys.argv) == 1:
 
 def get_preset_from_id(id):
     if id == '1':
-        return "highlight"
+        return "code"
     elif id == '2':
-        return "alert"
-    elif id == '3':
-        return "info"
+        return "key"
     else:
         return "alert"
 
-output = sys.argv[1]
 
-# If format found > parse the string "my {{1example}}"
-if output.find("{{") != -1:
+def parse_string(string):
     # First part of the string
-    pos1 = output.index("{{")
-    first_part = output[:pos1]
+    pos1 = string.index("{{")
+    first_part = string[:pos1]
     # Last part of the string
-    pos2 = output.index("}}")
-    last_part = " " + output[pos2 + 2:]
+    pos2 = string.index("}}")
+    last_part = string[pos2 + 2:]
     # Preset id
-    preset_id = output[pos1 + 2]
+    preset_id = string[pos1 + 2]
     preset = get_preset_from_id(preset_id)
     # Colour part of the string
-    string = output[pos1 + 3:pos2]
-    colour_part = colours.decorate_with_preset(string, preset)
-    output = first_part + colour_part + last_part
+    colour_part = string[pos1 + 3:pos2]
+    colour_part = colours.decorate_with_preset(colour_part, preset)
+    return first_part + colour_part + last_part
+
+
+output = sys.argv[1]
+# If format found > parse the string "my {{1example}}"
+while output.find("{{") != -1:
+    output = parse_string(output)
 
 print output
