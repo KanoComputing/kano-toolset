@@ -523,6 +523,18 @@ def disconnect(iface):
     return
 
 
+def is_redirected():
+    '''
+    Returns true if there is a url redirection
+    We don't use execute() to avoid an exception
+    '''
+
+    cmdline = shlex.split("curl -Is 'www.google.com'")
+    p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (out, err) = p.communicate()
+    return (out.find("http://www.google.") == -1)
+
+
 class KwifiCache:
     '''
     Class to manage a cache of the last successful wireless connection.
