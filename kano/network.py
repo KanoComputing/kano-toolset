@@ -205,7 +205,7 @@ class IWList():
             print 'Debug on: Dumping parsed wireless info:'
             pp.pprint(self.data)
 
-        self.iwnets = []
+        iwnets = []
         for w in self.data:
             ww = self.data[w]
 
@@ -240,13 +240,13 @@ class IWList():
                     pass
                 else:
                     wnet['encryption'] = enc
-                    self.iwnets.append(wnet)
+                    iwnets.append(wnet)
 
-        self.iwnets = sorted(self.iwnets, key=sortNetworks, reverse=True)
+        iwnets = sorted(self.iwnets, key=sortNetworks, reverse=True)
         if first and len(self.iwnets) > 1:
-            return [self.iwnets[0]]
+            return [iwnets[0]]
         else:
-            return self.iwnets
+            return iwnets
 
 
 def remove_pid(filename):
