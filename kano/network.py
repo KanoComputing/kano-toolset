@@ -261,13 +261,6 @@ class IWList():
             return iwnets
 
 
-def remove_pid(filename):
-    try:
-        os.unlink(filename)
-    except:
-        pass
-
-
 def execute(cmdline):
     '''
     Executes command. If it fails with return code an exception is raised.
