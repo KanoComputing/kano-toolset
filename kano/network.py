@@ -40,8 +40,6 @@ class IWList():
             Developped, tested with Wireless Extension v29 English translation, Nov 2007
             If iwlist points to a file, you can mimic iwlist from a response file for testing
             '''
-            outdata = ''
-            retries = 3
 
             # Make sure the wlan interface is up, otherwise the network scan will not proceed
             os.system('ifconfig %s up' % interface)
@@ -49,10 +47,10 @@ class IWList():
                 outdata = open(iwlist, 'r').read()
             else:
                 # Contemplate those seldom cases where the dongle driver returns an empty list
-                while len(outdata) < 80 and retries:
-                    cstring = "iwlist " + interface + " scan 2>/dev/nul"
-                    outdata = os.popen(cstring).read()
-                    retries -= 1
+                cstring = "iwlist " + interface + " scan 2>/dev/nul"
+                outdata = os.popen(cstring).read()
+
+            # outdata = ''
 
             return outdata
 
@@ -65,18 +63,21 @@ class IWList():
             cellDataL = []
             #currentCell = None
             for s in rawdatas:
+                # skip empty lines
+                if not s.strip():
+                    continue
                 # If new cell:
                 if s.lstrip().startswith("Cell "):
                     # log.debug("parseRawData: new cell")
                     cellDataL.append([])
                 if len(cellDataL) > 0 and len(s) > 0:
                     cellDataL[len(cellDataL) - 1].append(s)
+
             # Data is separated by cells, now we'll parse each cell's data
             parsedCellData = {}
             for s in cellDataL:
-                if s is not None:
-                    (cellNumber, cellData) = parseCellData("\n".join(s))
-                    parsedCellData[cellNumber] = cellData
+                cellNumber, cellData = parseCellData("\n".join(s))
+                parsedCellData[cellNumber] = cellData
             #log.debug("parseRawData: parsed "+str(len(cellDataL))+" cells")
             return parsedCellData
 
@@ -182,11 +183,22 @@ class IWList():
 
             return cellData["Number"], cellData
 
-        # Get raw data as a string
-        rawdata = getRawData(self.interface, iwlist)
-        # Parse raw data into a dictionary
-        if rawdata:
-            self.data = parseRawData(rawdata)
+        # keep scanning until at least one valid network is found
+        retries = 0
+        while not self.data and retries < 3:
+            retries += 1
+
+            # Get raw data as a string
+            rawdata = getRawData(self.interface, iwlist)
+
+            # Parse raw data into a dictionary
+            if rawdata:
+                self.data = parseRawData(rawdata)
+                logger.debug('found {} networks in scanning loop'.format(len(self.data)))
+            else:
+                logger.debug('not found any networks in scanning loop'.format(len(self.data)))
+
+        logger.info('found {} networks'.format(len(self.data)))
 
     def getList(self, unsecure=False, first=False, debug=False):
         '''
