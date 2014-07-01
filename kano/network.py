@@ -50,8 +50,6 @@ class IWList():
                 cstring = "iwlist " + interface + " scan 2>/dev/nul"
                 outdata = os.popen(cstring).read()
 
-            # outdata = ''
-
             return outdata
 
         def parseRawData(rawdata):
