@@ -242,8 +242,8 @@ class IWList():
                     wnet['encryption'] = enc
                     iwnets.append(wnet)
 
-        iwnets = sorted(self.iwnets, key=sortNetworks, reverse=True)
-        if first and len(self.iwnets) > 1:
+        iwnets = sorted(iwnets, key=sortNetworks, reverse=True)
+        if first and len(iwnets) > 1:
             return [iwnets[0]]
         else:
             return iwnets
