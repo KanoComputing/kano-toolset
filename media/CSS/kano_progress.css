@@ -1,0 +1,32 @@
+/*
+# progress_bar.css
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+#
+*/
+
+* {
+    -GtkProgressBar-min-horizontal-bar-height: 30;
+    -GtkProgressBar-min-vertical-bar-width: 60;
+}
+
+GtkProgressBar {
+    border-style: solid;
+    border-color: #dddddd;
+    border-width: 3px;
+    border-radius: 3px;
+}
+
+/* background bar */
+GtkProgressBar.trough {
+    background: #ffffff;
+}
+
+/* Moving part*/
+GtkProgressBar.progressbar {
+    background: @kano_green;
+    border-radius: 3px;
+    border-color: transparent;
+}
