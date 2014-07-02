@@ -269,38 +269,25 @@ def play_sound(audio_file, background=False):
 
     # Check if file exists
     if not os.path.isfile(audio_file):
+        logger.error('audio file not found: {}'.format(audio_file))
         return False
 
-    # Find out if we use HDMI or analogue
-    cmd = "omxplayer "
-    try:
-        from kano_settings.config_file import get_setting
-        if get_setting('Audio') == 'HDMI':
-            cmd += "-o hdmi "
-    except Exception:
-        pass
-
-    volume_percent, _ = get_volume()
-
-    cmd += audio_file
-    cmd += ' --vol {}'.format(percent_to_millibel(volume_percent, raspberry_mod=True))
-    cmd += " 2>/dev/null >/dev/null"
-
+    cmd = 'aplay -q {}'.format(audio_file)
     logger.debug('cmd: {}'.format(cmd))
 
     if background:
         run_bg(cmd)
         rc = 0
     else:
-        _, _, rc = run_cmd(cmd)
+        _, _, rc = run_cmd_log(cmd)
 
     return rc == 0
 
 
 def is_running(program):
-    cmd = "pidof {}".format(program)
-    _, _, rc = run_cmd(cmd)
-    return rc == 0
+    cmd = "pgrep -f '{}' -l | grep -v pgrep | wc -l".format(program)
+    o, _, _ = run_cmd(cmd)
+    return int(o)
 
 
 def enforce_root(msg):
@@ -338,6 +325,10 @@ def percent_to_millibel(percent, raspberry_mod=False):
         millibel = 1000 * log10(percent / 100.)
 
     else:
+        # special case for mute
+        if percent == 0:
+            return -11000
+
         min_allowed = -4000
         max_allowed = 400
         percent = percent / 100.
@@ -346,7 +337,7 @@ def percent_to_millibel(percent, raspberry_mod=False):
     return int(millibel)
 
 
-def get_volume(raspberry_mod=True):
+def get_volume():
     from kano.logging import logger
 
     percent = 100

@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+
+# colours-cli
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+
+import os
+import sys
+if __name__ == '__main__' and __package__ is None:
+    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if dir_path != '/usr':
+        sys.path.insert(1, dir_path)
+
+import kano.colours as colours
+
+if __name__ != '__main__':
+    sys.exit("This is a script, do not import it as a module!")
+
+if len(sys.argv) == 1:
+    help = 'Wrong usage, needs an argument\n'
+    help += 'Possible uses: get_app_data_dir, load_app_state_variable, save_app_state_variable\n'
+    help += 'increment_app_state_variable, unlock, lock, is_registered, get_avatar, get_xp\n'
+    help += 'get_level, get_username, has_token, get_stats'
+    sys.exit(help)
+
+
+def get_preset_from_id(id):
+    if id == '1':
+        return "code"
+    elif id == '2':
+        return "key"
+    else:
+        return "alert"
+
+
+def parse_string(string):
+    # First part of the string
+    pos1 = string.index("{{")
+    first_part = string[:pos1]
+    # Last part of the string
+    pos2 = string.index("}}")
+    last_part = string[pos2 + 2:]
+    # Preset id
+    preset_id = string[pos1 + 2]
+    preset = get_preset_from_id(preset_id)
+    # Colour part of the string
+    colour_part = string[pos1 + 3:pos2]
+    colour_part = colours.decorate_with_preset(colour_part, preset)
+    return first_part + colour_part + last_part
+
+
+output = sys.argv[1]
+# If format found > parse the string "my {{1example}}"
+while output.find("{{") != -1:
+    output = parse_string(output)
+
+print output

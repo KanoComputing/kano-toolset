@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# typewriter_echo
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Print a formatted string
+# "my {{idstring}}" > where id is a number from 0-9 which represents a preset
+# The preset list is in colours-cli
+
+string=$(python /usr/bin/colours-cli "$1")
+echo $string

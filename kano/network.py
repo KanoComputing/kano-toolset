@@ -16,10 +16,10 @@
 import os
 import time
 import subprocess
-from kano.logging import logger
 import shlex
 import json
 import re
+from kano.logging import logger
 
 
 class IWList():
@@ -28,182 +28,175 @@ class IWList():
         For testing, <iwlist> can point to a file name which contains
         the output of a "iwlist" command, very useful to test remote complex network neighbourhoods.
         '''
-        self.rawdata = ""
         self.data = {}
         self.interface = interface
         self.refresh(iwlist=iwlist)
 
     def refresh(self, iwlist=None):
-        # Get raw data as a string
-        self.rawdata = self.getRawData(self.interface, iwlist)
-        # Parse raw data into a dictionary
-        if self.rawdata is not None and len(self.rawdata.strip()):
-            self.data = self.parseRawData(self.rawdata)
 
-    def getRawData(self, interface, iwlist=None):
-        '''
-        Runs iwlist and gets WiFi data in a string
-        Developped, tested with Wireless Extension v29 English translation, Nov 2007
-        If iwlist points to a file, you can mimic iwlist from a response file for testing
-        '''
-        outdata = ''
-        retries = 3
-        if iwlist:
-            outdata = open(iwlist, 'r').read()
-        else:
-            # Contemplate those seldom cases where the dongle driver returns an empty list
-            while len(outdata) < 80 and retries:
+        def getRawData(interface, iwlist=None):
+            '''
+            Runs iwlist and gets WiFi data in a string
+            Developped, tested with Wireless Extension v29 English translation, Nov 2007
+            If iwlist points to a file, you can mimic iwlist from a response file for testing
+            '''
+
+            # Make sure the wlan interface is up, otherwise the network scan will not proceed
+            os.system('ifconfig %s up' % interface)
+            if iwlist:
+                outdata = open(iwlist, 'r').read()
+            else:
+                # Contemplate those seldom cases where the dongle driver returns an empty list
                 cstring = "iwlist " + interface + " scan 2>/dev/nul"
                 outdata = os.popen(cstring).read()
-                retries -= 1
 
-        return outdata
+            return outdata
 
-    def parseRawData(self, rawdata):
-        # Parses a string containing the data printed by iwlist
-        # Pre-condition: rawdata is not empty
-        rawdatas = rawdata.split("\n")
-        # Strip blanks
-        # Let's separate by cells
-        cellDataL = []
-        #currentCell = None
-        for s in rawdatas:
-            # If new cell:
-            if s.lstrip().startswith("Cell "):
-                # log.debug("parseRawData: new cell")
-                cellDataL.append([])
-            if len(cellDataL) > 0 and len(s) > 0:
-                cellDataL[len(cellDataL) - 1].append(s)
-        # Data is separated by cells, now we'll parse each cell's data
-        parsedCellData = {}
-        for s in cellDataL:
-            if s is not None:
-                (cellNumber, cellData) = self.parseCellData("\n".join(s))
+        def parseRawData(rawdata):
+            # Parses a string containing the data printed by iwlist
+            # Pre-condition: rawdata is not empty
+            rawdatas = rawdata.split("\n")
+            # Strip blanks
+            # Let's separate by cells
+            cellDataL = []
+            #currentCell = None
+            for s in rawdatas:
+                # skip empty lines
+                if not s.strip():
+                    continue
+                # If new cell:
+                if s.lstrip().startswith("Cell "):
+                    # log.debug("parseRawData: new cell")
+                    cellDataL.append([])
+                if len(cellDataL) > 0 and len(s) > 0:
+                    cellDataL[len(cellDataL) - 1].append(s)
+
+            # Data is separated by cells, now we'll parse each cell's data
+            parsedCellData = {}
+            for s in cellDataL:
+                cellNumber, cellData = parseCellData("\n".join(s))
                 parsedCellData[cellNumber] = cellData
-        #log.debug("parseRawData: parsed "+str(len(cellDataL))+" cells")
-        return parsedCellData
+            #log.debug("parseRawData: parsed "+str(len(cellDataL))+" cells")
+            return parsedCellData
 
-    def printData(self):
-        # Debugging print
-        for s in self.data:
-            print s, self.data[s]
+        def parseCellData(rawCellData):
+            # Parses a string containing raw cell data
+            # @return a tuble containing the cell's number and a dictionary with the data
 
-    def parseCellData(self, rawCellData):
-        # Parses a string containing raw cell data
-        # @return a tuble containing the cell's number and a dictionary with the data
+            def getCellExtra(s):
+                s = s.split(":")
+                if len(s) > 2:
+                    ret = ":".join(s[1:]).strip()
+                else:
+                    ret = s[1].strip()
+                return ret
 
-        splitRawData = rawCellData.split("\n")
-        cellData = {}
-        for s in splitRawData:
-            if s.strip().startswith("Cell "):
-                cellData["Number"] = self.getCellNumber(s)
-                cellData["MAC"] = self.getCellMAC(s)
-            if s.strip().startswith("ESSID:\""):
-                cellData["ESSID"] = self.getCellESSID(s)
-            if s.strip().startswith("Protocol:"):
-                cellData["Protocol"] = self.getCellProtocol(s)
-            if s.strip().startswith("Mode:"):
-                cellData["Mode"] = self.getCellMode(s)
-            if s.strip().startswith("Mode:"):
-                cellData["Mode"] = self.getCellMode(s)
-            if s.strip().startswith("Frequency:"):
-                cellData["Frequency"] = self.getCellFrequency(s)
-                cellData["Channel"] = self.getCellChannel(s)
-            if s.strip().startswith("Quality="):
-                cellData["Quality"] = self.getCellQuality(s)
-                cellData["Signal"] = self.getCellSignal(s)
-                cellData["Noise"] = self.getCellNoise(s)
-            if s.strip().startswith("Encryption key:"):
-                cellData["Encryption"] = self.getCellEncryption(s)
+            def getCellIE(s):
+                s = s.split(":")
+                if len(s) > 2:
+                    ret = ":".join(s[1:]).strip()
+                else:
+                    ret = s[1].strip()
+                return ret
 
-            if s.strip().startswith("IE"):
+            def getCellNumber(s):
+                return s.strip().split(" ")[1]
+
+            def getCellFrequency(s):
+                s = s.split(":")[1]
+                return s.strip().split(" ")[0]
+
+            def getCellChannel(s):
+                return s.strip().split(" ")[3][0:-1]
+
+            def getCellEncryption(s):
+                return s.strip().split(":")[1]
+
+            def getCellSignal(s):
+                s = s.split("Signal level=")[1]
+                return s.strip().split(" ")[0]
+
+            def getCellNoise(s):
                 try:
-                    ie = cellData["IE"]
-                except KeyError:
-                    ie = []
-                ie.append(self.getCellIE(s))
-                cellData["IE"] = ie
+                    s = s.split("Noise level:")[1]
+                    return s.strip().split(" ")[0]
+                except:
+                    return 0
 
-            if s.strip().startswith("Extra:"):
-                try:
-                    extra = cellData["Extra"]
-                except KeyError:
-                    extra = []
-                extra.append(self.getCellExtra(s))
-                cellData["Extra"] = extra
+            def getCellQuality(s):
+                s = s.split("=")[1]
+                return s.strip().split(" ")[0]
 
-        return cellData["Number"], cellData
+            def getCellMAC(s):
+                return s.strip().split(" ")[4]
 
-    def getCellExtra(self, s):
-        s = s.split(":")
-        if len(s) > 2:
-            ret = ":".join(s[1:]).strip()
-        else:
-            ret = s[1].strip()
-        return ret
+            def getCellESSID(s):
+                return s.strip().split(":\"")[1][0:-1]
 
-    def getCellIE(self, s):
-        s = s.split(":")
-        if len(s) > 2:
-            ret = ":".join(s[1:]).strip()
-        else:
-            ret = s[1].strip()
-        return ret
+            def getCellProtocol(s):
+                return s.strip().split(":")[1][-1]
 
-    def getCellBitRates(self, s, rawdatas):
-        # Pre-condition: s is in rawdatas, and bit rates are described in 3 lines
-        ixBitRate = rawdatas.index(s)
-        rawBitRate = rawdatas[ixBitRate].split(":")[1].strip() + "; " + rawdatas[ixBitRate + 1].strip() + "; " + \
-            rawdatas[ixBitRate + 2].strip()
-        return rawBitRate
+            def getCellMode(s):
+                return s.strip().split(":")[1]
 
-    def getCellNumber(self, s):
-        return s.strip().split(" ")[1]
+            splitRawData = rawCellData.split("\n")
+            cellData = {}
+            for s in splitRawData:
+                if s.strip().startswith("Cell "):
+                    cellData["Number"] = getCellNumber(s)
+                    cellData["MAC"] = getCellMAC(s)
+                if s.strip().startswith("ESSID:\""):
+                    cellData["ESSID"] = getCellESSID(s)
+                if s.strip().startswith("Protocol:"):
+                    cellData["Protocol"] = getCellProtocol(s)
+                if s.strip().startswith("Mode:"):
+                    cellData["Mode"] = getCellMode(s)
+                if s.strip().startswith("Mode:"):
+                    cellData["Mode"] = getCellMode(s)
+                if s.strip().startswith("Frequency:"):
+                    cellData["Frequency"] = getCellFrequency(s)
+                    cellData["Channel"] = getCellChannel(s)
+                if s.strip().startswith("Quality="):
+                    cellData["Quality"] = getCellQuality(s)
+                    cellData["Signal"] = getCellSignal(s)
+                    cellData["Noise"] = getCellNoise(s)
+                if s.strip().startswith("Encryption key:"):
+                    cellData["Encryption"] = getCellEncryption(s)
 
-    def getCellFrequency(self, s):
-        s = s.split(":")[1]
-        return s.strip().split(" ")[0]
+                if s.strip().startswith("IE"):
+                    try:
+                        ie = cellData["IE"]
+                    except KeyError:
+                        ie = []
+                    ie.append(getCellIE(s))
+                    cellData["IE"] = ie
 
-    def getCellChannel(self, s):
-        return s.strip().split(" ")[3][0:-1]
+                if s.strip().startswith("Extra:"):
+                    try:
+                        extra = cellData["Extra"]
+                    except KeyError:
+                        extra = []
+                    extra.append(getCellExtra(s))
+                    cellData["Extra"] = extra
 
-    def getCellEncryption(self, s):
-        return s.strip().split(":")[1]
+            return cellData["Number"], cellData
 
-    def getCellSignal(self, s):
-        s = s.split("Signal level=")[1]
-        return s.strip().split(" ")[0]
+        # keep scanning until at least one valid network is found
+        retries = 0
+        while not self.data and retries < 3:
+            retries += 1
 
-    def getCellNoise(self, s):
-        try:
-            s = s.split("Noise level:")[1]
-            return s.strip().split(" ")[0]
-        except:
-            return 0
+            # Get raw data as a string
+            rawdata = getRawData(self.interface, iwlist)
 
-    def getCellQuality(self, s):
-        s = s.split("=")[1]
-        return s.strip().split(" ")[0]
+            # Parse raw data into a dictionary
+            if rawdata:
+                self.data = parseRawData(rawdata)
+                logger.debug('found {} networks in scanning loop'.format(len(self.data)))
+            else:
+                logger.debug('not found any networks in scanning loop'.format(len(self.data)))
 
-    def getCellMAC(self, s):
-        return s.strip().split(" ")[4]
-
-    def getCellESSID(self, s):
-        return s.strip().split(":\"")[1][0:-1]
-
-    def getCellProtocol(self, s):
-        return s.strip().split(":")[1][-1]
-
-    def getCellMode(self, s):
-        return s.strip().split(":")[1]
-
-    def getData(self):
-        return self.data
-
-    def sortNetworks(self, adict):
-        x, z = adict['quality'].split('/')
-        factor = int(x) / float(z)
-        return factor
+        logger.info('found {} networks'.format(len(self.data)))
 
     def getList(self, unsecure=False, first=False, debug=False):
         '''
@@ -211,13 +204,18 @@ class IWList():
         sorted by signal strength (strongest first)
         '''
 
+        def sortNetworks(adict):
+            x, z = adict['quality'].split('/')
+            factor = int(x) / float(z)
+            return factor
+
         if debug:
             import pprint
             pp = pprint.PrettyPrinter(indent=4, depth=6)
             print 'Debug on: Dumping parsed wireless info:'
             pp.pprint(self.data)
 
-        self.iwnets = []
+        iwnets = []
         for w in self.data:
             ww = self.data[w]
 
@@ -252,20 +250,13 @@ class IWList():
                     pass
                 else:
                     wnet['encryption'] = enc
-                    self.iwnets.append(wnet)
+                    iwnets.append(wnet)
 
-        self.iwnets = sorted(self.iwnets, key=self.sortNetworks, reverse=True)
-        if first and len(self.iwnets) > 1:
-            return [self.iwnets[0]]
+        iwnets = sorted(iwnets, key=sortNetworks, reverse=True)
+        if first and len(iwnets) > 1:
+            return [iwnets[0]]
         else:
-            return self.iwnets
-
-
-def remove_pid(filename):
-    try:
-        os.unlink(filename)
-    except:
-        pass
+            return iwnets
 
 
 def execute(cmdline):
@@ -278,7 +269,7 @@ def execute(cmdline):
     (out, err) = p.communicate()
     rc = p.returncode
     if not rc == 0:
-        logger.error('FAIL: "%s" rc=%s, out="%s", err="%s"' % (cmdline, rc, out, err))
+        logger.debug('FAIL: "%s" rc=%s, out="%s", err="%s"' % (cmdline, rc, out, err))
         raise Exception(cmdline, 'rc=%s, out="%s", err="%s"' % (rc, out, err))
     else:
         return out, err
@@ -382,23 +373,32 @@ def wpa_conf(essid, psk, confile):
     f.write(wpa_conf)
     f.close()
 
-def reload_kernel_module (device_vendor='148f', device_product='5370', module='rt2800usb'):
+
+def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt2800usb'):
     '''
     If the Kano USB deviceID is connected to the system, reload the kernel module. Returns True if reloaded.
     Works silently and ok even if the module is not currently loaded in the kernel.
     FIXME: This procedure should be called prior to connect() to circumvent current kernel module random problems.
     '''
     reloaded = False
+
+    # Terminate wpa_supplicant daemon
+    try:
+        rc = os.system('wpa_cli terminate > /dev/null 2>&1 ; sleep .5')
+        logger.info('wpa_cli has been terminated')
+    except:
+        pass
+
     rc = os.system('lsusb -d %s:%s > /dev/null 2>&1' % (device_vendor, device_product))
     if rc == 0:
         # The device id is matched, reload the kernel driver
-        rc_load = os.system ('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1' % (module, module))
-        logger.info ('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' % 
-                     (module, device_vendor, device_product, rc_load))
+        rc_load = os.system('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1 ; sleep 5' % (module, module))
+        logger.info('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' %
+                    (module, device_vendor, device_product, rc_load))
         if rc_load == 0:
             reloaded = True
     else:
-        logger.info ('Not reloading kernel module because device not found (%s:%s)' % (device_vendor, device_product))
+        logger.info('Not reloading kernel module because device not found (%s:%s)' % (device_vendor, device_product))
 
     return reloaded
 
@@ -422,14 +422,15 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     #
     # kill previous connection daemons
     #
+
     try:
         execute("pkill -f '%s'" % (udhcpc_cmdline))
     except:
         pass
 
-    # and wpa supllicant daemons
+    # and wpa supllicant daemon, politely through wpa_cli
     try:
-        execute("pkill -f 'wpa_supplicant'")
+        execute("wpa_cli terminate > /dev/null 2>&1")
     except:
         pass
 
@@ -439,9 +440,10 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     escaped_essid = essid.replace('\'', '\\\'')
     escaped_essid = escaped_essid.replace('\"', '\\\"')
 
+    execute("iwconfig %s power off" % iface)
     execute("ifconfig %s down" % iface)
-    execute("iwconfig %s mode managed" % iface)
     execute("iwconfig %s essid \"%s\"" % (iface, escaped_essid))
+    execute("iwconfig %s mode managed" % iface)
     execute("ifconfig %s up" % iface)
 
     if wpa_custom_file:
@@ -477,7 +479,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
 
             # Wait for wpa_supplicant to become associated to the AP
             # or give up if it takes too long
-            assoc_timeout = 20 # seconds
+            assoc_timeout = 20  # seconds
             assoc_start = time.time()
             while (time.time() - assoc_start) < assoc_timeout:
                 r = os.popen('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
@@ -485,9 +487,9 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
                 if wpa_state.split('=')[1] == 'COMPLETED':
                     associated = True
                     break
-            
+
                 r.close()
-                time.sleep (0.5)
+                time.sleep(0.5)
         except:
             pass
 
@@ -495,7 +497,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             return False
 
     try:
-        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))        
+        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))
         execute(udhcpc_cmdline)
         return True
     except:
@@ -507,6 +509,18 @@ def disconnect(iface):
     execute('iwconfig "%s" mode managed' % iface)
     time.sleep(3)
     return
+
+
+def is_redirected():
+    '''
+    Returns true if there is a url redirection
+    We don't use execute() to avoid an exception
+    '''
+
+    cmdline = shlex.split("curl -Is 'www.google.com'")
+    p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (out, err) = p.communicate()
+    return (out.find("http://www.google.") == -1)
 
 
 class KwifiCache:
@@ -558,28 +572,3 @@ class KwifiCache:
         wdata = json.loads(lastknown)
         return wdata
 
-
-if __name__ == '__main__':
-    import sys
-    import pprint
-
-    pp = pprint.PrettyPrinter(indent=4, depth=6)
-    wiface = 'wlan0'
-
-    print 'Read wireless networks from a dump file (iwlist scan output)'
-    if len(sys.argv) < 2:
-        print 'Syntax: network.py <iwlist dump file>'
-        sys.exit(1)
-    else:
-        iwlist = sys.argv[1]
-
-    print 'Parsing info from file: %s\n' % iwlist
-    iwl = IWList(wiface, iwlist=iwlist)
-
-    print '>>> Raw parsed data follows:'
-    pp.pprint(iwl.data)
-
-    print '>>> Compact parsed data follows:'
-    pp.pprint(iwl.getList())
-
-    sys.exit(0)

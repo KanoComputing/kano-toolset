@@ -55,7 +55,7 @@ function linebreak
 # Main function
 function typewriter_echo
 {
-    string="$1"
+    string=$(python /usr/bin/colours-cli "$1")
 
     # Amount of whitespace at used for padding
     whitespace=`add_character_padding 3`
