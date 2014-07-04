@@ -52,14 +52,14 @@ PRESETS = {
     "none":           [None, None, False],
 
     # Used in colours-cli
-    "keyboard":       ["white", "red", True],
-    "instructions":   ["light-cyan", None, False],
+    "keyboard":       ["white", "light-red", True],
+    "instructions":   ["light-cyan", "dark-gray", False],
     "success_text":   ["light-green", None, False],
-    "success_icon":   ["dark-gray", "green", False],
+    "success_icon":   ["white", "green", True],
     "hint_text":      ["light-yellow", None, False],
-    "hint_icon":      ["dark-gray", "yellow", False],
+    "hint_icon":      ["dark-gray", "light-yellow", True],
     "error_text":     ["light-red", None, False],
-    "error_icon":     ["dark-gray", "red", False]
+    "error_icon":     ["white", "red", True]
 }
 
 enabled = True
