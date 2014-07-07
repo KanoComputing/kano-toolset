@@ -182,9 +182,10 @@ class IWList():
             return cellData["Number"], cellData
 
         # keep scanning until at least one valid network is found
-        retries = 0
-        while not self.data and retries < 3:
-            retries += 1
+        tries = 0
+        start_time = time.time()
+        while not self.data and time.time() - start_time < 5:
+            tries += 1
 
             # Get raw data as a string
             rawdata = getRawData(self.interface, iwlist)
@@ -195,8 +196,9 @@ class IWList():
                 logger.debug('found {} networks in scanning loop'.format(len(self.data)))
             else:
                 logger.debug('not found any networks in scanning loop'.format(len(self.data)))
+                time.sleep(0.2)
 
-        logger.info('found {} networks'.format(len(self.data)))
+        logger.error('found {} networks in {} tries in {} seconds'.format(len(self.data), tries, time.time() - start_time))
 
     def getList(self, unsecure=False, first=False, debug=False):
         '''
