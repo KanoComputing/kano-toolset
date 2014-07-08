@@ -165,12 +165,15 @@ class KanoDialog():
                 # get selected radio button only if press the OK button
                 if button.get_label().upper() == "OK":
                     self.returnvalue = radio_returnvalue
-            self.dialog.destroy()
-            return self.returnvalue
+            self.dialog.response(self.returnvalue)
+
+        # Indicate that the signal has been handled
+        return True
 
     def run(self):
         self.dialog.show_all()
         self.dialog.run()
+        self.dialog.destroy()
         return self.returnvalue
 
     def set_text(self, title_text, description_text):
