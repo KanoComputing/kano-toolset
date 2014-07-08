@@ -112,7 +112,7 @@ class KanoDialog():
 
             button = KanoButton(button_name)
             button.set_color(color)
-            button.connect("button-press-event", self.exit_dialog, return_value)
+            button.connect("button-release-event", self.exit_dialog, return_value)
             button.connect("key-release-event", self.exit_dialog, return_value)
             self.buttons.append(button)
             button_box.pack_start(button, False, False, 6)
