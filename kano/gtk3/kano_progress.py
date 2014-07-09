@@ -18,7 +18,7 @@ class Progress(Gtk.ProgressBar):
         css = Gtk.CssProvider()
         css.load_from_path(common_css_dir + "/colours.css")
         progress_css = Gtk.CssProvider()
-        progress_css.load_from_path(common_css_dir + "/progress_bar.css")
+        progress_css.load_from_path(common_css_dir + "/kano_progress.css")
 
         screen = Gdk.Screen.get_default()
         styleContext = Gtk.StyleContext()
