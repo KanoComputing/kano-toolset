@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+# kano-progress
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+
+# usage: kano-progress title=title description=desc buttons=abc:orange:1,bcd:red:2
+
+import os
+import sys
+from gi.repository import Gtk
+
+
+if __name__ == '__main__' and __package__ is None:
+    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if dir_path != '/usr':
+        sys.path.insert(1, dir_path)
+
+from kano.gtk3.kano_progress import KanoProgress
+
+
+def parse_items(args):
+    global radio_returnvalue
+
+    pulse = False
+    title = "Loading"
+
+    for arg in args:
+        split = arg.split('=')
+
+        if split[0] == "pulse":
+            pulse = True
+        if split[0] == "title":
+            title = split[1]
+
+    return pulse, title
+
+
+def main():
+    text = sys.argv[1:]
+    pulse, title = parse_items(text)
+    pbar = KanoProgress(pulse, title)
+    pbar.show_all()
+    Gtk.main()
+
+
+if __name__ == '__main__':
+    #if len(sys.argv) == 1:
+    #    sys.exit('Nothing to display!')
+    main()
