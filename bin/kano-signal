@@ -26,11 +26,11 @@ if [ ! -p $pipe_name ]; then
     # nor Pong nor Minecraft are running, byebye
     exit 1
 else
-    # which one is running? 
+    # which one is running?
     xwininfo -tree -root|grep -i pong > /dev/null 2>&1
     if [ $? == 0 ]; then
 	app="pong"
-    else 
+    else
 	xwininfo -tree -root|grep -i minecraft > /dev/null 2>&1
 	if [ $? == 0 ]; then
 	    app="minecraft"
@@ -42,53 +42,30 @@ else
     fi
 fi
 
-# Make-Pong signals
-function pong-save {
-    jscmd="IO.updateScreenshotSrc(); location.href='#saveDialog'; IO.addListeners();"
+# Signals
+function save {
+    jscmd="Signal.save();"
     echo $jscmd > $pipe_name
 }
 
-function pong-load {
-    jscmd="location.href='#loadSource'"
+function load {
+    jscmd="Signal.load();"
     echo $jscmd > $pipe_name
 }
 
-function pong-share {
-    jscmd="IO.updateScreenshotSrc(); location.href='#shareDialog'; IO.addListeners();"
+function share {
+    jscmd="Signal.share();"
     echo $jscmd > $pipe_name
 }
 
-function pong-make {
-    jscmd="SoundFX.make.play(); Stats.update(); IO.screenshot(); Pong.savePythonScript();"
+function make {
+    jscmd="Signal.make();"
     echo $jscmd > $pipe_name
 }
 
-# Make-Minecraft signals
-function minecraft-save {
-    jscmd="IO.updateScreenshotSrc(); location.href='#saveDialog'; IO.addListeners();"
-    echo $jscmd > $pipe_name
-}
-
-function minecraft-load {
-    jscmd="location.href='#loadSource'"
-    echo $jscmd > $pipe_name
-}
-
-function minecraft-share {
-    jscmd="IO.updateScreenshotSrc(); location.href='#shareDialog'; IO.addListeners();"
-    echo $jscmd > $pipe_name
-}
-
-function minecraft-make {
-    jscmd="SoundFX.make.play(); Stats.update(); IO.screenshot(); Minecraft.savePythonScript()"
-    echo $jscmd > $pipe_name
-}
-
-# construct an application name, append a signal name, then dispatch to the specific function
-appsignal="$app-$signal"
 if [ "$2" == "debug" ]; then
-    echo "Dispatching signal: $appsignal"
+    echo "Dispatching signal: $signal"
 fi
 
-eval $appsignal
+eval $signal
 exit $?
