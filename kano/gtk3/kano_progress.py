@@ -7,23 +7,14 @@
 #
 # Customised progress bar widget
 
-from gi.repository import Gtk, Gdk, GObject
-from kano.paths import common_css_dir
+from gi.repository import Gtk, GObject
+from kano.gtk3.apply_styles import apply_styles, apply_named_style
 #import sys
 
 
 class Progress(Gtk.ProgressBar):
 
     def __init__(self, pulse=True):
-        css = Gtk.CssProvider()
-        css.load_from_path(common_css_dir + "/colours.css")
-        progress_css = Gtk.CssProvider()
-        progress_css.load_from_path(common_css_dir + "/kano_progress.css")
-
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        styleContext.add_provider_for_screen(screen, progress_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         Gtk.ProgressBar.__init__(self)
         self.activity_mode = pulse
@@ -55,14 +46,24 @@ class Progress(Gtk.ProgressBar):
 
 class KanoProgress(Gtk.Window):
 
-    def __init__(self, pulse):
+    def __init__(self, pulse, title=""):
+        apply_styles()
+        apply_named_style('kano_progress')
+
         Gtk.Window.__init__(self)
-        self.progress = Progress(pulse)
-        self.add(self.progress)
         self.set_decorated(False)
         self.set_resizable(False)
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect("delete-event", Gtk.main_quit)
+
+        label = Gtk.Label(title)
+        progress = Progress(pulse)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.add(box)
+        box.pack_start(label, False, False, 5)
+        box.pack_start(progress, False, False, 0)
+
 
 
 

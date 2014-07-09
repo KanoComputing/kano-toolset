@@ -25,20 +25,23 @@ def parse_items(args):
     global radio_returnvalue
 
     pulse = False
+    title = "Loading"
 
     for arg in args:
         split = arg.split('=')
 
         if split[0] == "pulse":
             pulse = True
+        if split[0] == "title":
+            title = split[1]
 
-    return pulse
+    return pulse, title
 
 
 def main():
     text = sys.argv[1:]
-    pulse = parse_items(text)
-    pbar = KanoProgress(pulse)
+    pulse, title = parse_items(text)
+    pbar = KanoProgress(pulse, title)
     pbar.show_all()
     Gtk.main()
 

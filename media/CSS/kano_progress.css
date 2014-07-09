@@ -30,3 +30,8 @@ GtkProgressBar.progressbar {
     border-radius: 3px;
     border-color: transparent;
 }
+
+GtkLabel {
+    font: Bariol 15;
+    color: @active_writing;
+}
