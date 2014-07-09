@@ -35,21 +35,31 @@ COLOURS = {
 }
 
 PRESETS = {
-    "code":       ["green", "dark-gray", True],
-    "key":        ["red", "dark-gray", True],
+    "code":           ["green", "dark-gray", True],
+    "key":            ["red", "dark-gray", True],
 
-    "faded":      ["yellow", None, False],
-    "alert":      ["red", None, True],
-    "highlight":  ["blue", None, True],
+    "faded":          ["yellow", None, False],
+    "alert":          ["red", None, True],
+    "highlight":      ["blue", None, True],
 
-    "pass":       ["green", None, True],
-    "fail":       ["red", None, True],
+    "pass":           ["green", None, True],
+    "fail":           ["red", None, True],
 
-    "info":       ["green", None, True],
-    "debug":      ["blue", None, True],
-    "warning":    ["yellow", None, True],
-    "error":      ["red", None, True],
-    "none":       [None, None, False]
+    "info":           ["green", None, True],
+    "debug":          ["blue", None, True],
+    "warning":        ["yellow", None, True],
+    "error":          ["red", None, True],
+    "none":           [None, None, False],
+
+    # Used in colours-cli
+    "keyboard":       ["white", "light-red", True],
+    "instructions":   ["light-cyan", "dark-gray", False],
+    "success_text":   ["light-green", None, False],
+    "success_icon":   ["white", "green", True],
+    "hint_text":      ["light-yellow", None, False],
+    "hint_icon":      ["dark-gray", "light-yellow", True],
+    "error_text":     ["light-red", None, False],
+    "error_icon":     ["white", "red", True]
 }
 
 enabled = True
