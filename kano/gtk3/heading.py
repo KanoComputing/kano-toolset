@@ -17,6 +17,7 @@ class Heading():
 
         self.title = Gtk.Label(title)
         self.description = Gtk.Label(description)
+        self.description.set_line_wrap(True)
 
         # Table
         self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
