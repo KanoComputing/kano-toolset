@@ -19,6 +19,7 @@ import subprocess
 import shlex
 import json
 import re
+from kano.utils import run_cmd
 from kano.logging import logger
 
 
@@ -42,13 +43,13 @@ class IWList():
             '''
 
             # Make sure the wlan interface is up, otherwise the network scan will not proceed
-            os.system('ifconfig %s up' % interface)
+            run_cmd('ifconfig %s up' % interface)
             if iwlist:
                 outdata = open(iwlist, 'r').read()
             else:
                 # Contemplate those seldom cases where the dongle driver returns an empty list
-                cstring = "iwlist " + interface + " scan 2>/dev/nul"
-                outdata = os.popen(cstring).read()
+                cstring = "iwlist " + interface + " scan"
+                outdata, _, _ = run_cmd(cstring)
 
             return outdata
 
@@ -261,22 +262,6 @@ class IWList():
             return iwnets
 
 
-def execute(cmdline):
-    '''
-    Executes command. If it fails with return code an exception is raised.
-    If successful returns True
-    '''
-    args = shlex.split(cmdline)
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    (out, err) = p.communicate()
-    rc = p.returncode
-    if not rc == 0:
-        logger.debug('FAIL: "%s" rc=%s, out="%s", err="%s"' % (cmdline, rc, out, err))
-        raise Exception(cmdline, 'rc=%s, out="%s", err="%s"' % (rc, out, err))
-    else:
-        return out, err
-
-
 def is_device(iface):
     '''
     Returns True if wireless dongle is connected, False otherwise
@@ -307,24 +292,20 @@ def is_connected(iface):
     or None if device is not present or non-operative
     '''
     essid = mode = ap = None
-    time.sleep(1)
-    try:
-        out, err = execute("iwgetid %s --raw" % iface)
-        essid = out.strip()
 
-        out, err = execute("iwgetid %s --raw --ap" % iface)
-        ap = out.strip()
+    out, err, _ = run_cmd("iwgetid %s --raw" % iface)
+    essid = out.strip()
 
-        # mode 2 = Managed
-        out, err = execute("iwgetid %s --raw --mode" % iface)
-        out = out.strip()
-        if out == '2':
-            mode = 'Managed'
-        else:
-            mode = out
+    out, err, _ = run_cmd("iwgetid %s --raw --ap" % iface)
+    ap = out.strip()
 
-    except:
-        pass
+    # mode 2 = Managed
+    out, err, _ = run_cmd("iwgetid %s --raw --mode" % iface)
+    out = out.strip()
+    if out == '2':
+        mode = 'Managed'
+    else:
+        mode = out
 
     return (essid, mode, ap)
 
@@ -334,16 +315,13 @@ def is_gateway():
     Find the default route gateway, try to contact it. Return True if responding
     '''
     responds = False
-    out, err = execute("ip route show")
+    out, err, _ = run_cmd("ip route show")
     guess_ip = re.match('^default via ([0-9\.]*) .*', out)
     if guess_ip:
         gway_ip = guess_ip.group(1)
-        try:
-            rc = os.system('ping -c 1 %s > /dev/null 2>&1' % gway_ip)
-            if rc == 0:
-                responds = True
-        except:
-            pass
+        _, _, rc = run_cmd('ping -c 1 %s' % gway_ip)
+        if rc == 0:
+            responds = True
 
     return responds
 
@@ -352,11 +330,8 @@ def is_internet():
     '''
     Returns True if Internet is available, False otherwise
     '''
-    try:
-        rc = os.system('/usr/bin/is_internet')
-        return rc == 0
-    except:
-        return False
+    _, _, rc = run_cmd('/usr/bin/is_internet')
+    return rc == 0
 
 
 def wpa_conf(essid, psk, confile):
@@ -385,16 +360,23 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
     reloaded = False
 
     # Terminate wpa_supplicant daemon
-    try:
-        rc = os.system('wpa_cli terminate > /dev/null 2>&1 ; sleep .5')
-        logger.info('wpa_cli has been terminated')
-    except:
-        pass
+    run_cmd('wpa_cli terminate')
+    time.sleep(0.5)
+    logger.info('wpa_cli has been terminated')
 
-    rc = os.system('lsusb -d %s:%s > /dev/null 2>&1' % (device_vendor, device_product))
+    _, _, rc = run_cmd('lsusb -d %s:%s' % (device_vendor, device_product))
     if rc == 0:
         # The device id is matched, reload the kernel driver
-        rc_load = os.system('rmmod "%s" > /dev/null 2>&1 ; sleep .5 ; modprobe "%s" > /dev/null 2>&1 ; sleep 5' % (module, module))
+        rc_load = 0
+
+        _, _, rc = run_cmd('rmmod "{}"'.format(module))
+        time.sleep(0.5)
+        rc_load += rc
+
+        _, _, rc = run_cmd('modprobe "{}"'.format(module))
+        time.sleep(5)
+        rc_load += rc
+
         logger.info('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' %
                     (module, device_vendor, device_product, rc_load))
         if rc_load == 0:
@@ -421,20 +403,11 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     udhcpc_cmdline = 'udhcpc -S -t 70 -A 20 -n -a --script=/etc/udhcpc/kano.script -i %s' % iface
     time.sleep(1)
 
-    #
     # kill previous connection daemons
-    #
-
-    try:
-        execute("pkill -f '%s'" % (udhcpc_cmdline))
-    except:
-        pass
+    run_cmd("pkill -f '%s'" % (udhcpc_cmdline))
 
     # and wpa supllicant daemon, politely through wpa_cli
-    try:
-        execute("wpa_cli terminate > /dev/null 2>&1")
-    except:
-        pass
+    run_cmd("wpa_cli terminate")
 
     #
     # Set the ESSID of the wireless network to associate
@@ -442,19 +415,16 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     escaped_essid = essid.replace('\'', '\\\'')
     escaped_essid = escaped_essid.replace('\"', '\\\"')
 
-    execute("iwconfig %s power off" % iface)
-    execute("ifconfig %s down" % iface)
-    execute("iwconfig %s essid \"%s\"" % (iface, escaped_essid))
-    execute("iwconfig %s mode managed" % iface)
-    execute("ifconfig %s up" % iface)
+    run_cmd("iwconfig %s power off" % iface)
+    run_cmd("ifconfig %s down" % iface)
+    run_cmd("iwconfig %s essid \"%s\"" % (iface, escaped_essid))
+    run_cmd("iwconfig %s mode managed" % iface)
+    run_cmd("ifconfig %s up" % iface)
 
     if wpa_custom_file:
         logger.info("Starting wpa_supplicant with custom config: %s" % wpa_custom_file)
-        try:
-            # wpa_supplicant might complain even if it goes ahead doing its job
-            execute("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
-        except:
-            pass
+        # wpa_supplicant might complain even if it goes ahead doing its job
+        run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
 
     elif encrypt == 'wep':
         # WEP encryption keys have to be either 5, 13 or 58 ASCII chars in length (40/104/232 bits)
@@ -463,11 +433,8 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             logger.error("WEP encryption key lenght incorrect (%d) has to be one of 5/13/58 chars" % (len(seckey)))
             return False
         else:
-            try:
-                logger.info("Setting WEP encryption key for network '%s' to interface %s" % (essid, iface))
-                execute("iwconfig %s key 's:%s'" % (iface, seckey))
-            except:
-                pass
+            logger.info("Setting WEP encryption key for network '%s' to interface %s" % (essid, iface))
+            run_cmd("iwconfig %s key 's:%s'" % (iface, seckey))
 
     elif encrypt == 'wpa':
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
@@ -475,40 +442,32 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         associated = False
         wpa_conf(essid, seckey, confile=wpafile)
 
-        try:
-            # wpa_supplicant might complain even if it goes ahead doing its job
-            execute("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+        # wpa_supplicant might complain even if it goes ahead doing its job
+        run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
 
-            # Wait for wpa_supplicant to become associated to the AP
-            # or give up if it takes too long
-            assoc_timeout = 20  # seconds
-            assoc_start = time.time()
-            while (time.time() - assoc_start) < assoc_timeout:
-                r = os.popen('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
-                wpa_state = r.read().strip('\n')
-                if wpa_state.split('=')[1] == 'COMPLETED':
-                    associated = True
-                    break
-
-                r.close()
-                time.sleep(0.5)
-        except:
-            pass
+        # Wait for wpa_supplicant to become associated to the AP
+        # or give up if it takes too long
+        assoc_timeout = 20  # seconds
+        assoc_start = time.time()
+        while (time.time() - assoc_start) < assoc_timeout:
+            out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
+            wpa_state = out.strip('\n')
+            if wpa_state.split('=')[1] == 'COMPLETED':
+                associated = True
+                break
+            time.sleep(0.5)
 
         if not associated:
             return False
 
-    try:
-        logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))
-        execute(udhcpc_cmdline)
-        return True
-    except:
-        return False
+    logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))
+    out, err, rc = run_cmd(udhcpc_cmdline)
+    return rc == 0
 
 
 def disconnect(iface):
-    execute('iwconfig "%s" essid off' % iface)
-    execute('iwconfig "%s" mode managed' % iface)
+    run_cmd('iwconfig "%s" essid off' % iface)
+    run_cmd('iwconfig "%s" mode managed' % iface)
     time.sleep(3)
     return
 
