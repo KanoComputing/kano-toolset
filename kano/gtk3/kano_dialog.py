@@ -166,7 +166,7 @@ class KanoDialog():
                 if button.get_label().upper() == "OK":
                     self.returnvalue = radio_returnvalue
             # TODO: change the structure so we emit different signals depending on the button clicked
-            self.dialog.response(Gtk.ResponseType.NONE)
+            self.dialog.response(Gtk.ResponseType.OK)
 
         # Indicate that the signal has been handled
         return True
