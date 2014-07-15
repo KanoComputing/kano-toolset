@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # window.py
-# 
+#
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
 #
@@ -37,7 +37,10 @@ def _is_decorated(win):
         return
 
     extents = _get_win_property(win, "_NET_FRAME_EXTENTS")
-    return sum(extents) > 0
+    if extents:
+        return sum(extents) > 0
+    else:
+        return False
 
 
 # Returns a 2-tuple (width, height) that is used for decoration
