@@ -48,7 +48,10 @@ def _get_decoration_size(win):
     if not win:
         return
     extents = _get_win_property(win, "_NET_FRAME_EXTENTS")
-    return (extents[0] + extents[1], extents[2] + extents[3])
+    if extents:
+        return (extents[0] + extents[1], extents[2] + extents[3])
+    else:
+        return 0
 
 
 def _get_window_by_pid(pid):
@@ -56,6 +59,9 @@ def _get_window_by_pid(pid):
     if not root:
         return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
+    if not extents:
+        return
+
     for id in extents:
         w = gdk.window_foreign_new(id)
         if w:
@@ -69,6 +75,8 @@ def _get_window_by_child_pid(pid):
     if not root:
         return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
+    if not extents:
+        return
 
     # make a set of all visible pids
     winpids = set()
@@ -107,6 +115,9 @@ def _get_window_by_title(title):
     if not root:
         return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
+    if not extents:
+        return
+
     for id in extents:
         w = gdk.window_foreign_new(id)
         if w:
