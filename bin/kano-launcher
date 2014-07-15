@@ -9,14 +9,21 @@
 # Usage: kano-launcher cmd [preset]
 
 # Make sure there are no other projects running at the same time
-killall -q python
-killall -q minecraft-pi
-killall -q make-minecraft
-killall -q splash.py
-killall -q make-pong
-killall -q make-music
-killall -q make-video
-killall -q make-snake
+killall_projects () {
+    killall -q python
+    killall -q minecraft-pi
+    killall -q make-minecraft
+    killall -q splash.py
+    killall -q make-pong
+    killall -q make-music
+    killall -q make-video
+    killall -q make-snake
+}
+
+
+if [ "$2" != "pcmanfm" ]; then
+    killall_projects
+fi
 
 if [ -z "$1" ]; then
     exit 1
@@ -27,12 +34,12 @@ eval "$1 &"
 # Apply window presets
 case "$2" in
     make-snake)
-        kano-window-tool -t "Make Snake" -dno -m -f ;;
+        kano-window-tool -t "Make Snake" -dno -m -f
+        ;;
     pcmanfm)
         if [ -e /usr/bin/kano-profile-cli ]; then
             kano-profile-cli increment_app_state_variable pcmanfm starts 1
         fi
-
         ;;
 esac
 
