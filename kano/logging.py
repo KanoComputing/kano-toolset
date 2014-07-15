@@ -12,7 +12,7 @@ import grp
 import json
 import time
 import yaml
-from kano.colours import decorate_string, decorate_with_preset
+from kano.colours import decorate_string_only_terminal, decorate_with_preset
 from kano.utils import get_home_by_username
 
 LOG_ENV = "LOG_LEVEL"
@@ -28,7 +28,7 @@ usr = os.getenv("SUDO_USER") if is_sudoed else pwd.getpwuid(os.getuid())[0]
 
 try:
     home_folder = get_home_by_username(usr)
-except KeyError: # user doesn't exist
+except KeyError:  # user doesn't exist
     if is_sudoed:
         # something weird happened with sudo
         # fall back to the root user
@@ -49,8 +49,9 @@ LEVELS = {
     "debug": 4
 }
 
+
 def normalise_level(level):
-    if level == None:
+    if level is None:
         return "none"
 
     level = level.lower()
@@ -59,6 +60,7 @@ def normalise_level(level):
             return l
 
     return "none"
+
 
 class Logger:
     def __init__(self):
@@ -123,7 +125,7 @@ class Logger:
 
     def set_app_name(self, name):
         self._app_name = os.path.basename(name.strip()).lower().replace(" ", "_")
-        if self._log_file != None:
+        if self._log_file is not None:
             self._log_file.close()
             self._log_file = None
 
@@ -137,7 +139,7 @@ class Logger:
         sys_output_level = LEVELS[self.get_output_level()]
 
         if level > 0 and (level <= sys_log_level or level <= sys_output_level):
-            if self._app_name == None:
+            if self._app_name is None:
                 self.set_app_name(sys.argv[0])
 
             lines = str(msg).strip().split("\n")
@@ -150,15 +152,15 @@ class Logger:
                 log["level"] = lname
 
                 if level <= sys_log_level:
-                    if self._log_file == None:
+                    if self._log_file is None:
                         self._init_log_file()
                     self._log_file.write("{}\n".format(json.dumps(log)))
 
                 if level <= sys_output_level:
                     print "{}[{}] {} {}".format(
                         self._app_name,
-                        decorate_string(self._pid, "yellow"),
-                        decorate_with_preset(log["level"], log["level"]),
+                        decorate_string_only_terminal(self._pid, "yellow"),
+                        decorate_with_preset(log["level"], log["level"], True),
                         log["message"]
                     )
 
@@ -179,7 +181,7 @@ class Logger:
         self.write(msg, **kwargs)
 
     def _init_log_file(self):
-        if self._log_file != None:
+        if self._log_file is not None:
             self._log_file.close()
 
         if os.getuid() == 0 and not is_sudoed:
@@ -212,11 +214,14 @@ class Logger:
 
 logger = Logger()
 
+
 def set_system_log_level(lvl):
     _set_conf_var("log_level", lvl)
 
+
 def set_system_output_level(lvl):
     _set_conf_var("output_level", lvl)
+
 
 def _set_conf_var(var, value):
     conf = None
@@ -231,17 +236,19 @@ def _set_conf_var(var, value):
     with open(CONF_FILE, "w") as f:
         f.write(yaml.dump(conf, default_flow_style=False))
 
+
 def read_logs(app=None):
     data = {}
     for d in [USER_LOGS_DIR, SYSTEM_LOGS_DIR]:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                if app == None or re.match("^{}\.log".format(app), log):
+                if app is None or re.match("^{}\.log".format(app), log):
                     log_path = os.path.join(d, log)
                     with open(log_path, "r") as f:
                         data[log_path] = map(json.loads, f.readlines())
 
     return data
+
 
 def cleanup(app=None, line_limit=TAIL_LENGTH):
     dirs = [USER_LOGS_DIR]
@@ -251,12 +258,13 @@ def cleanup(app=None, line_limit=TAIL_LENGTH):
     for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                if app == None or re.match("^{}\.log".format(app), log):
+                if app is None or re.match("^{}\.log".format(app), log):
                     log_path = os.path.join(d, log)
                     try:
                         __tail_log_file(log_path, line_limit)
                     except IOError:
                         pass
+
 
 def __tail_log_file(file_path, length):
     data = None
