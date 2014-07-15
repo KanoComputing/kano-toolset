@@ -43,6 +43,8 @@ def get_preset_from_id(id):
         return "error_text"
     elif id == '8':
         return "error_icon"
+    elif id == '9':
+        return "code"
     else:
         return "alert"
 
