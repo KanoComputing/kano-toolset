@@ -157,12 +157,13 @@ class Logger:
                     self._log_file.write("{}\n".format(json.dumps(log)))
 
                 if level <= sys_output_level:
-                    print "{}[{}] {} {}".format(
+                    output_line = "{}[{}] {} {}\n".format(
                         self._app_name,
                         decorate_string_only_terminal(self._pid, "yellow"),
                         decorate_with_preset(log["level"], log["level"], True),
                         log["message"]
                     )
+                    sys.stderr.write(output_line)
 
     def error(self, msg, **kwargs):
         kwargs["level"] = "error"
