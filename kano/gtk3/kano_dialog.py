@@ -112,7 +112,7 @@ class KanoDialog():
 
             button = KanoButton(button_name)
             button.set_color(color)
-            button.connect("button-press-event", self.exit_dialog, return_value)
+            button.connect("button-release-event", self.exit_dialog, return_value)
             button.connect("key-release-event", self.exit_dialog, return_value)
             self.buttons.append(button)
             button_box.pack_start(button, False, False, 6)
@@ -165,12 +165,16 @@ class KanoDialog():
                 # get selected radio button only if press the OK button
                 if button.get_label().upper() == "OK":
                     self.returnvalue = radio_returnvalue
-            self.dialog.destroy()
-            return self.returnvalue
+            # TODO: change the structure so we emit different signals depending on the button clicked
+            self.dialog.response(Gtk.ResponseType.OK)
+
+        # Indicate that the signal has been handled
+        return True
 
     def run(self):
         self.dialog.show_all()
         self.dialog.run()
+        self.dialog.destroy()
         return self.returnvalue
 
     def set_text(self, title_text, description_text):
