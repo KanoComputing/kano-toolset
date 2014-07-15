@@ -14,9 +14,12 @@ import sys
 
 
 class ScrolledWindow(Gtk.ScrolledWindow):
-    def __init__(self, hexpand=None, vexpand=None):
+    def __init__(self, hexpand=None, vexpand=None, wide_scrollbar=False):
         scrollbar_css = Gtk.CssProvider()
         css_file = os.path.join(common_css_dir, 'scrollbar.css')
+        if wide_scrollbar:
+            css_file = os.path.join(common_css_dir, 'scrollbar-wide.css')
+
         if not os.path.exists(css_file):
             sys.exit('CSS file missing!')
         scrollbar_css.load_from_path(css_file)
