@@ -291,6 +291,7 @@ def is_connected(iface):
     or None if device is not present or non-operative
     '''
     essid = mode = ap = None
+    linked = False
 
     out, err, _ = run_cmd("iwgetid %s --raw" % iface)
     essid = out.strip()
@@ -306,7 +307,12 @@ def is_connected(iface):
     else:
         mode = out
 
-    return (essid, mode, ap)
+    # ifplugstatus will tell us if we are associated
+    # and authenticated to the AP with return code 2
+    _, _, rc = run_cmd ("/usr/sbin/ifplugstatus %s" % iface)
+    linked = rc == 2
+
+    return (essid, mode, ap, linked)
 
 
 def is_gateway(iface):
@@ -447,7 +453,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         while (time.time() - assoc_start) < assoc_timeout:
             out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
             wpa_state = out.strip('\n')
-            if wpa_state.split('=')[1] == 'COMPLETED':
+            if len(wpa_state) and wpa_state.split('=')[1] == 'COMPLETED':
                 associated = True
                 break
             time.sleep(0.5)
