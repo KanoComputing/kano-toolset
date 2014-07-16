@@ -310,7 +310,7 @@ def is_connected(iface):
     # ifplugstatus will tell us if we are associated
     # and authenticated to the AP with return code 2
     _, _, rc = run_cmd ("/usr/sbin/ifplugstatus %s" % iface)
-    linked = rc == 2
+    linked = (rc == 2)
 
     return (essid, mode, ap, linked)
 
