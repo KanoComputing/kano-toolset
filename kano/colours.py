@@ -52,6 +52,7 @@ PRESETS = {
     "none":           [None, None, False],
 
     # Used in colours-cli
+    "command_prompt": ["light-cyan", None, False],
     "keyboard":       ["white", "light-red", True],
     "instructions":   ["light-cyan", "dark-gray", False],
     "success_text":   ["light-green", None, False],
