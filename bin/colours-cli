@@ -27,7 +27,9 @@ if len(sys.argv) == 1:
 
 
 def get_preset_from_id(id):
-    if id == '1':
+    if id == '0':
+        return "command_prompt"
+    elif id == '1':
         return "keyboard"
     elif id == '2':
         return "instructions"
@@ -43,6 +45,8 @@ def get_preset_from_id(id):
         return "error_text"
     elif id == '8':
         return "error_icon"
+    elif id == '9':
+        return "code"
     else:
         return "alert"
 

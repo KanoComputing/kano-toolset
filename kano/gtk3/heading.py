@@ -29,7 +29,7 @@ class Heading():
 
         if not description == "":
             self.description = Gtk.Label(description)
-
+            self.description.set_line_wrap(True)
             self.description_style = self.description.get_style_context()
             self.description_style.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
             self.description_style.add_class('description')

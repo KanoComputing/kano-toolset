@@ -219,13 +219,12 @@ class IWList():
             pp.pprint(self.data)
 
         iwnets = []
-        for w in self.data:
-            ww = self.data[w]
+        for number, ww in self.data.iteritems():
 
             # Basic signal information, excluding hidden SSIDs
-            if len(ww['ESSID']):
+            if 'ESSID' in ww:
                 wnet = {
-                    'essid': ww['ESSID'] if len(ww['ESSID']) else ww['MAC'],
+                    'essid': ww['ESSID'],
                     'channel': ww['Channel'],
                     'signal': ww['Signal'],
                     'quality': ww['Quality']
@@ -256,8 +255,8 @@ class IWList():
                     iwnets.append(wnet)
 
         iwnets = sorted(iwnets, key=sortNetworks, reverse=True)
-        if first and len(iwnets) > 1:
-            return [iwnets[0]]
+        if first:
+            return iwnets[0:1]
         else:
             return iwnets
 
@@ -292,6 +291,7 @@ def is_connected(iface):
     or None if device is not present or non-operative
     '''
     essid = mode = ap = None
+    linked = False
 
     out, err, _ = run_cmd("iwgetid %s --raw" % iface)
     essid = out.strip()
@@ -307,23 +307,24 @@ def is_connected(iface):
     else:
         mode = out
 
-    return (essid, mode, ap)
+    # ifplugstatus will tell us if we are associated
+    # and authenticated to the AP with return code 2
+    _, _, rc = run_cmd ("/usr/sbin/ifplugstatus %s" % iface)
+    linked = (rc == 2)
+
+    return (essid, mode, ap, linked)
 
 
-def is_gateway():
+def is_gateway(iface):
     '''
     Find the default route gateway, try to contact it. Return True if responding
     '''
-    responds = False
-    out, err, _ = run_cmd("ip route show")
-    guess_ip = re.match('^default via ([0-9\.]*) .*', out)
+    out, _, _ = run_cmd("ip route show")
+    guess_ip = re.match('^default via ([0-9\.]*) dev {}'.format(iface), out)
     if guess_ip:
-        gway_ip = guess_ip.group(1)
-        _, _, rc = run_cmd('ping -c 1 %s' % gway_ip)
-        if rc == 0:
-            responds = True
-
-    return responds
+        return True
+    else:
+        return False
 
 
 def is_internet():
@@ -452,7 +453,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         while (time.time() - assoc_start) < assoc_timeout:
             out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
             wpa_state = out.strip('\n')
-            if wpa_state.split('=')[1] == 'COMPLETED':
+            if len(wpa_state) and wpa_state.split('=')[1] == 'COMPLETED':
                 associated = True
                 break
             time.sleep(0.5)

@@ -1,3 +1,9 @@
+kano-toolset (1.1-2) unstable; urgency=low
+
+  * Added support for a wider scrollbar
+
+ -- Team Kano <dev@kano.me>  Tue, 15 Jul 2014 15:36:56 +0100
+
 kano-toolset (1.1-1) unstable; urgency=low
 
   * Reviewing for the release.

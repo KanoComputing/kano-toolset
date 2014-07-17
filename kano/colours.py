@@ -52,6 +52,7 @@ PRESETS = {
     "none":           [None, None, False],
 
     # Used in colours-cli
+    "command_prompt": ["light-cyan", None, False],
     "keyboard":       ["white", "light-red", True],
     "instructions":   ["light-cyan", "dark-gray", False],
     "success_text":   ["light-green", None, False],
@@ -195,8 +196,12 @@ def decorate_string(string, fg_colour=None, bg_colour=None, bold=False):
     return string
 
 
-def decorate_with_preset(string, preset):
+def decorate_with_preset(string, preset, only_terminal=False):
     """ Decorate a string using a specified colour preset. """
 
     p = PRESETS[preset]
-    return decorate_string(string, p[0], p[1], p[2])
+
+    if not only_terminal:
+        return decorate_string(string, p[0], p[1], p[2])
+
+    return decorate_string_only_terminal(string, p[0], p[1], p[2])
