@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 # kano_dialog.py
