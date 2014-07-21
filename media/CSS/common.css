@@ -195,3 +195,7 @@ GtkLabel{
     border-width: 0px;
     border-color: transparent;
 }
+
+.blur {
+    background-color: RGBA(0, 0, 0, 0.35);
+}

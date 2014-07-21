@@ -1,3 +1,9 @@
+kano-toolset (1.1-3) unstable; urgency=low
+
+  * Added kano.gtk3.ApplicationWindow base class
+
+ -- Team Kano <dev@kano.me>  Mon, 21 Jul 2014 15:40:12 +0100
+
 kano-toolset (1.1-2) unstable; urgency=low
 
   * Added support for a wider scrollbar
