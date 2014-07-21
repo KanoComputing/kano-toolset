@@ -34,7 +34,7 @@ background_colors = ['grey', 'white']
 
 class KanoDialog():
     # button_dict includes the button text, color and button return values
-    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False, scrolled_text="", global_style=""):
+    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False, scrolled_text="", global_style="", parent_window=None):
         self.title_text = title_text
         self.description_text = description_text
         self.widget = widget
@@ -44,6 +44,7 @@ class KanoDialog():
         self.has_list = has_list
         self.scrolled_text = scrolled_text
         self.global_style = global_style
+        self.parent_window = parent_window
 
         self.dialog = Gtk.Dialog()
 
@@ -172,9 +173,20 @@ class KanoDialog():
         return True
 
     def run(self):
+        if self.parent_window != None and \
+           hasattr(self.parent_window, 'blur') and \
+           callable(self.parent_window.blur):
+            self.parent_window.blur()
+
         self.dialog.show_all()
         self.dialog.run()
         self.dialog.destroy()
+
+        if self.parent_window != None and \
+           hasattr(self.parent_window, 'unblur') and \
+           callable(self.parent_window.unblur):
+            self.parent_window.unblur()
+
         return self.returnvalue
 
     def set_text(self, title_text, description_text):
