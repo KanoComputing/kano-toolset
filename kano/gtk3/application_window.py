@@ -8,7 +8,7 @@
 # You can use this as a base for you application's window in case
 # you'd like to blur it.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from kano.paths import common_css_dir
 from kano.gtk3.apply_styles import apply_styles
 import os
