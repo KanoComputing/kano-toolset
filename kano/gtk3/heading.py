@@ -27,7 +27,7 @@ class Heading():
         self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.container.pack_start(self.title, False, False, 6)
 
-        if not description == "":
+        if description != "":
             self.description = Gtk.Label(description)
             self.description.set_line_wrap(True)
             self.description_style = self.description.get_style_context()
