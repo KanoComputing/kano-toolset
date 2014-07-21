@@ -40,7 +40,7 @@ class ApplicationWindow(Gtk.Window):
         self._overlay = Gtk.Overlay()
 
         self._blur = Gtk.EventBox()
-        self._blur.get_style_context().style.add_class('blur')
+        self._blur.get_style_context().add_class('blur')
 
         # TODO: Maybe handle the taskbar here to avoid even more code duplication?
 
