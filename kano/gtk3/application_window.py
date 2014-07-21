@@ -38,6 +38,7 @@ class ApplicationWindow(Gtk.Window):
         apply_styles()
 
         self._overlay = Gtk.Overlay()
+        self.add(self._overlay)
 
         self._blur = Gtk.EventBox()
         self._blur.get_style_context().add_class('blur')
