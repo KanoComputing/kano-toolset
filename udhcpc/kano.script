@@ -10,84 +10,84 @@ RESOLV_CONF="/etc/resolv.conf"
 
 case $1 in
     bound|renew)
-	[ -n "$broadcast" ] && BROADCAST="broadcast $broadcast"
-	[ -n "$subnet" ] && NETMASK="netmask $subnet"
+        [ -n "$broadcast" ] && BROADCAST="broadcast $broadcast"
+        [ -n "$subnet" ] && NETMASK="netmask $subnet"
 
-	/sbin/ifconfig $interface $ip $BROADCAST $NETMASK
+        /sbin/ifconfig $interface $ip $BROADCAST $NETMASK
 
-	if [ -n "$router" ]; then
-	    echo "$0: Resetting default routes"
-	    while /sbin/route del default gw 0.0.0.0 dev $interface; do :; done
+        if [ -n "$router" ]; then
+            echo "$0: Resetting default routes"
+            while /sbin/route del default gw 0.0.0.0 dev $interface; do :; done
 
-	    metric=0
-	    for i in $router; do
-		/sbin/route add default gw $i dev $interface metric $metric
-		metric=$(($metric + 1))
-	    done
-	fi
+            metric=0
+            for i in $router; do
+                /sbin/route add default gw $i dev $interface metric $metric
+                metric=$(($metric + 1))
+            done
+        fi
 
-	# Update resolver configuration file
-	R=""
-	[ -n "$domain" ] && R="domain $domain
+        # Update resolver configuration file
+        R=""
+        [ -n "$domain" ] && R="domain $domain
 "
-	for i in $dns; do
-	    echo "$0: Adding DNS $i"
-	    R="${R}nameserver $i
+        for i in $dns; do
+            echo "$0: Adding DNS $i"
+            R="${R}nameserver $i
 "
-	done
+        done
 
-	if [ -x /sbin/resolvconf ]; then
-	    echo -n "$R" | resolvconf -a "${interface}.udhcpc"
-	else
-	    echo -n "$R" > "$RESOLV_CONF"
-	fi
-     
-	# set local timezone and network time upon interface up
+        if [ -x /sbin/resolvconf ]; then
+            echo -n "$R" | resolvconf -a "${interface}.udhcpc"
+        else
+            echo -n "$R" > "$RESOLV_CONF"
+        fi
+
+        # set local timezone and network time upon interface up
         # save the result of this work in small log files under /var/log
-	tzupdated=`/usr/local/bin/tzupdate 2>&1`
-	if [ "$?" -eq 0 ]; then
-	    logger_info "tzupdate SUCCESS: $tzupdated"
-	else
-	    IFS=$'\n'
-	    for line in ${tzupdated}; do
-		logger_error "tzupdate FAIL: $line"
-	    done
-	fi
+        tzupdated=`/usr/local/bin/tzupdate 2>&1`
+        if [ "$?" -eq 0 ]; then
+            logger_info "tzupdate SUCCESS: $tzupdated"
+        else
+            IFS=$'\n'
+            for line in ${tzupdated}; do
+                logger_error "tzupdate FAIL: $line"
+            done
+        fi
 
-	# Set the system time from a network server, retry if it fails.
-	for dateretries in 1 2 3 4 5
-	do
-	    dated=`/usr/bin/rdate -cv $(cat /etc/timeserver.conf) 2>&1`
-	    if [ "$?" -eq 0 ]; then
-		logger_info "rdate SUCCESS: $dated"
-		break
-	    else
-		IFS=$'\n'
-		for line in ${dated}; do
-		    logger_error "rdate FAIL: $line"
-		done
-		sleep 1
-	    fi
-	done
-	;;
+        # Set the system time from a network server, retry if it fails.
+        for dateretries in 1 2 3 4 5
+        do
+            dated=`/usr/bin/rdate -cv $(cat /etc/timeserver.conf) 2>&1`
+            if [ "$?" -eq 0 ]; then
+                logger_info "rdate SUCCESS: $dated"
+                break
+            else
+                IFS=$'\n'
+                for line in ${dated}; do
+                    logger_error "rdate FAIL: $line"
+                done
+                sleep 1
+            fi
+        done
+        ;;
 
     deconfig)
-	if [ -x /sbin/resolvconf ]; then
-	    resolvconf -d "${interface}.udhcpc"
-	fi
-	/sbin/ifconfig $interface 0.0.0.0
-	;;
+        if [ -x /sbin/resolvconf ]; then
+            resolvconf -d "${interface}.udhcpc"
+        fi
+        /sbin/ifconfig $interface 0.0.0.0
+        ;;
 
     leasefail)
-	echo "$0: Lease failed: $message"
-	;;
+        echo "$0: Lease failed: $message"
+        ;;
 
     nak)
-	echo "$0: Received a NAK: $message"
-	;;
+        echo "$0: Received a NAK: $message"
+        ;;
 
     *)
-	echo "$0: Unknown udhcpc command: $1";
-	exit 1;
-	;;
+        echo "$0: Unknown udhcpc command: $1";
+        exit 1;
+        ;;
 esac
