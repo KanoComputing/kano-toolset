@@ -128,11 +128,9 @@ class WebApp(object):
 
         if self._app_icon is not None:
             try:
-                win.set_icon(self._app_icon)
+                win.set_icon_name(self._app_icon)
             except:
-                pass
-
-            win.set_icon_from_file(self._app_icon)
+                win.set_icon_from_file(self._app_icon)
 
         if self._taskbar is False:
             gtk.Window.set_skip_taskbar_hint(win, True)
