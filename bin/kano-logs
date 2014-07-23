@@ -44,7 +44,11 @@ def show_logs(app=None):
         app_name = re.sub(r"\.log$", "", log)
         with open(log, "r") as f:
             for line in f:
-                data = json.loads(line)
+                try:
+                    data = json.loads(line)
+                except:
+                    # Couldn't read the line, skip it
+                    continue
 
                 dt = datetime.datetime.fromtimestamp(data["time"])
                 time = dt.strftime('%Y-%m-%d %H:%M:%S')
