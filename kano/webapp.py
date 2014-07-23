@@ -127,10 +127,10 @@ class WebApp(object):
         win.connect("destroy", gtk.main_quit)
 
         if self._app_icon is not None:
-            try:
-                win.set_icon_name(self._app_icon)
-            except:
+            if os.path.exists(self._app_icon):
                 win.set_icon_from_file(self._app_icon)
+            else:
+                win.set_icon_name(self._app_icon)
 
         if self._taskbar is False:
             gtk.Window.set_skip_taskbar_hint(win, True)
