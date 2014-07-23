@@ -70,9 +70,11 @@ class WebApp(object):
     _maximized = False
     _decoration = True
     _taskbar = True
-    _pipe = True
+    _app_icon = None
 
     _zenity = None
+
+    _pipe = True
 
     def run(self):
         warnings.simplefilter("ignore")
@@ -124,8 +126,14 @@ class WebApp(object):
         win.set_title(self._title)
         win.connect("destroy", gtk.main_quit)
 
+        if self._app_icon is not None:
+            if os.path.exists(self._app_icon):
+                win.set_icon_from_file(self._app_icon)
+            else:
+                win.set_icon_name(self._app_icon)
+
         if self._taskbar is False:
-		    gtk.Window.set_skip_taskbar_hint(win, True)
+            gtk.Window.set_skip_taskbar_hint(win, True)
 
         zin.write("70\n")
 
