@@ -181,6 +181,10 @@ class Logger:
         kwargs["level"] = "info"
         self.write(msg, **kwargs)
 
+    def flush(self):
+        self._log_file.close()
+        sys.stderr.flush()
+
     def _init_log_file(self):
         if self._log_file is not None:
             self._log_file.close()
