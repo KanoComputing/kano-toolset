@@ -367,9 +367,9 @@ def get_volume():
 
 
 def is_model_b_plus():
-    o, _, _ = run_cmd('lsusb -t')
-    o = o.splitlines()
     try:
+        o, _, _ = run_cmd('lsusb -t')
+        o = o.splitlines()
         return 'hub/5p' in o[1]
     except Exception:
         return False
