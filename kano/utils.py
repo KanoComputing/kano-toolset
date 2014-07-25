@@ -35,7 +35,7 @@ def run_cmd_log(cmd):
     logger.info("Command: {}".format(cmd))
 
     if len(out.strip()) > 0:
-        logger.debug(out)
+        logger.info(out)
 
     if len(err.strip()) > 0:
         logger.error(err)
