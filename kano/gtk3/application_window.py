@@ -54,3 +54,7 @@ class ApplicationWindow(Gtk.Window):
 
     def set_main_widget(self, widget):
         self._overlay.add(widget)
+
+    def remove_main_widget(self):
+        for w in self._overlay.get_children():
+            self._overlay.remove(w)
