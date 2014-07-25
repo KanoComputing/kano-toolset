@@ -364,3 +364,12 @@ def get_volume():
     # logger.debug('percent: {}, millibel: {}'.format(percent, millibel))
 
     return percent, millibel
+
+
+def is_model_b_plus():
+    o, _, _ = run_cmd('lsusb -t')
+    o = o.splitlines()
+    try:
+        return 'hub/5p' in o[1]
+    except Exception:
+        return False
