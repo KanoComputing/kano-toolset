@@ -16,6 +16,8 @@
 #   $6: Number of line breaks at the start (optional)
 #
 
+PADDING=9
+
 function rand_wait
 {
     local low=$1  # miliseconds
@@ -58,7 +60,7 @@ function typewriter_echo
     string=$(python /usr/bin/colours-cli "$1")
 
     # Amount of whitespace at used for padding
-    whitespace=`add_character_padding 3`
+    whitespace=`add_character_padding $PADDING`
 
     # $6: Number of line breaks at the start
     if [ -n "$6" ]; then
