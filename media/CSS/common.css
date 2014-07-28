@@ -87,7 +87,7 @@ GtkImage:hover {
  * Standard dropdown lists
  */
 GtkComboBox {
-    /* font effect arrow size */
+    /* font affects arrow size */
     font: Bariol 5;
 }
 

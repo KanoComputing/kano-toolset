@@ -14,7 +14,7 @@ import sys
 
 
 class GenericButton(Gtk.Button):
-    def __init__(self, text=""):
+    def __init__(self, text="", icon_filename=""):
 
         Gtk.Button.__init__(self)
 
@@ -34,8 +34,17 @@ class GenericButton(Gtk.Button):
         style_context.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         style_context.add_provider(self.colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        self.label = Gtk.Label(text)
-        self.add(self.label)
+        if icon_filename:
+            self.icon = Gtk.Image.new_from_file(icon_filename)
+            box = Gtk.Box(spacing=10)
+            box.pack_start(self.icon, False, False, 0)
+            self.label = Gtk.Label(text)
+            box.pack_start(self.label, False, False, 0)
+            self.add(box)
+        else:
+            self.label = Gtk.Label(text)
+            self.add(self.label)
+
         style = self.label.get_style_context()
         style.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
@@ -49,15 +58,16 @@ class GenericButton(Gtk.Button):
 
 
 class KanoButton(GenericButton):
-    def __init__(self, text="", color="green"):
+    def __init__(self, text="", color="green", icon_filename=""):
         # Keep this updated - useful for set_color function
-        self.available_colors = ["orange", "green", "red", "grey"]
+        self.available_colors = ["orange", "green", "red", "grey", "blue"]
 
         # Create button
-        GenericButton.__init__(self, text)
+        GenericButton.__init__(self, text, icon_filename)
 
         style_context = self.get_style_context()
         style_context.add_class("kano_button")
+        style_context.add_class("kano_button_padding")
         style_context.add_class(color + "_background")
 
         self.align = None
@@ -87,6 +97,12 @@ class KanoButton(GenericButton):
         for c in self.available_colors:
             self.get_style_context().remove_class(c + "_background")
         self.get_style_context().add_class(color + "_background")
+
+    def set_margin(self, top_margin, right_margin, bottom_margin, left_margin):
+        self.set_margin_left(left_margin)
+        self.set_margin_right(right_margin)
+        self.set_margin_top(top_margin)
+        self.set_margin_bottom(bottom_margin)
 
 
 class OrangeButton(GenericButton):

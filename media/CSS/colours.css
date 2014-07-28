@@ -11,6 +11,8 @@
 
 @define-color kano_green #7cc640;
 @define-color kano_orange #ff842A;
+@define-color kano_red #f37677;
+@define-color kano_blue #65C2E7;
 @define-color title_color #323232;
 @define-color subheading_color #6e6e6e;
 @define-color inactive_writing #cdcdcd;
@@ -18,5 +20,4 @@
 @define-color active_writing #323232;
 @define-color active_border #ababab;
 @define-color hover_color #eeeeee;
-@define-color kano_red #f37677;
 @define-color appgrid_grey #e1e1e1;
