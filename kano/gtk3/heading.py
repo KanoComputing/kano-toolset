@@ -24,8 +24,8 @@ class Heading():
         self.title_style.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         self.title_style.add_class('title')
 
-        self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-        self.container.pack_start(self.title, False, False, 6)
+        self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.container.pack_start(self.title, False, False, 0)
 
         if description != "":
             self.description = Gtk.Label(description)
@@ -47,3 +47,10 @@ class Heading():
             return [self.title.get_text(), self.description.get_text()]
         else:
             return [self.title.get_text(), ""]
+
+    def set_margin(self, top_margin, right_margin, bottom_margin, left_margin):
+        self.container.set_margin_left(left_margin)
+        self.container.set_margin_right(right_margin)
+        self.container.set_margin_top(top_margin)
+        self.container.set_margin_bottom(bottom_margin)
+

@@ -1,6 +1,6 @@
-/* 
+/*
 # buttons.css
-# 
+#
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
@@ -12,6 +12,9 @@
     border-radius: 4px;
     border-color: transparent;
     border-width: 4px;
+}
+
+.kano_button_padding {
     padding: 6px 16px 6px 16px;
 }
 
@@ -61,6 +64,15 @@
 
 .grey_background:focus {
     border-color: mix(#b7b7b7, #ffffff, 0.4);
+    border-style: solid;
+}
+
+.blue_background {
+    background: @kano_blue;
+}
+
+.blue_background:focus {
+    border-color: mix(@kano_blue, #ffffff, 0.4);
     border-style: solid;
 }
 
