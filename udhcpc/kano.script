@@ -28,10 +28,12 @@ case $1 in
 
         # Update resolver configuration file
         R=""
-        [ -n "$domain" ] && R="domain $domain"
+        [ -n "$domain" ] && R="domain $domain
+"
         for i in $dns; do
             echo "$0: Adding DNS $i"
-            R="${R}nameserver $i"
+            R="${R}nameserver $i
+"
         done
 
         if [ -x /sbin/resolvconf ]; then
