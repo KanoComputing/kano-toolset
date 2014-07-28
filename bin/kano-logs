@@ -23,13 +23,14 @@ if __name__ == '__main__' and __package__ is None:
 
 import kano.logging as logging
 from kano.logging import logger
-from kano.colours import decorate_string, decorate_with_preset
+from kano.colours import decorate_string_only_terminal, decorate_with_preset
 from kano.utils import enforce_root
+
 
 def show_logs(app=None):
     logfiles = []
     for d in [logging.SYSTEM_LOGS_DIR, logging.USER_LOGS_DIR]:
-        if app != None:
+        if app is not None:
             path = os.path.join(d, app + ".log")
             if os.path.exists(path):
                 logfiles.append(path)
@@ -40,7 +41,7 @@ def show_logs(app=None):
 
     output = ""
     for log in logfiles:
-        output += "{}: {}\n".format(decorate_string("LOGFILE", "green"), log)
+        output += "{}: {}\n".format(decorate_string_only_terminal("LOGFILE", "green"), log)
         app_name = re.sub(r"\.log$", "", log)
         with open(log, "r") as f:
             for line in f:
@@ -53,16 +54,17 @@ def show_logs(app=None):
                 dt = datetime.datetime.fromtimestamp(data["time"])
                 time = dt.strftime('%Y-%m-%d %H:%M:%S')
                 output += "{} {}[{}] {} {}\n".format(
-                    decorate_string(time, "cyan"),
+                    decorate_string_only_terminal(time, "cyan"),
                     os.path.basename(app_name),
-                    decorate_string(data["pid"], "yellow"),
-                    decorate_with_preset(data["level"], data["level"]),
+                    decorate_string_only_terminal(data["pid"], "yellow"),
+                    decorate_with_preset(data["level"], data["level"], True),
                     data["message"]
                 )
         output += "\n"
 
     if len(output) > 0:
         pydoc.pipepager(output, cmd='less -R')
+
 
 def process_args():
     parser = argparse.ArgumentParser()
@@ -107,18 +109,18 @@ def process_args():
     args = parser.parse_args()
     return vars(args)
 
+
 def main():
     args = process_args()
 
     if args["which"] == "show":
         show_logs(args["app"])
     elif args["which"] == "config":
-        if args["log_level"] == None and args["output_level"] == None and \
-           args["show_value"] == None:
+        if args["log_level"] is None and args["output_level"] is None and args["show_value"] is None:
             ll = logger.get_log_level()
             dl = logger.get_output_level()
-            print "Logging set to {}".format(decorate_with_preset(ll, ll))
-            print "Debugging set to {}".format(decorate_with_preset(dl, dl))
+            print "Logging set to {}".format(decorate_with_preset(ll, ll), True)
+            print "Debugging set to {}".format(decorate_with_preset(dl, dl), True)
             return 0
 
         if args["show_value"] is not None:

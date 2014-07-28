@@ -373,3 +373,9 @@ def is_model_b_plus():
         return 'hub/5p' in o[1]
     except Exception:
         return False
+
+
+def is_monitor():
+
+    status_str, _, _ = run_cmd('/usr/bin/tvservice -s')
+    return 'RGB full' in status_str
