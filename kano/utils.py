@@ -35,7 +35,7 @@ def run_cmd_log(cmd):
     logger.info("Command: {}".format(cmd))
 
     if len(out.strip()) > 0:
-        logger.debug(out)
+        logger.info(out)
 
     if len(err.strip()) > 0:
         logger.error(err)
@@ -364,3 +364,18 @@ def get_volume():
     # logger.debug('percent: {}, millibel: {}'.format(percent, millibel))
 
     return percent, millibel
+
+
+def is_model_b_plus():
+    try:
+        o, _, _ = run_cmd('lsusb -t')
+        o = o.splitlines()
+        return 'hub/5p' in o[1]
+    except Exception:
+        return False
+
+
+def is_monitor():
+
+    status_str, _, _ = run_cmd('/usr/bin/tvservice -s')
+    return 'RGB full' in status_str
