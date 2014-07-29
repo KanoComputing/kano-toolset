@@ -23,10 +23,7 @@ class TopBar(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        space_taken = 0
         self.has_buttons = has_buttons
-        if has_buttons:
-            space_taken = 44 * 4
 
         # Styling
         self.cssProvider = Gtk.CssProvider()
@@ -48,8 +45,6 @@ class TopBar(Gtk.EventBox):
             self.align_header = Gtk.Alignment(xalign=0.5, yalign=0.5, xscale=1, yscale=1)
         else:
             self.align_header = Gtk.Alignment(xalign=0, yalign=0.5, xscale=0, yscale=0)
-            padding_left = (window_width - space_taken - HEADER_WIDTH) / 2
-            self.align_header.set_padding(0, 0, padding_left, 0)
 
         self.align_header.add(self.header)
 
@@ -61,6 +56,10 @@ class TopBar(Gtk.EventBox):
         self.close_button.set_size_request(TOP_BAR_HEIGHT, TOP_BAR_HEIGHT)
         self.close_button.set_can_focus(False)
         self.add_style(self.close_button, "top_bar_button")
+
+        # Container to mimic a button, so we can centre the header
+        invisible = Gtk.Box()
+        invisible.set_size_request(44, 44)
 
         # Main container holding everything
         self.box = Gtk.Box()
@@ -100,8 +99,15 @@ class TopBar(Gtk.EventBox):
 
         attach_cursor_events(self.close_button)
 
-        self.box.pack_start(self.align_header, False, False, 0)
-        self.box.pack_end(self.close_button, False, False, 0)
+        if has_buttons:
+            self.box.pack_start(self.align_header, True, True, 0)
+            self.box.pack_end(self.close_button, False, False, 0)
+            self.box.pack_end(invisible, False, False, 0)
+        else:
+            self.box.pack_start(invisible, False, False, 0)
+            self.box.pack_start(self.align_header, True, True, 0)
+            self.box.pack_end(self.close_button, False, False, 0)
+
         self.box.set_size_request(window_width, 44)
 
         self.add(self.box)
