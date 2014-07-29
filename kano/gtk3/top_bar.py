@@ -39,13 +39,7 @@ class TopBar(Gtk.EventBox):
         self.height = TOP_BAR_HEIGHT
 
         self.header = Gtk.Label(title, halign=Gtk.Align.CENTER)
-        self.header.set_size_request(HEADER_WIDTH, TOP_BAR_HEIGHT)
-
-        if window_width == -1:
-            self.align_header = Gtk.Alignment(xalign=0.5, yalign=0.5, xscale=1, yscale=1)
-        else:
-            self.align_header = Gtk.Alignment(xalign=0, yalign=0.5, xscale=0, yscale=0)
-
+        self.align_header = Gtk.Alignment(xalign=0.5, yalign=0.5, xscale=0, yscale=0)
         self.align_header.add(self.header)
 
         self.cross = icons.set_from_name("cross")
