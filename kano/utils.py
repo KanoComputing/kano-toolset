@@ -382,3 +382,14 @@ def is_monitor():
 
 def get_program_name():
     return os.path.basename(sys.argv[0])
+
+
+def debug_requests():
+    import httplib
+
+    old_send = httplib.HTTPConnection.send
+
+    def new_send(self, data):
+        print data
+        return old_send(self, data)
+    httplib.HTTPConnection.send = new_send
