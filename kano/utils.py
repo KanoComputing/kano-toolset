@@ -376,6 +376,9 @@ def is_model_b_plus():
 
 
 def is_monitor():
-
     status_str, _, _ = run_cmd('/usr/bin/tvservice -s')
     return 'RGB full' in status_str
+
+
+def get_program_name():
+    return os.path.basename(sys.argv[0])
