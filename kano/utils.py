@@ -376,6 +376,32 @@ def is_model_b_plus():
 
 
 def is_monitor():
-
     status_str, _, _ = run_cmd('/usr/bin/tvservice -s')
     return 'RGB full' in status_str
+
+
+def get_program_name():
+    return os.path.basename(sys.argv[0])
+
+
+def debug_requests():
+    import httplib
+
+    old_send = httplib.HTTPConnection.send
+
+    def new_send(self, data):
+        print data
+        return old_send(self, data)
+    httplib.HTTPConnection.send = new_send
+
+
+def pkill(clues):
+    if type(clues) == str:
+        clues = [clues]
+
+    psx, _, _ = run_cmd("ps x")
+    for line in psx.split("\n"):
+        for clue in clues:
+            if clue in line:
+                pid = line.split()[0]
+                run_cmd("kill {}".format(pid))
