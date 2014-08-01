@@ -8,5 +8,8 @@
 # Script to shutdown the system after a confirmation message
 #
 
+# Report shutdown event to Kano Tracker
+kano-profile-cli increment_app_runtime shutdown 0
+
 kano-sync --backup -s &
 lxsession-logout -p "Logout from this session?" -b /usr/share/kano-desktop/images/kano-logout-face.png -s top

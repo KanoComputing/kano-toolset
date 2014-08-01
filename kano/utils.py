@@ -393,3 +393,15 @@ def debug_requests():
         print data
         return old_send(self, data)
     httplib.HTTPConnection.send = new_send
+
+
+def pkill(clues):
+    if type(clues) == str:
+        clues = [clues]
+
+    psx, _, _ = run_cmd("ps x")
+    for line in psx.split("\n"):
+        for clue in clues:
+            if clue in line:
+                pid = line.split()[0]
+                run_cmd("kill {}".format(pid))

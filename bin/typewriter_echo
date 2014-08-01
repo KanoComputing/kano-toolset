@@ -11,12 +11,12 @@
 #   $1: Sring to be printed
 #   $2: Wait time at the end of the line (optional)
 #   $3: Number of line breaks at the end (optional)
-#   $4: Whether there is padding at the start of the line (1 or 0) (optional)
+#   $4: Whether there is padding at the start of the line (0, 1 or X) (optional)
 #   $5: Whether there is padding at the start of the next line (1 or 0) (optional)
 #   $6: Number of line breaks at the start (optional)
 #
 
-PADDING=9
+PADDING=3
 
 function rand_wait
 {
@@ -35,8 +35,16 @@ function clean_stdin
 #   $1: Number of characters to use to pad
 function add_character_padding
 {
+    if [ -z $1 ] || [ $1 -eq 0 ]; then
+        echo ""
+        return
+    elif [ $1 -eq 1 ]; then
+        pad=$PADDING
+    else
+        pad=$1
+    fi
     string=""
-    for (( i=0; i<=$1 ; i++ )); do
+    for (( i=0; i<=$pad ; i++ )); do
         string+=" "
     done
     echo "${string}"
@@ -60,7 +68,7 @@ function typewriter_echo
     string=$(python /usr/bin/colours-cli "$1")
 
     # Amount of whitespace at used for padding
-    whitespace=`add_character_padding $PADDING`
+    whitespace=`add_character_padding $4`
 
     # $6: Number of line breaks at the start
     if [ -n "$6" ]; then
