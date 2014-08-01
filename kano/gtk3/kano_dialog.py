@@ -62,7 +62,7 @@ class KanoDialog():
         self.colour_provider.load_from_path(colours_path)
 
         # if widget or an orange button is added, to get styling correct the global_stylign property should be on.
-        if global_style == "" and (widget is not None or orange_info is not None):
+        if global_style or (widget is not None or orange_info is not None):
             apply_styles()
 
         styleContext = self.dialog.get_style_context()
