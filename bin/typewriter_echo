@@ -35,7 +35,7 @@ function clean_stdin
 #   $1: Number of characters to use to pad
 function add_character_padding
 {
-    if [ $1 -eq 0 ]; then
+    if [ -z $1 ] || [ $1 -eq 0 ]; then
         echo ""
         return
     elif [ $1 -eq 1 ]; then
