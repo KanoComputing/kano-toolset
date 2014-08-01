@@ -147,6 +147,9 @@ class KanoDialog():
         if not has_entry:
             self.buttons[0].grab_focus()
 
+        # Set area around the buttons grey by default
+        self.set_action_background("grey")
+
     def add_style(self, widget, app_class):
         style = widget.get_style_context()
         style.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -173,7 +176,7 @@ class KanoDialog():
         return True
 
     def run(self):
-        if self.parent_window != None and \
+        if self.parent_window is not None and \
            hasattr(self.parent_window, 'blur') and \
            callable(self.parent_window.blur):
             self.parent_window.blur()
@@ -182,7 +185,7 @@ class KanoDialog():
         self.dialog.run()
         self.dialog.destroy()
 
-        if self.parent_window != None and \
+        if self.parent_window is not None and \
            hasattr(self.parent_window, 'unblur') and \
            callable(self.parent_window.unblur):
             self.parent_window.unblur()
