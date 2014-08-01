@@ -111,3 +111,22 @@ class OrangeButton(GenericButton):
         # Create button
         GenericButton.__init__(self, text)
         self.get_style_context().add_class("small_orange_button")
+
+
+class KanoButtonBox(Gtk.ButtonBox):
+    def __init__(self, button1_text, orange_button_text=""):
+
+        Gtk.ButtonBox.__init__(self, spacing=10)
+        self.set_layout(Gtk.ButtonBoxStyle.SPREAD)
+
+        self.kano_button = KanoButton(button1_text)
+
+        if orange_button_text:
+            self.orange_button = OrangeButton(orange_button_text)
+            self.pack_start(self.orange_button, False, False, 0)
+            self.pack_start(self.kano_button, False, False, 0)
+            # The empty label is to centre the kano_button
+            self.label = Gtk.Label("    ")
+            self.pack_start(self.label, False, False, 0)
+        else:
+            self.pack_start(self.kano_button, False, False, 0)

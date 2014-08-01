@@ -89,3 +89,15 @@
 .small_orange_button:hover {
     background: transparent;
 }
+
+GtkButtonBox .small_orange_button {
+    background: transparent;
+    border-color: transparent;
+    padding: 0px;
+}
+
+GtkButtonBox .small_orange_button:hover {
+    background: transparent;
+    border-color: transparent;
+    padding: 0px;
+}
