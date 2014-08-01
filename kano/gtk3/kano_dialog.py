@@ -20,7 +20,7 @@
 
 
 from gi.repository import Gtk
-from kano.gtk3.buttons import KanoButton
+from kano.gtk3.buttons import KanoButton, OrangeButton
 from kano.gtk3.heading import Heading
 from kano.gtk3.scrolled_window import ScrolledWindow
 from kano.gtk3.apply_styles import apply_styles
@@ -33,8 +33,12 @@ background_colors = ['grey', 'white']
 
 
 class KanoDialog():
+
     # button_dict includes the button text, color and button return values
-    def __init__(self, title_text="", description_text="", button_dict=None, widget=None, has_entry=False, has_list=False, scrolled_text="", global_style="", parent_window=None):
+    def __init__(self, title_text="", description_text="", button_dict=None, widget=None,
+                 has_entry=False, has_list=False, scrolled_text="", global_style="", parent_window=None,
+                 orange_info=None):
+
         self.title_text = title_text
         self.description_text = description_text
         self.widget = widget
@@ -45,6 +49,7 @@ class KanoDialog():
         self.scrolled_text = scrolled_text
         self.global_style = global_style
         self.parent_window = parent_window
+        self.orange_info = orange_info
 
         self.dialog = Gtk.Dialog()
 
@@ -56,7 +61,8 @@ class KanoDialog():
         colours_path = os.path.join(common_css_dir, "colours.css")
         self.colour_provider.load_from_path(colours_path)
 
-        if global_style:
+        # if widget or an orange button is added, to get styling correct the global_stylign property should be on.
+        if global_style or (widget is not None or orange_info is not None):
             apply_styles()
 
         styleContext = self.dialog.get_style_context()
@@ -87,7 +93,7 @@ class KanoDialog():
         self.title = Heading(self.title_text, self.description_text)
         content_area.pack_start(self.title.container, False, False, 0)
         self.buttons = []
-        button_box = Gtk.Box()
+        box = Gtk.Box()
 
         if self.button_dict is None or self.button_dict == {}:
             self.button_dict = {"OK": button_defaults}
@@ -116,12 +122,28 @@ class KanoDialog():
             button.connect("button-release-event", self.exit_dialog, return_value)
             button.connect("key-release-event", self.exit_dialog, return_value)
             self.buttons.append(button)
-            button_box.pack_start(button, False, False, 6)
+            box.pack_start(button, False, False, 6)
 
-        alignment = Gtk.Alignment()
-        alignment.add(button_box)
-        # annoying uneven alignment - cannot seem to centre y position
-        alignment.set_padding(6, 3, 0, 0)
+        if orange_info is not None:
+            orange_text = orange_info["name"]
+            orange_return_value = orange_info["return_value"]
+
+            button_container = Gtk.ButtonBox(spacing=10)
+            button_container.set_layout(Gtk.ButtonBoxStyle.SPREAD)
+            self.orange_button = OrangeButton(orange_text)
+            self.orange_button.connect("button-release-event", self.exit_dialog, orange_return_value)
+            self.add_style(self.orange_button, "small_orange_text")
+
+            button_container.pack_start(self.orange_button, False, False, 0)
+            button_container.pack_start(box, False, False, 0)
+            # The empty label is to centre the kano_button
+            label = Gtk.Label("    ")
+            button_container.pack_start(label, False, False, 0)
+        else:
+            button_container = Gtk.Alignment()
+            button_container.add(box)
+            # annoying uneven alignment - cannot seem to centre y position
+            button_container.set_padding(6, 3, 0, 0)
 
         # Add scrolled window
         if self.scrolled_text:
@@ -141,7 +163,7 @@ class KanoDialog():
         elif self.widget is not None:
             content_area.pack_start(self.widget, False, False, 0)
 
-        action_area.pack_start(alignment, False, False, 0)
+        action_area.pack_start(button_container, False, False, 0)
 
         # Set keyboard focus on first button if no entry
         if not has_entry:
