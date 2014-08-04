@@ -456,13 +456,9 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         # wpa_supplicant might complain even if it goes ahead doing its job
         run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
 
-        # TODO: WEP validate authentication seems to be non-existent, so we need a way to fake this.
-        # otherwise udhcpc will take a very long time if the passphrase is wrong for kano-wifi to request new passphrase.
-        # tested wpa_cli, iwpriv, iwspy, iwconfig. Everyone reports same statuses with wrong passphrase
-        # /proc/net packets received? netcat broadcast?
-
-        # Wait for wpa_supplicant to become associated to the AP
-        # or give up if it takes too long
+        # Wait for wpa_supplicant to become associated to the AP - key validation.
+        # For WEP Open networks it will always proceed, beacuse there is no real authentication,
+        # connection will fail during DHCP process. For WEP Shared networks it will fail here if the key is wrong.
         assoc_timeout = 20  # seconds
         assoc_start = time.time()
         while (time.time() - assoc_start) < assoc_timeout:
