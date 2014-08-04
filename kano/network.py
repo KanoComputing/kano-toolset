@@ -346,6 +346,7 @@ def wpa_conf(essid, psk, confile, wep=False):
              key_mgmt=NONE
              wep_key0="%s"
              wep_tx_keyidx=0
+             auth_alg=OPEN SHARED
          }
         ''' % (essid, psk)
     else:
