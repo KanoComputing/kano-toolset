@@ -335,17 +335,30 @@ def is_internet():
     return rc == 0
 
 
-def wpa_conf(essid, psk, confile):
-    wpa_conf = '''
-      ctrl_interface=/var/run/wpa_supplicant
-      network={
+def wpa_conf(essid, psk, confile, wep=False):
+
+    if wep == True:
+        wpa_conf = '''
+          ctrl_interface=/var/run/wpa_supplicant
+          network={
+             ssid="%s"
+             scan_ssid=1
+             key_mgmt=NONE
+             wep_key0="%s"
+             wep_tx_keyidx=0
+         }
+        ''' % (essid, psk)
+    else:
+        wpa_conf = '''
+          ctrl_interface=/var/run/wpa_supplicant
+          network={
              ssid="%s"
              scan_ssid=1
              key_mgmt=WPA-EAP WPA-PSK IEEE8021X NONE
              pairwise=CCMP TKIP
              psk="%s"
-      }
-    ''' % (essid, psk)
+          }
+        ''' % (essid, psk)
 
     f = open(confile, 'w')
     f.write(wpa_conf)
@@ -433,9 +446,34 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         if len(seckey) not in (5, 13, 58):
             logger.error("WEP encryption key lenght incorrect (%d) has to be one of 5/13/58 chars" % (len(seckey)))
             return False
-        else:
-            logger.info("Setting WEP encryption key for network '%s' to interface %s" % (essid, iface))
-            run_cmd("iwconfig %s key 's:%s'" % (iface, seckey))
+
+        logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
+        wpafile = '/etc/kano_wpa_connect.conf'
+        associated = False
+        wpa_conf(essid, seckey, confile=wpafile, wep=True)
+
+        # wpa_supplicant might complain even if it goes ahead doing its job
+        run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+
+        # TODO: WEP validate authentication seems to be non-existent, so we need a way to fake this.
+        # otherwise udhcpc will take a very long time if the passphrase is wrong for kano-wifi to request new passphrase.
+        # tested wpa_cli, iwpriv, iwspy, iwconfig. Everyone reports same statuses with wrong passphrase
+        # /proc/net packets received? netcat broadcast?
+
+        # Wait for wpa_supplicant to become associated to the AP
+        # or give up if it takes too long
+        assoc_timeout = 20  # seconds
+        assoc_start = time.time()
+        while (time.time() - assoc_start) < assoc_timeout:
+            out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
+            wpa_state = out.strip('\n')
+            if len(wpa_state) and wpa_state.split('=')[1] == 'COMPLETED':
+                associated = True
+                break
+            time.sleep(0.5)
+
+        if not associated:
+            return False
 
     elif encrypt == 'wpa':
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))

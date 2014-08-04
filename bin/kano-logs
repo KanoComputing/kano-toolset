@@ -47,19 +47,19 @@ def show_logs(app=None):
             for line in f:
                 try:
                     data = json.loads(line)
+
+                    dt = datetime.datetime.fromtimestamp(data["time"])
+                    time = dt.strftime('%Y-%m-%d %H:%M:%S')
+                    output += "{} {}[{}] {} {}\n".format(
+                        decorate_string_only_terminal(time, "cyan"),
+                        os.path.basename(app_name),
+                        decorate_string_only_terminal(data["pid"], "yellow"),
+                        decorate_with_preset(data["level"], data["level"], True),
+                        data["message"]
+                    )
                 except:
                     # Couldn't read the line, skip it
                     continue
-
-                dt = datetime.datetime.fromtimestamp(data["time"])
-                time = dt.strftime('%Y-%m-%d %H:%M:%S')
-                output += "{} {}[{}] {} {}\n".format(
-                    decorate_string_only_terminal(time, "cyan"),
-                    os.path.basename(app_name),
-                    decorate_string_only_terminal(data["pid"], "yellow"),
-                    decorate_with_preset(data["level"], data["level"], True),
-                    data["message"]
-                )
         output += "\n"
 
     if len(output) > 0:
