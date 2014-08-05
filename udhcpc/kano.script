@@ -44,14 +44,18 @@ case $1 in
 
         # set local timezone and network time upon interface up
         # save the result of this work in small log files under /var/log
-        tzupdated=`/usr/local/bin/tzupdate 2>&1`
-        if [ "$?" -eq 0 ]; then
-            logger_info "tzupdate SUCCESS: $tzupdated"
+        if [ ! -L /etc/localtime ]; then
+            tzupdated=`/usr/local/bin/tzupdate 2>&1`
+            if [ "$?" -eq 0 ]; then
+                logger_info "tzupdate SUCCESS: $tzupdated"
+            else
+                IFS=$'\n'
+                for line in ${tzupdated}; do
+                    logger_error "tzupdate FAIL: $line"
+                done
+            fi
         else
-            IFS=$'\n'
-            for line in ${tzupdated}; do
-                logger_error "tzupdate FAIL: $line"
-            done
+            logger_info "skipping tzupdate"
         fi
 
         # Set the system time from a network server, retry if it fails.
