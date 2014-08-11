@@ -26,6 +26,7 @@ def parse_items(args):
 
     pulse = False
     title = "Loading"
+    rate = 0.01
 
     for arg in args:
         split = arg.split('=')
@@ -34,19 +35,19 @@ def parse_items(args):
             pulse = True
         if split[0] == "title":
             title = split[1]
+        if split[0] == "rate":
+            rate = float(split[1])
 
-    return pulse, title
+    return pulse, title, rate
 
 
 def main():
     text = sys.argv[1:]
-    pulse, title = parse_items(text)
-    pbar = KanoProgress(pulse, title)
+    pulse, title, rate = parse_items(text)
+    pbar = KanoProgress(pulse, title, rate)
     pbar.show_all()
     Gtk.main()
 
 
 if __name__ == '__main__':
-    #if len(sys.argv) == 1:
-    #    sys.exit('Nothing to display!')
     main()

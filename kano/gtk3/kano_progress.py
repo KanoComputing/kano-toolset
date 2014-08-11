@@ -14,11 +14,12 @@ from kano.gtk3.apply_styles import apply_styles, apply_named_style
 
 class Progress(Gtk.ProgressBar):
 
-    def __init__(self, pulse=True):
+    def __init__(self, pulse=True, rate=0.01):
 
         Gtk.ProgressBar.__init__(self)
         self.activity_mode = pulse
         self.keep_going = True
+        self.progress_rate = rate
 
         if self.activity_mode:
             self.pulse()
@@ -31,7 +32,7 @@ class Progress(Gtk.ProgressBar):
         if self.activity_mode:
             self.pulse()
         else:
-            new_value = self.get_fraction() + 0.01
+            new_value = self.get_fraction() + self.progress_rate
 
             if new_value > 1:
                 new_value = 0
