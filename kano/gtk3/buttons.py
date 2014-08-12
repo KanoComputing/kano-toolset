@@ -34,16 +34,17 @@ class GenericButton(Gtk.Button):
         style_context.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         style_context.add_provider(self.colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
+        self.internal_box = Gtk.Box(spacing=10)
+        self.add(self.internal_box)
+
         if icon_filename:
             self.icon = Gtk.Image.new_from_file(icon_filename)
-            box = Gtk.Box(spacing=10)
-            box.pack_start(self.icon, False, False, 0)
+            self.internal_box.pack_start(self.icon, False, False, 0)
             self.label = Gtk.Label(text)
-            box.pack_start(self.label, False, False, 0)
-            self.add(box)
+            self.internal_box.pack_start(self.label, False, False, 0)
         else:
             self.label = Gtk.Label(text)
-            self.add(self.label)
+            self.internal_box.add(self.label)
 
         style = self.label.get_style_context()
         style.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -103,6 +104,18 @@ class KanoButton(GenericButton):
         self.set_margin_right(right_margin)
         self.set_margin_top(top_margin)
         self.set_margin_bottom(bottom_margin)
+
+    def start_spinner(self, cb, args):
+        self.unparent(self.internal_box)
+        spinner = Gtk.Spinner()
+        self.add(spinner)
+
+        # Stops background going grey on making kano button insensitive, and controls styling of
+        # spinenr
+        self.get_style_context().add_class("loading_kano_button")
+
+        # Threading should be handled by each indiviidual program, so we don't get memory leaks from
+        # two sets of initialisation of GObject.threads.init()
 
 
 class OrangeButton(GenericButton):
