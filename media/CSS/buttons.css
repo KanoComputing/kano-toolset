@@ -52,9 +52,12 @@ GtkButton.green_background:active {
     border-style: solid;
 }
 
-.green_background.loading_kano_button:insensitive {
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.green_background.loading_kano_button:insensitive {
     background: @kano_green_darker;
-}
+}*/
 
 .red_background {
     background: @kano_red;
@@ -73,9 +76,12 @@ GtkButton.red_background:active {
     border-style: solid;
 }
 
-.red_background.loading_kano_button:insensitive {
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.red_background.loading_kano_button:insensitive {
     background: @kano_red_darker;
-}
+}*/
 
 .orange_background {
     background: @kano_orange;
@@ -94,9 +100,12 @@ GtkButton.orange_background:active {
     border-style: solid;
 }
 
-.orange_background.loading_kano_button:insensitive {
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.orange_background.loading_kano_button:insensitive {
     background: @kano_orange_darker;
-}
+}*/
 
 .grey_background {
     background: @kano_grey;
@@ -115,9 +124,12 @@ GtkButton.grey_background:active {
     border-style: solid;
 }
 
-.grey_background.loading_kano_button:insensitive {
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.grey_background.loading_kano_button:insensitive {
     background: @kano_grey_darker;
-}
+}*/
 
 .blue_background {
     background: @kano_blue;
@@ -136,9 +148,12 @@ GtkButton.blue_background:active {
     border-style: solid;
 }
 
-.blue_background.loading_kano_button:insensitive {
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.blue_background.loading_kano_button:insensitive {
     background: @kano_blue_darker;
-}
+}*/
 
 .small_orange_button {
     background: transparent;
