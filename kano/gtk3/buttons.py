@@ -35,6 +35,7 @@ class GenericButton(Gtk.Button):
         style_context.add_provider(self.colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.internal_box = Gtk.Box(spacing=10)
+        self.internal_box.props.halign = Gtk.Align.CENTER
         self.add(self.internal_box)
 
         if icon_filename:
