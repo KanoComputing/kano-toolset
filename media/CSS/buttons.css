@@ -31,10 +31,6 @@
     color: #aaaaaa;
 }
 
-.loading_kano_button:insensitive {
-    background: transparent;
-}
-
 .loading_kano_button GtkLabel:insensitive {
     color: #ffffff;
 }
@@ -56,6 +52,9 @@ GtkButton.green_background:active {
     border-style: solid;
 }
 
+.green_background.loading_kano_button:insensitive {
+    background: @kano_green_darker;
+}
 
 .red_background {
     background: @kano_red;
@@ -72,6 +71,10 @@ GtkButton.red_background:active {
 .red_background:focus {
     border-color: @kano_red_darker;
     border-style: solid;
+}
+
+.red_background.loading_kano_button:insensitive {
+    background: @kano_red_darker;
 }
 
 .orange_background {
@@ -91,6 +94,10 @@ GtkButton.orange_background:active {
     border-style: solid;
 }
 
+.orange_background.loading_kano_button:insensitive {
+    background: @kano_orange_darker;
+}
+
 .grey_background {
     background: @kano_grey;
 }
@@ -108,6 +115,10 @@ GtkButton.grey_background:active {
     border-style: solid;
 }
 
+.grey_background.loading_kano_button:insensitive {
+    background: @kano_grey_darker;
+}
+
 .blue_background {
     background: @kano_blue;
 }
@@ -123,6 +134,10 @@ GtkButton.blue_background:active {
 .blue_background:focus {
     border-color: @kano_blue_darker;
     border-style: solid;
+}
+
+.blue_background.loading_kano_button:insensitive {
+    background: @kano_blue_darker;
 }
 
 .small_orange_button {

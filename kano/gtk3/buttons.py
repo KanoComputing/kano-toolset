@@ -6,7 +6,7 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from kano.gtk3 import cursor
 from kano.paths import common_css_dir
 import os
@@ -60,8 +60,12 @@ class GenericButton(Gtk.Button):
 
 class KanoButton(GenericButton):
     def __init__(self, text="", color="green", icon_filename=""):
+
         # Keep this updated - useful for set_color function
         self.available_colors = ["orange", "green", "red", "grey", "blue"]
+
+        self.spinner = Gtk.Spinner()
+        self.is_spinning = False
 
         # Create button
         GenericButton.__init__(self, text, icon_filename)
@@ -80,7 +84,8 @@ class KanoButton(GenericButton):
 
     # Pakcing in a box and within an Alignment
     def pack_and_align(self):
-        # This stops the button resizing to fit the size of it's container
+
+        # This stops the button resizing to fit the size of its container
         self.box = Gtk.Box()
         self.box.add(self)
         self.props.halign = Gtk.Align.CENTER
@@ -105,17 +110,30 @@ class KanoButton(GenericButton):
         self.set_margin_top(top_margin)
         self.set_margin_bottom(bottom_margin)
 
-    def start_spinner(self, cb, args):
-        self.unparent(self.internal_box)
-        spinner = Gtk.Spinner()
-        self.add(spinner)
+    # Threading should be handled by each individual program, so we don't get memory leaks from
+    # two sets of initialisation of GObject.threads.init()
+    def start_spinner(self):
+        self.remove(self.internal_box)
+        self.add(self.spinner)
 
-        # Stops background going grey on making kano button insensitive, and controls styling of
-        # spinenr
+        # Stops background going grey on making kano button insensitive,
+        # and controls styling of spinner
         self.get_style_context().add_class("loading_kano_button")
 
-        # Threading should be handled by each indiviidual program, so we don't get memory leaks from
-        # two sets of initialisation of GObject.threads.init()
+        # force change of class? This may not be neccessary
+        self.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
+
+        self.set_sensitive(False)
+        self.show_all()
+        self.is_spinning = True
+        self.spinner.start()
+
+    def stop_spinner(self):
+        self.spinner.stop()
+        self.remove(self.spinner)
+        self.add(self.internal_box)
+        self.set_sensitive(True)
+        self.is_spinning = False
 
 
 class OrangeButton(GenericButton):
@@ -138,6 +156,7 @@ class KanoButtonBox(Gtk.ButtonBox):
             self.orange_button = OrangeButton(orange_button_text)
             self.pack_start(self.orange_button, False, False, 0)
             self.pack_start(self.kano_button, False, False, 0)
+
             # The empty label is to centre the kano_button
             self.label = Gtk.Label("    ")
             self.pack_start(self.label, False, False, 0)
