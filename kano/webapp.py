@@ -6,9 +6,7 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
-import gtk
-import gobject
-import webkit
+from gi.repository import Gtk, Gdk, GObject, WebKit
 import sys
 import re
 import os
@@ -27,7 +25,7 @@ def asynchronous_gtk_message(fun):
         apply(function, args, kwargs)
 
     def fun2(*args, **kwargs):
-        gobject.idle_add(worker, (fun, args, kwargs))
+        GObject.idle_add(worker, (fun, args, kwargs))
 
     return fun2
 
@@ -36,7 +34,7 @@ def atexit_pipe_cleanup(pipe_file):
     os.unlink (pipe_file)
 
 
-def thr_inject_javascript (browser, pipe_file):
+def thr_inject_javascript(browser, pipe_file):
     '''
     This function reads from a pipe, a plain message interpreted as Javascript code.
     It then injects that code into the Webkit browser instance.
@@ -91,7 +89,7 @@ class WebApp(object):
         zin = self._zenity.stdin
         zin.write("20\n")
 
-        self._view = view = webkit.WebView()
+        self._view = view = WebKit.WebView()
         view.connect('navigation-policy-decision-requested',
                      self._api_handler)
         view.connect('close-web-view', self._close)
@@ -112,19 +110,19 @@ class WebApp(object):
 
         zin.write("40\n")
 
-        splitter = gtk.VPaned()
-        sw = gtk.ScrolledWindow()
+        splitter = Gtk.VPaned()
+        sw = Gtk.ScrolledWindow()
         sw.add(view)
         splitter.add1(sw)
 
-        inspector = view.get_web_inspector()
+        inspector = view.get_inspector()
         inspector.connect("inspect-web-view", self._activate_inspector, splitter)
 
         zin.write("50\n")
 
-        self._win = win = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self._win = win = Gtk.Window(Gtk.WindowType.TOPLEVEL)
         win.set_title(self._title)
-        win.connect("destroy", gtk.main_quit)
+        win.connect("destroy", Gtk.main_quit)
 
         if self._app_icon is not None:
             if os.path.exists(self._app_icon):
@@ -133,7 +131,7 @@ class WebApp(object):
                 win.set_icon_name(self._app_icon)
 
         if self._taskbar is False:
-            gtk.Window.set_skip_taskbar_hint(win, True)
+            Gtk.Window.set_skip_taskbar_hint(win, True)
 
         zin.write("70\n")
 
@@ -141,7 +139,7 @@ class WebApp(object):
         win.realize()
         win.show_all()
 
-        gdk_window_settings(win.window, self._x, self._y,
+        gdk_window_settings(win.get_window(), self._x, self._y,
                             self._width, self._height, self._decoration,
                             self._maximized, self._centered)
 
@@ -156,10 +154,10 @@ class WebApp(object):
             atexit.register (atexit_pipe_cleanup, self._pipe_name)
             thread.start_new_thread (thr_inject_javascript, (self._view, self._pipe_name))
 
-        gtk.main()
+        Gtk.main()
 
     def _activate_inspector(self, inspector, target_view, splitter):
-        inspector_view = webkit.WebView()
+        inspector_view = WebKit.WebView()
         splitter.add2(inspector_view)
         return inspector_view
 
@@ -178,14 +176,14 @@ class WebApp(object):
         sys.stderr.write("Error: %s\n" % msg)
 
     def chooseFile(self, default_dir=None):
-        dialog = gtk.FileChooserDialog(
+        dialog = Gtk.FileChooserDialog(
             "Open File",
-            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                     gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                     Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 
-        dialog.set_default_response(gtk.RESPONSE_OK)
+        dialog.set_default_response(Gtk.ResponseType.OK)
 
-        filter = gtk.FileFilter()
+        filter = Gtk.FileFilter()
         filter.set_name("XML Files")
         filter.add_pattern("*.xml")
         dialog.add_filter(filter)
@@ -196,9 +194,9 @@ class WebApp(object):
         path = ""
 
         response = dialog.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             path = dialog.get_filename()
-        elif response == gtk.RESPONSE_CANCEL:
+        elif response == Gtk.ResponseType.CANCEL:
             self.error("No files selected.")
 
         dialog.destroy()

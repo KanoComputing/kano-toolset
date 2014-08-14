@@ -8,26 +8,26 @@
 # Base common code for Kano apps and projects
 #
 
-from gtk import gdk
+from gi.repository import GdkX11, Gdk
+import Xlib.display
 import time
 
 from kano.utils import run_cmd
 
 BOTTOM_BAR_HEIGHT = 44
 
-
-# Get property needs to run through a loop in case the
-# window is not yet ready
-def _get_win_property(win, property_name):
-    if not win:
-        return
+def _get_win_property(gdk_win, property_name):
+    disp = Xlib.display.Display()
+    xwin = disp.create_resource_object("window", gdk_win.get_xid())
 
     for i in range(0, 10):
-        property = win.property_get(property_name)
-        if property:
-            return property[2]
+        prop = xwin.get_full_property(disp.intern_atom(property_name), Xlib.X.AnyPropertyType)
+        if prop is not None:
+            disp.close()
+            return prop.value
         time.sleep(0.1)
-    return
+
+    disp.close()
 
 
 # Extremly hackish, but the most reliable way of determining
@@ -55,7 +55,7 @@ def _get_decoration_size(win):
 
 
 def _get_window_by_pid(pid):
-    root = gdk.get_default_root_window()
+    root = Gdk.get_default_root_window()
     if not root:
         return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
@@ -63,15 +63,15 @@ def _get_window_by_pid(pid):
         return
 
     for id in extents:
-        w = gdk.window_foreign_new(id)
+        w = GdkX11.X11Window.foreign_new_for_display(Gdk.Display.get_default(), id)
         if w:
-            wm_pids = w.property_get("_NET_WM_PID")
-            if pid in wm_pids[2]:
+            wm_pids = _get_win_property(w, "_NET_WM_PID")
+            if pid in wm_pids:
                 return w
 
 
 def _get_window_by_child_pid(pid):
-    root = gdk.get_default_root_window()
+    root = Gdk.get_default_root_window()
     if not root:
         return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
@@ -81,9 +81,9 @@ def _get_window_by_child_pid(pid):
     # make a set of all visible pids
     winpids = set()
     for id in extents:
-        w = gdk.window_foreign_new(id)
+        w = GdkX11.X11Window.foreign_new_for_display(Gdk.Display.get_default(), id)
         if w:
-            for pid in w.property_get("_NET_WM_PID")[2]:
+            for pid in _get_win_property(w, "_NET_WM_PID")[2]:
                 winpids.add(pid)
 
     # make a list of (pid, pstree_section) pairs
@@ -103,15 +103,15 @@ def _get_window_by_child_pid(pid):
 
     # get win belonging to that pid
     for id in extents:
-        w = gdk.window_foreign_new(id)
+        w = GdkX11.X11Window.foreign_new_for_display(Gdk.Display.get_default(), id)
         if w:
-            wm_pids = w.property_get("_NET_WM_PID")
-            if winpid in wm_pids[2]:
+            wm_pids = _get_win_property(w, "_NET_WM_PID")
+            if winpid in wm_pids:
                 return w
 
 
 def _get_window_by_title(title):
-    root = gdk.get_default_root_window()
+    root = Gdk.get_default_root_window()
     if not root:
         return
     extents = _get_win_property(root, '_NET_CLIENT_LIST')
@@ -119,17 +119,17 @@ def _get_window_by_title(title):
         return
 
     for id in extents:
-        w = gdk.window_foreign_new(id)
+        w = GdkX11.X11Window.foreign_new_for_display(Gdk.Display.get_default(), id)
         if w:
-            wm_name = w.property_get("WM_NAME")
-            if wm_name and title == wm_name[2]:
+            wm_name = _get_win_property(w, "WM_NAME")
+            if wm_name and title == wm_name:
                 return w
 
 
 def _get_window_by_id(wid):
     if wid[0:2] == "0x":
         wid = int(wid, 16)
-    return gdk.window_foreign_new(int(wid))
+    return GdkX11.X11Window.foreign_new_for_display(Gdk.Display.get_default(), int(wid))
 
 
 # Find the gdk window to be manipulated. Gives up after 30 seconds.
@@ -155,8 +155,8 @@ def find_window(title=None, pid=None, wid=None):
 def gdk_window_settings(win, x=None, y=None, width=None, height=None,
                         decoration=None, maximized=False, centered=False):
     # Screen dimensions
-    scr_width = gdk.screen_width()
-    scr_height = gdk.screen_height() - BOTTOM_BAR_HEIGHT
+    scr_width = Gdk.Screen.width()
+    scr_height = Gdk.Screen.height() - BOTTOM_BAR_HEIGHT
 
     # Window dimensions and position
     old_x, old_y = win.get_root_origin()
@@ -172,13 +172,13 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
                 old_height += dh
 
                 win.set_decorations(0)
-                gdk.window_process_all_updates()
-                gdk.flush()
+                Gdk.Window.process_all_updates()
+                Gdk.flush()
         else:
             # Resize if the window was not decorated before
             if not _is_decorated(win):
                 win.set_decorations(1)
-                gdk.flush()
+                Gdk.flush()
 
                 dw, dh = _get_decoration_size(win)
                 old_width -= dw
@@ -187,8 +187,8 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
     # Resizing is irrelevant when maximizing, so just return afterwards
     if maximized:
         win.maximize()
-        gdk.window_process_all_updates()
-        gdk.flush()
+        Gdk.Window.process_all_updates()
+        Gdk.flush()
         return
 
     # Initialize the target values
@@ -234,7 +234,5 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
 
     # Do all the resizing at once
     win.move_resize(int(new_x), int(new_y), int(new_width), int(new_height))
-    gdk.window_process_all_updates()
-    gdk.flush()
-
-
+    Gdk.Window.process_all_updates()
+    Gdk.flush()
