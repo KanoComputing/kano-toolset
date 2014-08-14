@@ -204,7 +204,7 @@ def is_number(str):
     try:
         float(str)
         return True
-    except ValueError:
+    except (ValueError, TypeError):
         return False
 
 
