@@ -11,7 +11,7 @@
     -GtkWidget-focus-line-width: 0;
     border-radius: 4px;
     border-color: transparent;
-    border-width: 4px;
+    border-width: 3px;
 }
 
 .kano_button_padding {
@@ -31,50 +31,129 @@
     color: #aaaaaa;
 }
 
+.loading_kano_button GtkLabel:insensitive {
+    color: #ffffff;
+}
+
 .green_background {
     background: @kano_green;
 }
 
+GtkButton.green_background:active {
+    background: @kano_green_darker;
+}
+
+.green_background:hover {
+    background: @kano_green_lighter;
+}
+
 .green_background:focus {
-    border-color: mix(@kano_green, #ffffff, 0.4);
+    border-color: @kano_green_darker;
     border-style: solid;
 }
+
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.green_background.loading_kano_button:insensitive {
+    background: @kano_green_darker;
+}*/
 
 .red_background {
     background: @kano_red;
 }
 
+GtkButton.red_background:active {
+    background: @kano_red_darker;
+}
+
+.red_background:hover {
+    background: @kano_red_lighter;
+}
+
 .red_background:focus {
-    border-color: mix(@kano_red, #ffffff, 0.4);
+    border-color: @kano_red_darker;
     border-style: solid;
 }
+
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.red_background.loading_kano_button:insensitive {
+    background: @kano_red_darker;
+}*/
 
 .orange_background {
     background: @kano_orange;
 }
 
+GtkButton.orange_background:active {
+    background: @kano_orange_darker;
+}
+
+.orange_background:hover {
+    background: @kano_orange_lighter;
+}
+
 .orange_background:focus {
-    border-color: mix(@kano_orange, #ffffff, 0.4);
+    border-color: @kano_orange_darker;
     border-style: solid;
 }
 
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.orange_background.loading_kano_button:insensitive {
+    background: @kano_orange_darker;
+}*/
+
 .grey_background {
-    background: #b7b7b7;
+    background: @kano_grey;
+}
+
+GtkButton.grey_background:active {
+    background: @kano_grey_darker;
+}
+
+.grey_background:hover {
+    background: @kano_grey_lighter;
 }
 
 .grey_background:focus {
-    border-color: mix(#b7b7b7, #ffffff, 0.4);
+    border-color: @kano_grey_darker;
     border-style: solid;
 }
+
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.grey_background.loading_kano_button:insensitive {
+    background: @kano_grey_darker;
+}*/
 
 .blue_background {
     background: @kano_blue;
 }
 
+GtkButton.blue_background:active {
+    background: @kano_blue_darker;
+}
+
+.blue_background:hover {
+    background: @kano_blue_lighter;
+}
+
 .blue_background:focus {
-    border-color: mix(@kano_blue, #ffffff, 0.4);
+    border-color: @kano_blue_darker;
     border-style: solid;
 }
+
+/* Leave these commented - when we can customize the spinner colour,
+   we'll put these back in the code */
+
+/*.blue_background.loading_kano_button:insensitive {
+    background: @kano_blue_darker;
+}*/
 
 .small_orange_button {
     background: transparent;

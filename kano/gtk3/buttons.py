@@ -34,16 +34,18 @@ class GenericButton(Gtk.Button):
         style_context.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         style_context.add_provider(self.colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
+        self.internal_box = Gtk.Box(spacing=10)
+        self.internal_box.props.halign = Gtk.Align.CENTER
+        self.add(self.internal_box)
+
         if icon_filename:
             self.icon = Gtk.Image.new_from_file(icon_filename)
-            box = Gtk.Box(spacing=10)
-            box.pack_start(self.icon, False, False, 0)
+            self.internal_box.pack_start(self.icon, False, False, 0)
             self.label = Gtk.Label(text)
-            box.pack_start(self.label, False, False, 0)
-            self.add(box)
+            self.internal_box.pack_start(self.label, False, False, 0)
         else:
             self.label = Gtk.Label(text)
-            self.add(self.label)
+            self.internal_box.add(self.label)
 
         style = self.label.get_style_context()
         style.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -59,6 +61,7 @@ class GenericButton(Gtk.Button):
 
 class KanoButton(GenericButton):
     def __init__(self, text="", color="green", icon_filename=""):
+
         # Keep this updated - useful for set_color function
         self.available_colors = ["orange", "green", "red", "grey", "blue"]
 
@@ -79,7 +82,8 @@ class KanoButton(GenericButton):
 
     # Pakcing in a box and within an Alignment
     def pack_and_align(self):
-        # This stops the button resizing to fit the size of it's container
+
+        # This stops the button resizing to fit the size of its container
         self.box = Gtk.Box()
         self.box.add(self)
         self.props.halign = Gtk.Align.CENTER
@@ -125,6 +129,7 @@ class KanoButtonBox(Gtk.ButtonBox):
             self.orange_button = OrangeButton(orange_button_text)
             self.pack_start(self.orange_button, False, False, 0)
             self.pack_start(self.kano_button, False, False, 0)
+
             # The empty label is to centre the kano_button
             self.label = Gtk.Label("    ")
             self.pack_start(self.label, False, False, 0)

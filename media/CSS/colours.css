@@ -10,9 +10,25 @@
 /* Define colours */
 
 @define-color kano_green #7cc640;
+@define-color kano_green_darker #6DB038;
+@define-color kano_green_lighter #91DD54;
+
 @define-color kano_orange #ff842A;
+@define-color kano_orange_darker #E7680B;
+@define-color kano_orange_lighter #FFA563;
+
 @define-color kano_red #f37677;
+@define-color kano_red_darker #D55555;
+@define-color kano_red_lighter #FF9494;
+
 @define-color kano_blue #65C2E7;
+@define-color kano_blue_darker #49A6CD;
+@define-color kano_blue_lighter #89DCFE;
+
+@define-color kano_grey #C0C0C0;
+@define-color kano_grey_darker #A5A5A5;
+@define-color kano_grey_lighter #D6D6D6;
+
 @define-color title_color #323232;
 @define-color subheading_color #6e6e6e;
 @define-color inactive_writing #cdcdcd;
