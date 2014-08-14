@@ -6,7 +6,7 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 from kano.gtk3 import cursor
 from kano.paths import common_css_dir
 import os
@@ -65,9 +65,6 @@ class KanoButton(GenericButton):
         # Keep this updated - useful for set_color function
         self.available_colors = ["orange", "green", "red", "grey", "blue"]
 
-        self.spinner = Gtk.Spinner()
-        self.is_spinning = False
-
         # Create button
         GenericButton.__init__(self, text, icon_filename)
 
@@ -111,24 +108,31 @@ class KanoButton(GenericButton):
         self.set_margin_top(top_margin)
         self.set_margin_bottom(bottom_margin)
 
-    # Threading should be handled by each individual program, so we don't get memory leaks from
-    # two sets of initialisation of GObject.threads.init()
+    # This currently isn't being implemented due to issues with spinner stopping spinning
+    # and styling issues
+
+    # Replace content of button with spinner, disable button and start spinner spinning
+    def add_spinner(self):
+        self.spinner = Gtk.Spinner()
+        self.spinner.props.active = True
+        self.is_spinning = False
+
     def start_spinner(self):
+        # Keep old dimensions with box
+        allocation = self.get_allocation()
         self.remove(self.internal_box)
         self.add(self.spinner)
+        self.set_size_request(allocation.width, allocation.height)
 
         # Stops background going grey on making kano button insensitive,
         # and controls styling of spinner
         self.get_style_context().add_class("loading_kano_button")
-
-        # force change of class? This may not be neccessary
-        self.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
-
         self.set_sensitive(False)
-        self.show_all()
         self.is_spinning = True
+        self.show_all()
         self.spinner.start()
 
+     # Replace content of button with original content and stop spinner spinning
     def stop_spinner(self):
         self.spinner.stop()
         self.remove(self.spinner)
@@ -163,3 +167,29 @@ class KanoButtonBox(Gtk.ButtonBox):
             self.pack_start(self.label, False, False, 0)
         else:
             self.pack_start(self.kano_button, False, False, 0)
+
+
+# This is a test class to try out different button functions
+class TestWindow(Gtk.Window):
+    def __init__(self):
+        Gtk.Window.__init__(self)
+        self.kano_button = KanoButton("hello")
+        self.add(self.kano_button)
+        self.connect("delete-event", Gtk.main_quit)
+        self.show_all()
+        self.kano_button.connect("button-release-event", self.spinner_test)
+
+    def spinner_test(self, widget, event):
+        if self.kano_button.is_spinning:
+            pass
+            #self.kano_button.stop_spinner()
+            #self.kano_button.spinner.start()
+        else:
+            self.kano_button.start_spinner()
+            #self.kano_button.set_sensitive(False)
+
+
+if __name__ == "__main__":
+    win = TestWindow()
+    win.connect("delete-event", Gtk.main_quit)
+    Gtk.main()
