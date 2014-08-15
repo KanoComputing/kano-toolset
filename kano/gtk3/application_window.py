@@ -56,7 +56,7 @@ class ApplicationWindow(Gtk.Window):
     def unblur(self):
         if self._blurred:
             self._overlay.remove(self._blur)
-            self._blur = False
+            self._blurred = False
 
     def set_main_widget(self, widget):
         self._overlay.add(widget)
