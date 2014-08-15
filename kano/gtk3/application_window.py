@@ -42,15 +42,21 @@ class ApplicationWindow(Gtk.Window):
 
         self._blur = Gtk.EventBox()
         self._blur.get_style_context().add_class('blur')
+        
+        self._blurred = False
 
         # TODO: Maybe handle the taskbar here to avoid even more code duplication?
 
     def blur(self):
-        self._overlay.add_overlay(self._blur)
-        self._blur.show()
+        if not self._blurred:
+            self._overlay.add_overlay(self._blur)
+            self._blur.show()
+            self._blurred = True
 
     def unblur(self):
-        self._overlay.remove(self._blur)
+        if self._blurred:
+            self._overlay.remove(self._blur)
+            self._blur = False
 
     def set_main_widget(self, widget):
         self._overlay.add(widget)
