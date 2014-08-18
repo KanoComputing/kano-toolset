@@ -19,7 +19,7 @@ import subprocess
 import shlex
 import json
 import re
-from kano.utils import run_cmd
+from kano.utils import run_cmd, get_user_unsudoed, run_bg
 from kano.logging import logger
 
 
@@ -309,7 +309,7 @@ def is_connected(iface):
 
     # ifplugstatus will tell us if we are associated
     # and authenticated to the AP with return code 2
-    _, _, rc = run_cmd ("/usr/sbin/ifplugstatus %s" % iface)
+    _, _, rc = run_cmd("/usr/sbin/ifplugstatus %s" % iface)
     linked = (rc == 2)
 
     return (essid, mode, ap, linked)
@@ -337,7 +337,7 @@ def is_internet():
 
 def wpa_conf(essid, psk, confile, wep=False):
 
-    if wep == True:
+    if wep is True:
         wpa_conf = '''
           ctrl_interface=/var/run/wpa_supplicant
           network={
@@ -569,3 +569,21 @@ class KwifiCache:
         wdata = json.loads(lastknown)
         return wdata
 
+
+def launch_chromium():
+    user_name = get_user_unsudoed()
+    run_bg('su - ' + user_name + ' -c chromium')
+
+
+def network_info():
+    command_network = "/sbin/iwconfig wlan0 | grep 'ESSID:' | awk '{print $4}' | sed 's/ESSID://g' | sed 's/\"//g'"
+    out, e, _ = run_cmd(command_network)
+    if e:
+        network = "Ethernet"
+        command_ip = "/sbin/ifconfig eth0 | grep inet | awk '{print $2}' | cut -d':' -f2"
+    else:
+        network = out
+        command_ip = "/sbin/ifconfig wlan0 | grep inet | awk '{print $2}' | cut -d':' -f2"
+    ip, _, _ = run_cmd(command_ip)
+
+    return network.strip(), ip.strip()
