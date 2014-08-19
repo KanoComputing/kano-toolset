@@ -589,7 +589,7 @@ def network_info():
             command_network = "/sbin/iwconfig wlan0 | grep 'ESSID:' | awk '{print $4}' | sed 's/ESSID://g' | sed 's/\"//g'"
             out, _, _ = run_cmd(command_network)
             data['ESSID'] = out.strip()
-            data['nice_name'] = 'Wireless {}'.format(out.strip())
+            data['nice_name'] = 'Wireless: {}'.format(out.strip())
         else:
             data['nice_name'] = 'Ethernet'
 
