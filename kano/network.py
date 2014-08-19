@@ -570,7 +570,7 @@ class KwifiCache:
         return wdata
 
 
-def launch_chromium():
+def launch_chromium(*args):
     user_name = get_user_unsudoed()
     run_bg('su - ' + user_name + ' -c chromium')
 
