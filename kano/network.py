@@ -582,8 +582,20 @@ def network_info():
         if line.startswith('default'):
             continue
         interface = line.split('dev ')[1].split()[0]
-        address = line.split('src ')[1].split()[0]
-        network_dict[interface] = address
+
+        data = dict()
+
+        if interface.startswith('wlan'):
+            command_network = "/sbin/iwconfig wlan0 | grep 'ESSID:' | awk '{print $4}' | sed 's/ESSID://g' | sed 's/\"//g'"
+            out, _, _ = run_cmd(command_network)
+            data['ESSID'] = out.strip()
+            data['nice_name'] = 'Wireless {}'.format(out.strip())
+        else:
+            data['nice_name'] = 'Ethernet'
+
+        data['address'] = line.split('src ')[1].split()[0]
+
+        network_dict[interface] = data
     return network_dict
 
 
