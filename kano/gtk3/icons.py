@@ -8,7 +8,7 @@
 # Creates pixbufs that we can use to make images from.  Uses a strip of icons, each 24px by 24px.
 
 from gi.repository import Gtk, GdkPixbuf
-from kano.paths import common_media_dir
+from kano.paths import common_images_dir
 import os
 
 # To make an image using the pixbuf icon, use the command below:
@@ -34,7 +34,7 @@ def set_from_name(name):
     elif name == "dropdown_arrow":
         icon_number = 7
     # Create main window
-    filename = os.path.join(common_media_dir, "images", "icons.png")
+    filename = os.path.join(common_images_dir, "icons.png")
     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, 192, 24)
     subpixbuf = pixbuf.new_subpixbuf(24 * icon_number, 0, 24, 24).add_alpha(True, 255, 255, 255)
     image = Gtk.Image()
