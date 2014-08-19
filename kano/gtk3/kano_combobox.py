@@ -201,9 +201,14 @@ class KanoComboBox(Gtk.Button):
 
     def set_items(self, items):
         # use this to set a list of string items for the dropdown menu
-        # it makes sure the parameter is actually a list
+        # it makes sure the parameter is actually a List which contains Strings
         if not isinstance(items, types.ListType):
             raise TypeError("KanoComboBox: set_items(): You must supply a List when setting items")
+
+        for item in items:
+            if not isinstance(item, types.StringTypes):
+                raise TypeError("KanoComboBox: append(): You must supply a String when appending text")
+
         self.items = list(items)
         self.update_dropdown()
 
