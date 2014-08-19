@@ -33,7 +33,6 @@ rc=$?
 if [ $rc -ne 0 ]; then
 	curl --retry 2 --retry-delay 1 $TEST_CURL > /dev/null 2>&1
 	rc=$?
-    fi
 fi
 
 exit $rc
