@@ -576,14 +576,15 @@ def launch_chromium():
 
 
 def network_info():
-    command_network = "/sbin/iwconfig wlan0 | grep 'ESSID:' | awk '{print $4}' | sed 's/ESSID://g' | sed 's/\"//g'"
-    out, e, _ = run_cmd(command_network)
-    if e:
-        network = "Ethernet"
-        command_ip = "/sbin/ifconfig eth0 | grep inet | awk '{print $2}' | cut -d':' -f2"
-    else:
-        network = out
-        command_ip = "/sbin/ifconfig wlan0 | grep inet | awk '{print $2}' | cut -d':' -f2"
-    ip, _, _ = run_cmd(command_ip)
+    out, _, _ = run_cmd('ip route show')
+    network_dict = dict()
+    for line in out.splitlines():
+        if line.startswith('default'):
+            continue
+        interface = line.split('dev ')[1].split()[0]
+        address = line.split('src ')[1].split()[0]
+        network_dict[interface] = address
+    return network_dict
 
-    return network.strip(), ip.strip()
+
+
