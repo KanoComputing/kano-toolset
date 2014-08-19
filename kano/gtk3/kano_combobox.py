@@ -42,10 +42,6 @@ class KanoComboBox(Gtk.Button):
     def __init__(self, default_text="", items=[], max_display_items=4):
         Gtk.Button.__init__(self)
 
-        # setting the widget's variables
-        self.set_items(items)
-        self.max_display_items = max_display_items
-
         # the ComboBox is comprised of a Label for the selected item
         # and an arrow image to indicate a dropdown menu
         self.box = Gtk.Box()
@@ -78,7 +74,10 @@ class KanoComboBox(Gtk.Button):
         self.first_item_index = 0
 
         # initialising the dropdown menu with the given max number of items to display
-        self.update_dropdown()
+        self.max_display_items = max_display_items
+        self.set_items(items)
+
+        # setting the widget's variables
         self.selected_item_index = -1
         self.selected_item_text = ""
 
@@ -97,9 +96,11 @@ class KanoComboBox(Gtk.Button):
         # we make it so that it is positioned just underneath the combobox button
         window = self.get_window()
         (_, window_x, window_y) = window.get_origin()
+        combobox_x = self.get_allocation().x + window_x
+        combobox_y = self.get_allocation().y + window_y
         combobox_height = self.get_allocation().height
 
-        return window_x, window_y + combobox_height, True
+        return combobox_x, combobox_y + combobox_height, True
 
     def on_scroll(self, widget, event):
         # distinguishing between scrolling up and down
@@ -174,35 +175,58 @@ class KanoComboBox(Gtk.Button):
         if changed:
             self.emit("changed")
 
-    def get_selected_item_text(self):
-        # return the text of the selected item
-        return self.selected_item_text
-
     def get_selected_item_index(self):
         # returns the index of the selected item in the list of items given
         # or -1 if no item was selected
         return self.selected_item_index
 
-    # @Override
-    def set_size_request(self, width, height):
-        self.dropdown.set_size_request(width, -1)
-        return Gtk.Button.set_size_request(self, width, height)
+    def get_selected_item_text(self):
+        # return the text of the selected item
+        return self.selected_item_text
+
+    def set_selected_item_index(self, index):
+        # use this to select an item from the items list
+        self.selected_item_index = index
+        self.label.set_text(self.items[index])
+        self.selected_item_text = self.items[index]
+
+    def set_text(self, text):
+        # use this to set the text of the combobox directly
+        # NOTE: this does not modify the actual selected item index and/or text!
+        self.label.set_text(text)
 
     def get_items(self):
         # use this to retrieve the list of string items
         return self.items
 
     def set_items(self, items):
-        # use this to set a list of string items
+        # use this to set a list of string items for the dropdown menu
         # it makes sure the parameter is actually a list
-        # and it clones the given list
-        isinstance(items, types.ListType)
+        if not isinstance(items, types.ListType):
+            raise TypeError("KanoComboBox: set_items(): You must supply a List when setting items")
         self.items = list(items)
+        self.update_dropdown()
 
     def append(self, text):
-        # use this to append items
-        isinstance(text, types.StringTypes)
+        # use this to append items to the dropdown menu
+        if not isinstance(text, types.StringTypes):
+            raise TypeError("KanoComboBox: append(): You must supply a String when appending text")
         self.items.append(text)
+        self.update_dropdown()
+
+    def remove_all(self):
+        # use this to remove all items from the dropdown - will reset selected item
+        self.items = list()
+        self.first_item_index = 0
+        self.selected_item_index = -1
+        self.selected_item_text = ""
+        self.label.set_text("")
+        self.update_dropdown()
+
+    # @Override
+    def set_size_request(self, width, height):
+        self.dropdown.set_size_request(width, -1)
+        return Gtk.Button.set_size_request(self, width, height)
 
     def do_popup(self):
         # print 'dropdown popup'
