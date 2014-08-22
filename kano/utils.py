@@ -405,3 +405,11 @@ def pkill(clues):
             if clue in line:
                 pid = line.split()[0]
                 run_cmd("kill {}".format(pid))
+
+
+def get_all_home_folders(root=False):
+    home = '/home'
+    folders = [os.path.join(home, f) for f in os.listdir(home)]
+    if root:
+        folders += ['/root']
+    return folders
