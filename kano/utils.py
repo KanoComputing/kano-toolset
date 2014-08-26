@@ -407,9 +407,11 @@ def pkill(clues):
                 run_cmd("kill {}".format(pid))
 
 
-def get_all_home_folders(root=False):
+def get_all_home_folders(root=False, skel=False):
     home = '/home'
     folders = [os.path.join(home, f) for f in os.listdir(home)]
     if root:
         folders += ['/root']
+    if skel:
+        folders += ['/etc/skel']
     return folders
