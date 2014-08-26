@@ -206,6 +206,15 @@ class WebApp(object):
         return path
 
     def readFile(self, path):
+        local = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                             '../..', path)
+        usr = os.path.join('/usr/share', path)
+
+        if os.path.exists(local):
+            path = local
+        elif os.path.exists(usr):
+            path = usr
+
         try:
             with open(path, "r") as f:
                 return f.read()
