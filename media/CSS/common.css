@@ -147,6 +147,15 @@ GtkLabel{
     color: @active_writing;
 }
 
+GtkRadioButton
+GtkLabel:insensitive{
+    color: @inactive_writing;
+}
+
+GtkRadioButton:insensitive {
+    border-color: @inactive_writing;
+}
+
 /**
   * The title of the current level
   */
