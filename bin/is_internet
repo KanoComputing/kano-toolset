@@ -27,7 +27,7 @@ fi
 fping -c 10 -p 30ms -q $TEST_PING > /dev/null 2>&1
 rc=$?
 if [ $rc -ne 0 ]; then
-    curl_val=`curl -s -o /dev/null -I -w "%{http_code}" "http://www.google.com/favicon.ico"`
+    curl_val=`curl --max-time 5 --silent --output /dev/null --head --write-out "%{http_code}" "http://www.google.com/favicon.ico"`
     if [ $curl_val -eq 200 ]; then
         rc=0
     else
