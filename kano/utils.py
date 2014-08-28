@@ -218,7 +218,7 @@ def download_url(url, file_path):
     import requests
     try:
         with open(file_path, 'wb') as handle:
-            request = requests.get(url, stream=True)
+            request = requests.get(url, stream=True, proxies=proxies)
             if not request.ok:
                 return False, request.text
             for block in request.iter_content(1024):
@@ -233,7 +233,7 @@ def download_url(url, file_path):
 def requests_get_json(url, params=None):
     import requests
     try:
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params, proxies=proxies)
         if r.ok:
             return r.ok, None, r.json()
         else:
@@ -415,3 +415,10 @@ def get_all_home_folders(root=False, skel=False):
     if skel:
         folders += ['/etc/skel']
     return folders
+
+
+try:
+    from kano_settings.system.proxy import get_requests_proxies
+    proxies = get_requests_proxies()
+except Exception:
+    proxies = None
