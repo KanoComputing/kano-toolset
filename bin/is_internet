@@ -10,8 +10,6 @@
 #  The command is silent, no console output.
 #
 
-TEST_PING=8.8.8.8
-
 # Kanux provides networking through either Ethernet or Wireless
 # Before trying to reach the internet we make sure that one of this devices
 # is hard-wired (ethernet) or associated (wireless).
@@ -23,16 +21,11 @@ if [ "$lnketh0" != "2" ] && [ "$lnkwlan0" != "2" ]; then
     exit 3
 fi
 
-# Link is up, let's see if we can reach out to the Internet
-fping -c 10 -p 30ms -q $TEST_PING > /dev/null 2>&1
-rc=$?
-if [ $rc -ne 0 ]; then
-    curl_val=`curl -s -o /dev/null -I -w "%{http_code}" "http://www.google.com/favicon.ico"`
-    if [ $curl_val -eq 200 ]; then
-        rc=0
-    else
-        rc=5
-    fi
+# curl -I only gets the headers
+curl_val=`curl --max-time 5 --silent --output /dev/null --head --write-out "%{http_code}" "http://www.google.com/favicon.ico"`
+if [ $curl_val -eq 200 ]; then
+    exit 0
+else
+    exit 5
 fi
 
-exit $rc
