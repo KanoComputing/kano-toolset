@@ -212,6 +212,15 @@ class IWList():
             factor = int(x) / float(z)
             return factor
 
+        def add_wnet(wlist, new_wnet):
+            for i, old_wnet in enumerate(wlist):
+                if old_wnet["essid"] == new_wnet["essid"]:
+                    if int(old_wnet["signal"]) < int(new_wnet["signal"]):
+                        wlist[i] = new_wnet
+                    return
+
+            wlist.append(new_wnet)
+
         if debug:
             import pprint
             pp = pprint.PrettyPrinter(indent=4, depth=6)
@@ -252,7 +261,7 @@ class IWList():
                     pass
                 else:
                     wnet['encryption'] = enc
-                    iwnets.append(wnet)
+                    add_wnet(iwnets, wnet)
 
         iwnets = sorted(iwnets, key=sortNetworks, reverse=True)
         if first:
