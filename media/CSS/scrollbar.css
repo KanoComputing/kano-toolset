@@ -71,19 +71,19 @@ GtkScrolledWindow {
 }
 
 .scrollbar.button.top:hover {
-    box-shadow: 0 -1 inset mix(@scrollbar_slider, @scrollbar_trough, 0.8);
+    box-shadow: inset 0px -1px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
 }
 
 .scrollbar.button.bottom:hover {
-    box-shadow: 0 1 inset mix(@scrollbar_slider, @scrollbar_trough, 0.8);
+    box-shadow: inset 0px 1px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
 }
 
 .scrollbar.button.right:hover {
-    box-shadow: 1 0 inset mix(@scrollbar_slider, @scrollbar_trough, 0.8);
+    box-shadow: inset 1px 0px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
 }
 
 .scrollbar.button.left:hover {
-    box-shadow: -1 0 inset mix(@scrollbar_slider, @scrollbar_trough, 0.8);
+    box-shadow: inset -1px 0px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
 }
 
 .scrollbar.button.top:hover:backdrop,
