@@ -29,6 +29,7 @@
 
 .kano_button GtkLabel:insensitive {
     color: #aaaaaa;
+    background: #dddddd;
 }
 
 .loading_kano_button GtkLabel:insensitive {
