@@ -215,10 +215,15 @@ class IWList():
         def add_wnet(wlist, new_wnet):
             for i, old_wnet in enumerate(wlist):
                 if old_wnet["essid"] == new_wnet["essid"]:
-                    if int(old_wnet["signal"]) < int(new_wnet["signal"]):
-                        wlist[i] = new_wnet
+                    try:
+                        if int(old_wnet["signal"]) < int(new_wnet["signal"]):
+                            wlist[i] = new_wnet
+                    except:
+                        # The signal format is not an integer, keep the old network
+                        pass
+                    # The network is duplicated, do not add it again
                     return
-
+            # Add the network as it is not duplicated
             wlist.append(new_wnet)
 
         if debug:
