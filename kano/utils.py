@@ -147,8 +147,10 @@ def get_user():
 def get_user_unsudoed():
     if 'SUDO_USER' in os.environ:
         return os.environ['SUDO_USER']
-    else:
+    elif 'LOGNAME' in os.environ:
         return os.environ['LOGNAME']
+    else:
+        return 'root'
 
 
 def get_home():
