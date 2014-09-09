@@ -70,7 +70,7 @@ GtkScrolledWindow {
     background-color: mix(@scrollbar_slider, @scrollbar_trough, 0.8);
 }
 
-.scrollbar.button.top:hover {
+/*.scrollbar.button.top:hover {
     box-shadow: inset 0px -1px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
 }
 
@@ -84,7 +84,7 @@ GtkScrolledWindow {
 
 .scrollbar.button.left:hover {
     box-shadow: inset -1px 0px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
-}
+}*/
 
 .scrollbar.button.top:hover:backdrop,
 .scrollbar.button.bottom:hover:backdrop,
