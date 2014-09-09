@@ -150,6 +150,7 @@ GtkLabel{
 GtkRadioButton
 GtkLabel:insensitive{
     color: @inactive_writing;
+    background: transparent;
 }
 
 GtkRadioButton:insensitive {
