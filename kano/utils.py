@@ -100,7 +100,9 @@ def delete_file(file):
         os.remove(file)
 
 
-def zenity_show_progress(msg, title=''):
+def zenity_show_progress(msg, title=None):
+    if title is None:
+        title = ''
     if is_gui():
         cmd = 'yes | zenity --progress --text="{}" --pulsate --no-cancel ' + \
               '--auto-close --title="{}"'
