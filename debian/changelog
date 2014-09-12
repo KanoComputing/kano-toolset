@@ -1,3 +1,9 @@
+kano-toolset (1.2-1) unstable; urgency=low
+
+  * Changed toolset functions
+
+ -- Team Kano <dev@kano.me>  Fri, 12 Sep 2014 13:47:00 +0100
+
 kano-toolset (1.1-7) unstable; urgency=low
 
   * Fixed a bug in the main window blur
