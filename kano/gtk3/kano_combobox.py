@@ -11,9 +11,19 @@
 
 
 import os
+import sys
 import types
 from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
-from kano.paths import common_images_dir
+
+
+if __name__ == '__main__' and __package__ is None:
+    dir_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '../../'))
+    if dir_path != '/usr':
+        sys.path.insert(1, dir_path)
+
+from kano.gtk3.apply_styles import apply_styles
+from kano.paths import common_images_dir, common_css_dir
 
 
 class KanoComboBox(Gtk.Button):
@@ -41,6 +51,9 @@ class KanoComboBox(Gtk.Button):
     #
     def __init__(self, default_text="", items=[], max_display_items=4):
         Gtk.Button.__init__(self)
+
+        # Attach styling class name
+        self.get_style_context().add_class("KanoComboBox")
 
         # the ComboBox is comprised of a Label for the selected item
         # and an arrow image to indicate a dropdown menu
@@ -83,6 +96,17 @@ class KanoComboBox(Gtk.Button):
 
         # when the combobox button is clicked, we popup the dropdown
         self.connect("button-press-event", self.on_combo_box_click)
+
+    def include_styling(self):
+        self.provider = Gtk.CssProvider()
+        path = os.path.join(common_css_dir, "kano_combobox.css")
+        self.provider.load_from_path(path)
+
+        apply_styles()
+
+        screen = Gdk.Screen.get_default()
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider_for_screen(screen, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
     def on_combo_box_click(self, widget, event):
         self.emit("popup")
@@ -270,10 +294,34 @@ class KanoComboBox(Gtk.Button):
             self.add(self.box)
 
             # By overriding this signal we can stop the Menu
-            # containing this item from being poped down
+            # containing this item from being popped down
             self.connect("button-release-event", self.do_not_popdown_menu)
 
         def do_not_popdown_menu(self, widget, event):
             # Return that the signal has been handled
             # Subsequent default handling routines will not be executed
             return True
+
+
+# Test class
+
+class TestComboBoxWindow(Gtk.Window):
+
+    def __init__(self):
+        Gtk.Window.__init__(self)
+        self.combo_box = KanoComboBox()
+
+        self.combo_box.include_styling()
+
+        self.add(self.combo_box)
+        self.combo_box.set_items(["item1", "item2", "item3", "item4", "item5", "item6", "item8", "item9"])
+        self.combo_box.set_selected_item_index(0)
+
+        self.connect("delete-event", Gtk.main_quit)
+
+        self.show_all()
+
+
+if __name__ == "__main__":
+    win = TestComboBoxWindow()
+    Gtk.main()
