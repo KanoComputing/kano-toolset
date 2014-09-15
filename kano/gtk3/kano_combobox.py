@@ -71,8 +71,8 @@ class KanoComboBox(Gtk.Button):
         # creating the scroll up and down buttons for the dropdown menu
         self.scroll_up_button = self.ScrollMenuItem(self.SCROLL_ARROW_UP)
         self.scroll_down_button = self.ScrollMenuItem(self.SCROLL_ARROW_DOWN)
-        self.scroll_up_button.connect("button-press-event", self.on_scroll_button)
-        self.scroll_down_button.connect("button-press-event", self.on_scroll_button)
+        self.scroll_up_button.connect("enter-notify-event", self.on_scroll_button)
+        self.scroll_down_button.connect("enter-notify-event", self.on_scroll_button)
 
         # creating the popup dropdown menu
         self.dropdown = Gtk.Menu()
@@ -314,7 +314,7 @@ class TestComboBoxWindow(Gtk.Window):
         self.combo_box.include_styling()
 
         self.add(self.combo_box)
-        self.combo_box.set_items(["item1", "item2", "item3", "item4", "item5", "item6", "item8", "item9"])
+        self.combo_box.set_items(["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8"])
         self.combo_box.set_selected_item_index(0)
 
         self.connect("delete-event", Gtk.main_quit)
