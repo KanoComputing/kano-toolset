@@ -314,7 +314,7 @@ class TestComboBoxWindow(Gtk.Window):
         self.combo_box.include_styling()
 
         self.add(self.combo_box)
-        self.combo_box.set_items(["item1", "item2", "item3", "item4", "item5", "item6", "item8", "item9"])
+        self.combo_box.set_items(["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8"])
         self.combo_box.set_selected_item_index(0)
 
         self.connect("delete-event", Gtk.main_quit)
