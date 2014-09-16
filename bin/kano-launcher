@@ -34,7 +34,7 @@ eval "$1 &"
 # Apply window presets
 case "$2" in
     make-snake)
-        kano-window-tool -t "Make Snake" -dno -m -f
+        kano-window-tool -t "Make Snake" -dyes -m -f
         ;;
     pcmanfm)
         if [ -e /usr/bin/kano-profile-cli ]; then

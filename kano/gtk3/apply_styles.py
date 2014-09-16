@@ -38,3 +38,10 @@ def apply_named_style(style_name):
     screen = Gdk.Screen.get_default()
     styleContext = Gtk.StyleContext()
     styleContext.add_provider_for_screen(screen, css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+
+def apply_styling_to_widget(widget, path):
+    provider = Gtk.CssProvider()
+    provider.load_from_path(path)
+    styleContext = widget.get_style_context()
+    styleContext.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)

@@ -250,7 +250,13 @@ def read_logs(app=None):
                 if app is None or re.match("^{}\.log".format(app), log):
                     log_path = os.path.join(d, log)
                     with open(log_path, "r") as f:
-                        data[log_path] = map(json.loads, f.readlines())
+                        data[log_path] = []
+                        for line in f.readlines():
+                            try:
+                                data[log_path].append(json.loads(line))
+                            except:
+                                # unable to read the line, skip it
+                                pass
 
     return data
 

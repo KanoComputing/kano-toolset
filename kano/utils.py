@@ -100,12 +100,14 @@ def delete_file(file):
         os.remove(file)
 
 
-def zenity_show_progress(msg):
+def zenity_show_progress(msg, title=None):
+    if title is None:
+        title = ''
     if is_gui():
         cmd = 'yes | zenity --progress --text="{}" --pulsate --no-cancel ' + \
-              '--auto-close --title="kano-updater"'
+              '--auto-close --title="{}"'
         p = subprocess.Popen(
-            cmd.format(msg),
+            cmd.format(msg, title),
             shell=True,
             preexec_fn=restore_signals
         )
@@ -147,8 +149,10 @@ def get_user():
 def get_user_unsudoed():
     if 'SUDO_USER' in os.environ:
         return os.environ['SUDO_USER']
-    else:
+    elif 'LOGNAME' in os.environ:
         return os.environ['LOGNAME']
+    else:
+        return 'root'
 
 
 def get_home():
@@ -218,7 +222,7 @@ def download_url(url, file_path):
     import requests
     try:
         with open(file_path, 'wb') as handle:
-            request = requests.get(url, stream=True)
+            request = requests.get(url, stream=True, proxies=proxies)
             if not request.ok:
                 return False, request.text
             for block in request.iter_content(1024):
@@ -233,7 +237,7 @@ def download_url(url, file_path):
 def requests_get_json(url, params=None):
     import requests
     try:
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params, proxies=proxies)
         if r.ok:
             return r.ok, None, r.json()
         else:
@@ -405,3 +409,20 @@ def pkill(clues):
             if clue in line:
                 pid = line.split()[0]
                 run_cmd("kill {}".format(pid))
+
+
+def get_all_home_folders(root=False, skel=False):
+    home = '/home'
+    folders = [os.path.join(home, f) for f in os.listdir(home)]
+    if root:
+        folders += ['/root']
+    if skel:
+        folders += ['/etc/skel']
+    return folders
+
+
+try:
+    from kano_settings.system.proxy import get_requests_proxies
+    proxies = get_requests_proxies()
+except Exception:
+    proxies = None
