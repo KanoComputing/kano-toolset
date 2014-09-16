@@ -22,7 +22,7 @@ if __name__ == '__main__' and __package__ is None:
     if dir_path != '/usr':
         sys.path.insert(1, dir_path)
 
-from kano.gtk3.apply_styles import apply_colours, apply_styles, apply_styling_to_widget
+from kano.gtk3.apply_styles import apply_colours_to_widget, apply_styling_to_widget
 from kano.paths import common_images_dir, common_css_dir
 
 
@@ -102,20 +102,8 @@ class KanoComboBox(Gtk.Button):
 
         widgets = [self, self.label, self.dropdown, self.scroll_up_button, self.scroll_down_button]
         for w in widgets:
+            apply_colours_to_widget(w)
             apply_styling_to_widget(w, self.CSS_PATH)
-
-    # Apply styling globally - not recommended.
-    # If you run this, the styling of other widgtes in your application could be affected
-    def include_styling(self):
-        self.provider = Gtk.CssProvider()
-        path = os.path.join(common_css_dir, "kano_combobox.css")
-        self.provider.load_from_path(path)
-
-        apply_styles()
-
-        screen = Gdk.Screen.get_default()
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider_for_screen(screen, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
     def on_combo_box_click(self, widget, event):
         self.emit("popup")
@@ -184,6 +172,7 @@ class KanoComboBox(Gtk.Button):
         # then add to the dropdown the items to be displayed in the new range
         for index in range(self.first_item_index, last_display_item):
             item = Gtk.MenuItem(self.items[index])
+            apply_colours_to_widget(item)
             apply_styling_to_widget(item, self.CSS_PATH)
             item.connect("activate", self.on_item_selected, index)
             self.dropdown.append(item)
@@ -323,9 +312,6 @@ class TestComboBoxWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self)
         self.combo_box = KanoComboBox()
-
-        # get colour constants
-        apply_colours()
 
         self.add(self.combo_box)
         self.combo_box.set_items(["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8"])
