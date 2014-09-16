@@ -11,12 +11,25 @@
 
 
 import os
+import sys
 import types
 from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
-from kano.paths import common_images_dir
+
+
+if __name__ == '__main__' and __package__ is None:
+    dir_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '../../'))
+    if dir_path != '/usr':
+        sys.path.insert(1, dir_path)
+
+from kano.gtk3.apply_styles import apply_colours, apply_styles, apply_styling_to_widget
+from kano.paths import common_images_dir, common_css_dir
 
 
 class KanoComboBox(Gtk.Button):
+
+    # css file
+    CSS_PATH = os.path.join(common_css_dir, "kano_combobox.css")
 
     # default size for the combobox - use set_size_request to change these
     WIDTH = 250
@@ -41,6 +54,9 @@ class KanoComboBox(Gtk.Button):
     #
     def __init__(self, default_text="", items=[], max_display_items=4):
         Gtk.Button.__init__(self)
+
+        # Attach styling class name
+        self.get_style_context().add_class("KanoComboBox")
 
         # the ComboBox is comprised of a Label for the selected item
         # and an arrow image to indicate a dropdown menu
@@ -83,6 +99,23 @@ class KanoComboBox(Gtk.Button):
 
         # when the combobox button is clicked, we popup the dropdown
         self.connect("button-press-event", self.on_combo_box_click)
+
+        widgets = [self, self.label, self.dropdown, self.scroll_up_button, self.scroll_down_button]
+        for w in widgets:
+            apply_styling_to_widget(w, self.CSS_PATH)
+
+    # Apply styling globally - not recommended.
+    # If you run this, the styling of other widgtes in your application could be affected
+    def include_styling(self):
+        self.provider = Gtk.CssProvider()
+        path = os.path.join(common_css_dir, "kano_combobox.css")
+        self.provider.load_from_path(path)
+
+        apply_styles()
+
+        screen = Gdk.Screen.get_default()
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider_for_screen(screen, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
     def on_combo_box_click(self, widget, event):
         self.emit("popup")
@@ -151,6 +184,7 @@ class KanoComboBox(Gtk.Button):
         # then add to the dropdown the items to be displayed in the new range
         for index in range(self.first_item_index, last_display_item):
             item = Gtk.MenuItem(self.items[index])
+            apply_styling_to_widget(item, self.CSS_PATH)
             item.connect("activate", self.on_item_selected, index)
             self.dropdown.append(item)
 
@@ -250,11 +284,14 @@ class KanoComboBox(Gtk.Button):
         pass
 
     class ScrollMenuItem(Gtk.ImageMenuItem):
+        CSS_PATH = os.path.join(common_css_dir, "kano_combobox.css")
 
         def __init__(self, image_path):
             Gtk.ImageMenuItem.__init__(self)
             self.set_use_underline(False)
             self.set_always_show_image(True)
+
+            apply_styling_to_widget(self, self.CSS_PATH)
 
             # set the given image
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
@@ -270,10 +307,35 @@ class KanoComboBox(Gtk.Button):
             self.add(self.box)
 
             # By overriding this signal we can stop the Menu
-            # containing this item from being poped down
+            # containing this item from being popped down
             self.connect("button-release-event", self.do_not_popdown_menu)
 
         def do_not_popdown_menu(self, widget, event):
             # Return that the signal has been handled
             # Subsequent default handling routines will not be executed
             return True
+
+
+# Test class
+
+class TestComboBoxWindow(Gtk.Window):
+
+    def __init__(self):
+        Gtk.Window.__init__(self)
+        self.combo_box = KanoComboBox()
+
+        # get colour constants
+        apply_colours()
+
+        self.add(self.combo_box)
+        self.combo_box.set_items(["item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8"])
+        self.combo_box.set_selected_item_index(0)
+
+        self.connect("delete-event", Gtk.main_quit)
+
+        self.show_all()
+
+
+if __name__ == "__main__":
+    win = TestComboBoxWindow()
+    Gtk.main()
