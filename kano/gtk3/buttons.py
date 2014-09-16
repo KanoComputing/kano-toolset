@@ -26,6 +26,8 @@ class GenericButton(Gtk.Button):
 
         Gtk.Button.__init__(self)
 
+        apply_colours_to_widget(self)
+
         self.internal_box = Gtk.Box(spacing=10)
         self.internal_box.props.halign = Gtk.Align.CENTER
         self.add(self.internal_box)
@@ -49,7 +51,7 @@ class GenericButton(Gtk.Button):
 
 
 class KanoButton(GenericButton):
-    BUTTON_CSS = os.path.join(common_css_dir, 'buttons.css')
+    BUTTON_CSS = os.path.join(common_css_dir, 'kano_button.css')
     SPINNER_CSS = os.path.join(common_css_dir, 'spinner.css')
 
     def __init__(self, text="", color="green", icon_filename=""):
@@ -133,14 +135,20 @@ class KanoButton(GenericButton):
         self.spinner.stop()
         self.remove(self.spinner)
         self.add(self.internal_box)
+        self.get_style_context().remove_class("loading_kano_button")
         self.is_spinning = False
 
 
 class OrangeButton(GenericButton):
+    BUTTON_CSS = os.path.join(common_css_dir, 'small_orange_button.css')
+
     def __init__(self, text=""):
 
         # Create button
         GenericButton.__init__(self, text)
+        apply_styling_to_widget(self, self.BUTTON_CSS)
+        apply_styling_to_widget(self.label, self.BUTTON_CSS)
+
         self.get_style_context().add_class("small_orange_button")
 
 

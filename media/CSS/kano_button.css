@@ -1,5 +1,5 @@
 /*
-# buttons.css
+# kano_button.css
 #
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
@@ -151,28 +151,3 @@ GtkButton.blue_background:active {
     background: @kano_blue_darker;
 }
 
-.small_orange_button {
-    background: transparent;
-    padding: 0px;
-}
-
-.small_orange_button GtkLabel {
-    color: @kano_orange;
-    font: Bariol Bold 13px;
-}
-
-.small_orange_button:hover {
-    background: transparent;
-}
-
-GtkButtonBox .small_orange_button {
-    background: transparent;
-    border-color: transparent;
-    padding: 0px;
-}
-
-GtkButtonBox .small_orange_button:hover {
-    background: transparent;
-    border-color: transparent;
-    padding: 0px;
-}

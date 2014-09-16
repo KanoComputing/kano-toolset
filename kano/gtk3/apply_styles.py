@@ -19,19 +19,19 @@ def apply_styles_to_screen():
 
 
 def apply_colours_to_screen():
-    apply_styling_to_screen("colours")
+    apply_styling_to_screen(common_css_dir + "/colours.css")
 
 
 def apply_common_to_screen():
-    apply_styling_to_screen("common")
+    apply_styling_to_screen(common_css_dir + "/common.css")
 
 
-def apply_styling_to_screen(style_name):
+def apply_styling_to_screen(path):
     css = Gtk.CssProvider()
 
-    css_file = os.path.join(common_css_dir, style_name + '.css')
+    css_file = os.path.join(path)
     if not os.path.exists(css_file):
-        sys.exit(style_name + 'CSS file missing!')
+        sys.exit(path + ' CSS file missing!')
 
     css.load_from_path(css_file)
 

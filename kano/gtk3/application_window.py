@@ -10,7 +10,7 @@
 
 from gi.repository import Gtk, Gdk
 from kano.paths import common_css_dir
-from kano.gtk3.apply_styles import apply_styles
+from kano.gtk3.apply_styles import apply_styles_to_screen
 import os
 import sys
 
@@ -35,14 +35,14 @@ class ApplicationWindow(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect('delete-event', Gtk.main_quit)
 
-        apply_styles()
+        apply_styles_to_screen()
 
         self._overlay = Gtk.Overlay()
         self.add(self._overlay)
 
         self._blur = Gtk.EventBox()
         self._blur.get_style_context().add_class('blur')
-        
+
         self._blurred = False
 
         # TODO: Maybe handle the taskbar here to avoid even more code duplication?
