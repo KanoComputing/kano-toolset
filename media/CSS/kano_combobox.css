@@ -32,7 +32,7 @@ GtkImageMenuItem:hover {
     border-style: solid;
     border-width: 2px;
     border-radius:3px;
-    padding: 10px;
+    padding: 9px;
 }
 
 .KanoComboBox GtkLabel {
