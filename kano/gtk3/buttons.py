@@ -6,33 +6,25 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
-from gi.repository import Gtk
-from kano.gtk3 import cursor
-from kano.paths import common_css_dir
 import os
 import sys
+from gi.repository import Gtk
+
+if __name__ == '__main__' and __package__ is None:
+    dir_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '../../'))
+    if dir_path != '/usr':
+        sys.path.insert(1, dir_path)
+
+from kano.gtk3 import cursor
+from kano.gtk3.apply_styles import apply_styling_to_widget, apply_colours_to_widget
+from kano.paths import common_css_dir
 
 
 class GenericButton(Gtk.Button):
     def __init__(self, text="", icon_filename=""):
 
         Gtk.Button.__init__(self)
-
-        self.button_css = Gtk.CssProvider()
-        css_file = os.path.join(common_css_dir, 'buttons.css')
-        if not os.path.exists(css_file):
-            sys.exit('CSS file missing!')
-        self.button_css.load_from_path(css_file)
-
-        self.colour_css = Gtk.CssProvider()
-        colour_file = os.path.join(common_css_dir, 'colours.css')
-        if not os.path.exists(colour_file):
-            sys.exit('CSS file missing!')
-        self.colour_css.load_from_path(colour_file)
-
-        style_context = self.get_style_context()
-        style_context.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        style_context.add_provider(self.colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.internal_box = Gtk.Box(spacing=10)
         self.internal_box.props.halign = Gtk.Align.CENTER
@@ -47,9 +39,6 @@ class GenericButton(Gtk.Button):
             self.label = Gtk.Label(text)
             self.internal_box.add(self.label)
 
-        style = self.label.get_style_context()
-        style.add_provider(self.button_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         cursor.attach_cursor_events(self)
 
     def set_label(self, text):
@@ -60,6 +49,9 @@ class GenericButton(Gtk.Button):
 
 
 class KanoButton(GenericButton):
+    BUTTON_CSS = os.path.join(common_css_dir, 'buttons.css')
+    SPINNER_CSS = os.path.join(common_css_dir, 'spinner.css')
+
     def __init__(self, text="", color="green", icon_filename=""):
 
         # Keep this updated - useful for set_color function
@@ -75,6 +67,13 @@ class KanoButton(GenericButton):
 
         self.align = None
         cursor.attach_cursor_events(self)
+
+        self.add_spinner()
+
+        widgets = [self, self.label]
+        for w in widgets:
+            apply_colours_to_widget(w)
+            apply_styling_to_widget(w, self.BUTTON_CSS)
 
     def pack(self):
         self.box = Gtk.Box()
@@ -108,14 +107,11 @@ class KanoButton(GenericButton):
         self.set_margin_top(top_margin)
         self.set_margin_bottom(bottom_margin)
 
-    # This currently isn't being implemented due to issues with spinner stopping spinning
-    # and styling issues
-
-    # Replace content of button with spinner, disable button and start spinner spinning
     def add_spinner(self):
         self.spinner = Gtk.Spinner()
         self.spinner.props.active = True
         self.is_spinning = False
+        apply_styling_to_widget(self.spinner, self.SPINNER_CSS)
 
     def start_spinner(self):
         # Keep old dimensions with box
@@ -127,7 +123,7 @@ class KanoButton(GenericButton):
         # Stops background going grey on making kano button insensitive,
         # and controls styling of spinner
         self.get_style_context().add_class("loading_kano_button")
-        self.set_sensitive(False)
+
         self.is_spinning = True
         self.show_all()
         self.spinner.start()
@@ -137,7 +133,6 @@ class KanoButton(GenericButton):
         self.spinner.stop()
         self.remove(self.spinner)
         self.add(self.internal_box)
-        self.set_sensitive(True)
         self.is_spinning = False
 
 
@@ -173,20 +168,24 @@ class KanoButtonBox(Gtk.ButtonBox):
 class TestWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self)
-        self.kano_button = KanoButton("hello")
-        self.add(self.kano_button)
+        self.box = Gtk.Box()
+        self.add(self.box)
+
+        colours = ["red", "blue", "green", "orange"]
+        for c in colours:
+            button = KanoButton("hello", color=c)
+            self.box.pack_start(button, False, False, 0)
+            button.connect("button-release-event", self.spinner_test)
+
         self.connect("delete-event", Gtk.main_quit)
         self.show_all()
-        self.kano_button.connect("button-release-event", self.spinner_test)
 
     def spinner_test(self, widget, event):
-        if self.kano_button.is_spinning:
-            pass
-            #self.kano_button.stop_spinner()
-            #self.kano_button.spinner.start()
+        if widget.is_spinning:
+            widget.stop_spinner()
         else:
-            self.kano_button.start_spinner()
-            #self.kano_button.set_sensitive(False)
+            widget.start_spinner()
+            widget.set_sensitive(False)
 
 
 if __name__ == "__main__":
