@@ -7,9 +7,10 @@
 #
 # Customised progress bar widget
 
+import os
 from gi.repository import Gtk, GObject
-from kano.gtk3.apply_styles import apply_styles, apply_named_style
-#import sys
+from kano.gtk3.apply_styles import apply_styles_to_screen, apply_styling_to_screen
+from kano.paths import common_css_dir
 
 
 class Progress(Gtk.ProgressBar):
@@ -47,8 +48,10 @@ class Progress(Gtk.ProgressBar):
 class KanoProgress(Gtk.Window):
 
     def __init__(self, pulse, title=""):
-        apply_styles()
-        apply_named_style('kano_progress')
+
+        path = os.path.join(common_css_dir, 'kano_progress.css')
+        apply_styles_to_screen()
+        apply_styling_to_screen(path)
 
         Gtk.Window.__init__(self)
         self.set_decorated(False)
