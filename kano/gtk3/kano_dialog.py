@@ -23,7 +23,7 @@ from gi.repository import Gtk
 from kano.gtk3.buttons import KanoButton, OrangeButton
 from kano.gtk3.heading import Heading
 from kano.gtk3.scrolled_window import ScrolledWindow
-from kano.gtk3.apply_styles import apply_styling_to_screen
+from kano.gtk3.apply_styles import apply_styles_to_screen
 from kano.paths import common_css_dir
 import os
 
@@ -63,7 +63,7 @@ class KanoDialog():
 
         # if widget or an orange button is added, to get styling correct the global_stylign property should be on.
         if global_style or (widget is not None or orange_info is not None):
-            apply_styling_to_screen()
+            apply_styles_to_screen()
 
         styleContext = self.dialog.get_style_context()
         styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
