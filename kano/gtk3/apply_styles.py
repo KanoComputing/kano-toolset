@@ -13,25 +13,25 @@ from gi.repository import Gtk, Gdk
 from kano.paths import common_css_dir
 
 
-def apply_styles():
-    apply_colours()
-    apply_common()
+def apply_styles_to_screen():
+    apply_colours_to_screen()
+    apply_common_to_screen()
 
 
-def apply_colours():
-    apply_named_style("colours")
+def apply_colours_to_screen():
+    apply_styling_to_screen(common_css_dir + "/colours.css")
 
 
-def apply_common():
-    apply_named_style("common")
+def apply_common_to_screen():
+    apply_styling_to_screen(common_css_dir + "/common.css")
 
 
-def apply_named_style(style_name):
+def apply_styling_to_screen(path):
     css = Gtk.CssProvider()
 
-    css_file = os.path.join(common_css_dir, style_name + '.css')
+    css_file = os.path.join(path)
     if not os.path.exists(css_file):
-        sys.exit(style_name + 'CSS file missing!')
+        sys.exit(path + ' CSS file missing!')
 
     css.load_from_path(css_file)
 
@@ -45,3 +45,13 @@ def apply_styling_to_widget(widget, path):
     provider.load_from_path(path)
     styleContext = widget.get_style_context()
     styleContext.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+
+def apply_colours_to_widget(widget):
+    path = os.path.join(common_css_dir, "colours.css")
+    apply_styling_to_widget(widget, path)
+
+
+def apply_common_to_widget(widget):
+    path = os.path.join(common_css_dir, "common.css")
+    apply_styling_to_widget(widget, path)
