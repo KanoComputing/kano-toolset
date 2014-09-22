@@ -269,8 +269,8 @@ class KanoComboBox(Gtk.Button):
         pass
 
     @staticmethod
-    def apply_styling_to_screen(self):
-        apply_styling_to_screen(self.CSS_PATH)
+    def apply_styling_to_screen():
+        apply_styling_to_screen(KanoComboBox.CSS_PATH)
 
     def apply_styling_to_combobox(self):
         widgets = [self, self.label, self.dropdown, self.scroll_up_button, self.scroll_down_button]
