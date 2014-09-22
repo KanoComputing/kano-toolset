@@ -352,13 +352,21 @@ def is_internet():
 def wpa_conf(essid, psk, confile, wep=False):
 
     if wep is True:
+
+        # If the key starts with "hex" lowercase, what follows is the Hexadecimal form
+        # Otherwise it is in string form. Double quotes is how wpa_supplicant distinguishes.
+        if psk.startswith('hex'):
+            psk=psk[3:]
+        else:
+            psk='"%s"' % psk
+        
         wpa_conf = '''
           ctrl_interface=/var/run/wpa_supplicant
           network={
              ssid="%s"
              scan_ssid=1
              key_mgmt=NONE
-             wep_key0="%s"
+             wep_key0=%s
              wep_tx_keyidx=0
              auth_alg=OPEN SHARED
          }
@@ -456,10 +464,15 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
 
     elif encrypt == 'wep':
+
         # WEP encryption keys have to be either 5, 13 or 58 ASCII chars in length (40/104/232 bits)
         # plus 24 bits for IV giving 64,128,256-bit encryption modes
-        if len(seckey) not in (5, 13, 58):
-            logger.error("WEP encryption key lenght incorrect (%d) has to be one of 5/13/58 chars" % (len(seckey)))
+        if not seckey.startswith('hex') and len(seckey) not in (5, 13, 58):
+            logger.error("ASCII WEP encryption key lenght incorrect (%d) has to be one of 5/13/58 chars" % (len(seckey)))
+            return False
+
+        if seckey.startswith('hex') and len(seckey) not in (10+3, 26+3, 116+3):
+            logger.error("HEX WEP encryption key lenght incorrect (%d) has to be one of 10/26/116 chars" % (len(seckey)))
             return False
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
