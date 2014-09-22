@@ -13,19 +13,23 @@ from gi.repository import Gtk, Gdk
 from kano.paths import common_css_dir
 
 
-def apply_styles_to_screen():
+# Apply the general CSS files to the screen
+def apply_common_to_screen():
     apply_colours_to_screen()
-    apply_common_to_screen()
+    apply_base_to_screen()
 
 
+# This applies the colour variable names to the screen
 def apply_colours_to_screen():
     apply_styling_to_screen(common_css_dir + "/colours.css")
 
 
-def apply_common_to_screen():
-    apply_styling_to_screen(common_css_dir + "/common.css")
+# This applies the base styling of the widgets to the screen
+def apply_base_to_screen():
+    apply_styling_to_screen(common_css_dir + "/widgets.css")
 
 
+# Apply the styling from a filename to the screen
 def apply_styling_to_screen(path):
     css = Gtk.CssProvider()
 
@@ -40,6 +44,7 @@ def apply_styling_to_screen(path):
     styleContext.add_provider_for_screen(screen, css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
 
+# Apply the styling from a CSS file to a specific widget
 def apply_styling_to_widget(widget, path):
     provider = Gtk.CssProvider()
     provider.load_from_path(path)
@@ -47,11 +52,13 @@ def apply_styling_to_widget(widget, path):
     styleContext.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
 
+# Apply the colour variable names to the widget (useful if you want to refer to kano_green)
 def apply_colours_to_widget(widget):
     path = os.path.join(common_css_dir, "colours.css")
     apply_styling_to_widget(widget, path)
 
 
-def apply_common_to_widget(widget):
+# Apply the general styling of all the widgets to the widget (TODO: is this needed?)
+def apply_base_to_widget(widget):
     path = os.path.join(common_css_dir, "common.css")
     apply_styling_to_widget(widget, path)

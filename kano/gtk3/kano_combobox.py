@@ -22,7 +22,8 @@ if __name__ == '__main__' and __package__ is None:
     if dir_path != '/usr':
         sys.path.insert(1, dir_path)
 
-from kano.gtk3.apply_styles import apply_colours_to_widget, apply_styling_to_widget
+from kano.gtk3.apply_styles import (apply_colours_to_widget, apply_styling_to_widget,
+                                    apply_styling_to_screen)
 from kano.paths import common_images_dir, common_css_dir
 
 
@@ -99,11 +100,6 @@ class KanoComboBox(Gtk.Button):
 
         # when the combobox button is clicked, we popup the dropdown
         self.connect("button-press-event", self.on_combo_box_click)
-
-        widgets = [self, self.label, self.dropdown, self.scroll_up_button, self.scroll_down_button]
-        for w in widgets:
-            apply_colours_to_widget(w)
-            apply_styling_to_widget(w, self.CSS_PATH)
 
     def on_combo_box_click(self, widget, event):
         self.emit("popup")
@@ -271,6 +267,16 @@ class KanoComboBox(Gtk.Button):
     def do_changed(self):
         # print 'new item changed'
         pass
+
+    @staticmethod
+    def apply_styling_to_screen(self):
+        apply_styling_to_screen(self.CSS_PATH)
+
+    def apply_styling_to_combobox(self):
+        widgets = [self, self.label, self.dropdown, self.scroll_up_button, self.scroll_down_button]
+        for w in widgets:
+            apply_colours_to_widget(w)
+            apply_styling_to_widget(w, self.CSS_PATH)
 
     class ScrollMenuItem(Gtk.ImageMenuItem):
         CSS_PATH = os.path.join(common_css_dir, "kano_combobox.css")
