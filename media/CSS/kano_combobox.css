@@ -1,32 +1,38 @@
 
+GtkMenu.KanoComboBox {
+    border-width: 2px;
+    border-color: @active_border;
+    border-style: solid;
+    box-shadow: none;
+}
 
-GtkMenuItem {
+GtkMenuItem.KanoComboBox {
     background: #ffffff;
     padding-top: 5px;
     padding-bottom: 5px;
 }
 
-GtkMenuItem GtkLabel {
+GtkMenuItem.KanoComboBox GtkLabel {
     color: @active_writing;
     font: Bariol 14;
 }
 
-GtkMenuItem:hover {
+GtkMenuItem.KanoComboBox:hover {
     background: @kano_green;
     color: #ffffff;
 }
 
 /* These control the arrow button styling */
-GtkImageMenuItem {
+GtkImageMenuItem.KanoComboBox {
     padding-top: 10px;
     padding-bottom: 10px;
 }
 
-GtkImageMenuItem:hover {
+GtkImageMenuItem.KanoComboBox:hover {
     background: @kano_green;
 }
 
-.KanoComboBox {
+GtkButton.KanoComboBox {
     background: #ffffff;
     border-color: @active_border;
     border-style: solid;
@@ -35,7 +41,7 @@ GtkImageMenuItem:hover {
     padding: 9px;
 }
 
-.KanoComboBox GtkLabel {
+GtkButton.KanoComboBox GtkLabel {
     color: @active_writing;
     font: Bariol 14;
 }

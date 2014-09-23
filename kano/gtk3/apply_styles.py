@@ -21,16 +21,16 @@ def apply_common_to_screen():
 
 # This applies the colour variable names to the screen
 def apply_colours_to_screen():
-    apply_styling_to_screen(common_css_dir + "/colours.css")
+    apply_styling_to_screen(common_css_dir + "/colours.css", "SETTINGS")
 
 
 # This applies the base styling of the widgets to the screen
 def apply_base_to_screen():
-    apply_styling_to_screen(common_css_dir + "/widgets.css")
+    apply_styling_to_screen(common_css_dir + "/widgets.css", "SETTINGS")
 
 
 # Apply the styling from a filename to the screen
-def apply_styling_to_screen(path):
+def apply_styling_to_screen(path, priority="USER"):
     css = Gtk.CssProvider()
 
     css_file = os.path.join(path)
@@ -41,7 +41,19 @@ def apply_styling_to_screen(path):
 
     screen = Gdk.Screen.get_default()
     styleContext = Gtk.StyleContext()
-    styleContext.add_provider_for_screen(screen, css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+    if priority == "FALLBACK":
+        gtk_priority = Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK
+    elif priority == "THEME":
+        gtk_priority = Gtk.STYLE_PROVIDER_PRIORITY_THEME
+    elif priority == "SETTINGS":
+        gtk_priority = Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS
+    elif priority == "APPLICATION":
+        gtk_priority = Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    elif priority == "USER":
+        gtk_priority = Gtk.STYLE_PROVIDER_PRIORITY_USER
+
+    styleContext.add_provider_for_screen(screen, css, gtk_priority)
 
 
 # Apply the styling from a CSS file to a specific widget
