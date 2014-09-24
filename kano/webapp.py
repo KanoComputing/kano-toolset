@@ -185,9 +185,10 @@ class WebApp(object):
 
         dialog.set_default_response(gtk.RESPONSE_OK)
 
-        for pattern in filter_patterns:
+        patterns = self._str_to_obj(filter_patterns)
+        for pattern in patterns:
             file_filter = gtk.FileFilter()
-            file_filter.set_name(filter_patterns[pattern])
+            file_filter.set_name(patterns[pattern])
             file_filter.add_pattern('*.{}'.format(pattern))
             dialog.add_filter(file_filter)
 
@@ -283,3 +284,9 @@ class WebApp(object):
             view.execute_script(script % (name, timestamp, retval))
 
         return True
+
+    @staticmethod
+    def _str_to_obj(s):
+        import ast
+
+        return ast.literal_eval(s) if isinstance(s, basestring) else s
