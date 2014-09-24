@@ -22,12 +22,11 @@ if __name__ == '__main__' and __package__ is None:
     if dir_path != '/usr':
         sys.path.insert(1, dir_path)
 
-from kano.gtk3.apply_styles import apply_colours_to_widget, apply_styling_to_widget
+from kano.gtk3.apply_styles import apply_styling_to_screen
 from kano.paths import common_images_dir, common_css_dir
 
 
 class KanoComboBox(Gtk.Button):
-
     # css file
     CSS_PATH = os.path.join(common_css_dir, "kano_combobox.css")
 
@@ -79,6 +78,7 @@ class KanoComboBox(Gtk.Button):
 
         # creating the popup dropdown menu
         self.dropdown = Gtk.Menu()
+        self.dropdown.get_style_context().add_class("KanoComboBox")
         self.dropdown.set_size_request(self.WIDTH, -1)
 
         # we'll need to receive notifications about scrolling events
@@ -100,11 +100,6 @@ class KanoComboBox(Gtk.Button):
         # when the combobox button is clicked, we popup the dropdown
         self.connect("button-press-event", self.on_combo_box_click)
 
-        widgets = [self, self.label, self.dropdown, self.scroll_up_button, self.scroll_down_button]
-        for w in widgets:
-            apply_colours_to_widget(w)
-            apply_styling_to_widget(w, self.CSS_PATH)
-
     def on_combo_box_click(self, widget, event):
         self.emit("popup")
 
@@ -121,7 +116,8 @@ class KanoComboBox(Gtk.Button):
         combobox_y = self.get_allocation().y + window_y
         combobox_height = self.get_allocation().height
 
-        return combobox_x, combobox_y + combobox_height, True
+        # the y-coordinate is adjusted by 2px because of the border
+        return combobox_x, combobox_y + combobox_height - 2, True
 
     def on_scroll(self, widget, event):
         # distinguishing between scrolling up and down
@@ -172,8 +168,7 @@ class KanoComboBox(Gtk.Button):
         # then add to the dropdown the items to be displayed in the new range
         for index in range(self.first_item_index, last_display_item):
             item = Gtk.MenuItem(self.items[index])
-            apply_colours_to_widget(item)
-            apply_styling_to_widget(item, self.CSS_PATH)
+            item.get_style_context().add_class("KanoComboBox")
             item.connect("activate", self.on_item_selected, index)
             self.dropdown.append(item)
 
@@ -272,15 +267,18 @@ class KanoComboBox(Gtk.Button):
         # print 'new item changed'
         pass
 
+    @staticmethod
+    def apply_styling_to_screen():
+        apply_styling_to_screen(KanoComboBox.CSS_PATH)
+
     class ScrollMenuItem(Gtk.ImageMenuItem):
         CSS_PATH = os.path.join(common_css_dir, "kano_combobox.css")
 
         def __init__(self, image_path):
             Gtk.ImageMenuItem.__init__(self)
+            self.get_style_context().add_class("KanoComboBox")
             self.set_use_underline(False)
             self.set_always_show_image(True)
-
-            apply_styling_to_widget(self, self.CSS_PATH)
 
             # set the given image
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)

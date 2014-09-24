@@ -9,10 +9,7 @@
 # you'd like to blur it.
 
 from gi.repository import Gtk, Gdk
-from kano.paths import common_css_dir
-from kano.gtk3.apply_styles import apply_styles_to_screen
-import os
-import sys
+from kano.gtk3.apply_styles import apply_common_to_screen
 
 
 class ApplicationWindow(Gtk.Window):
@@ -35,7 +32,7 @@ class ApplicationWindow(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect('delete-event', Gtk.main_quit)
 
-        apply_styles_to_screen()
+        apply_common_to_screen()
 
         self._overlay = Gtk.Overlay()
         self.add(self._overlay)
