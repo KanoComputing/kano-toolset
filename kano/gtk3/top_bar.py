@@ -136,11 +136,11 @@ class TopBar(Gtk.EventBox):
 
     def set_prev_callback(self, callback):
         if self.has_buttons:
-            self.prev_button.connect("button_press_event", callback)
+            self.prev_button.connect("button_release_event", callback)
 
     def set_next_callback(self, callback):
         if self.has_buttons:
-            self.next_button.connect("button_press_event", callback)
+            self.next_button.connect("button_release_event", callback)
 
     def set_close_callback(self, callback):
-        self.close_button.connect("button_press_event", callback)
+        self.close_button.connect("button_release_event", callback)
