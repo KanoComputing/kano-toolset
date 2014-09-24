@@ -21,12 +21,12 @@ def apply_common_to_screen():
 
 # This applies the colour variable names to the screen
 def apply_colours_to_screen():
-    apply_styling_to_screen(common_css_dir + "/colours.css", "SETTINGS")
+    apply_styling_to_screen(common_css_dir + "/colours.css", "APPLICATION")
 
 
 # This applies the base styling of the widgets to the screen
 def apply_base_to_screen():
-    apply_styling_to_screen(common_css_dir + "/widgets.css", "SETTINGS")
+    apply_styling_to_screen(common_css_dir + "/widgets.css", "APPLICATION")
 
 
 # Apply the styling from a filename to the screen
