@@ -177,15 +177,18 @@ class WebApp(object):
     def error(self, msg):
         sys.stderr.write("Error: %s\n" % msg)
 
-    def chooseFile(self, default_dir=None, filter_patterns={'xml': 'XML Files'}):
+    def chooseFile(self, default_dir=None,
+                   filter_patterns=None):
         dialog = gtk.FileChooserDialog(
-            "Open File",
+            title="Open File",
+            parent=self._win,
+            action=gtk.FILE_CHOOSER_ACTION_OPEN,
             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                      gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 
         dialog.set_default_response(gtk.RESPONSE_OK)
 
-        patterns = self._str_to_obj(filter_patterns)
+        patterns = self._str_to_obj(filter_patterns) or {"xml": "XML Files"}
         for pattern in patterns:
             file_filter = gtk.FileFilter()
             file_filter.set_name(patterns[pattern])
