@@ -74,11 +74,11 @@ class ProgressBar(Gtk.ProgressBar):
 class KanoProgressBar(ProgressBar):
     CSS_PATH = os.path.join(common_css_dir, 'kano_progress.css')
 
-    def __init__(self, pulse=True, title=""):
+    def __init__(self, pulse=True, title="", rate=0.01):
         apply_colours_to_screen()
         apply_styling_to_screen(self.CSS_PATH)
 
-        ProgressBar.__init__(self, pulse)
+        ProgressBar.__init__(self, pulse, rate)
         self.get_style_context().add_class("KanoProgressBar")
 
         self.win = Gtk.Window()
