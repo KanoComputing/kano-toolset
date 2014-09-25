@@ -5,7 +5,7 @@
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# Create a green button with white text inside
+# Create a scrolled window with custom scrollbars
 
 from gi.repository import Gtk
 from kano.paths import common_css_dir

@@ -8,20 +8,32 @@
 # Customised progress bar widget
 
 import os
+import sys
 from gi.repository import Gtk, GObject
+
+if __name__ == '__main__' and __package__ is None:
+    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+    if dir_path != '/usr':
+        sys.path.insert(1, dir_path)
+
 from kano.gtk3.apply_styles import apply_colours_to_screen, apply_styling_to_screen
 from kano.paths import common_css_dir
 
+# Be careful you don't call another function with this
+GObject.threads_init()
+import threading
+import time
 
-class Progress(Gtk.ProgressBar):
 
-    def __init__(self, pulse=True):
+class ProgressBar(Gtk.ProgressBar):
+    def __init__(self, pulse=True, rate=0.01):
 
         Gtk.ProgressBar.__init__(self)
-        self.activity_mode = pulse
-        self.keep_going = True
+        self.pulse = pulse
+        self.still_working = True
+        self.progress_rate = rate
 
-        if self.activity_mode:
+        if self.pulse:
             self.pulse()
         else:
             self.set_fraction(0.0)
@@ -29,10 +41,10 @@ class Progress(Gtk.ProgressBar):
         GObject.timeout_add(50, self.on_timeout, None)
 
     def on_timeout(self, user_data):
-        if self.activity_mode:
+        if self.pulse:
             self.pulse()
         else:
-            new_value = self.get_fraction() + 0.01
+            new_value = self.get_fraction() + self.progress_rate
 
             if new_value > 1:
                 new_value = 0
@@ -40,32 +52,78 @@ class Progress(Gtk.ProgressBar):
 
             self.set_fraction(new_value)
 
+        if not self.still_working:
+            Gtk.main_quit()
+
         # As this is a timeout function, return True so that it
         # continues to get called
-        return self.keep_going
+        return self.still_working
+
+    def work(self):  # This would be the actual time-consuming workload
+        if hasattr(self, "work_function"):
+            if hasattr(self, "work_args"):
+                self.work_function(self.work_args)
+            else:
+                self.work_function()
+
+    def set_work_function(self, function, args=None):
+        self.work_function = function
+        if args is not None:
+            self.work_args = args
 
 
-class KanoProgress(Gtk.Window):
+class KanoProgressBar(ProgressBar):
     CSS_PATH = os.path.join(common_css_dir, 'kano_progress.css')
 
-    def __init__(self, pulse, title=""):
+    def __init__(self, pulse=True, title="", rate=0.01):
         apply_colours_to_screen()
         apply_styling_to_screen(self.CSS_PATH)
 
-        Gtk.Window.__init__(self)
-        self.set_decorated(False)
-        self.set_resizable(False)
-        self.set_position(Gtk.WindowPosition.CENTER)
-        self.connect("delete-event", Gtk.main_quit)
+        ProgressBar.__init__(self, pulse, rate)
+        self.get_style_context().add_class("KanoProgressBar")
 
-        label = Gtk.Label(title)
-        progress = Progress(pulse)
+        self.win = Gtk.Window()
+        self.win.get_style_context().add_class("KanoProgressBar")
+        self.win.set_decorated(False)
+        self.win.set_resizable(False)
+        self.win.set_position(Gtk.WindowPosition.CENTER)
+        self.win.connect("delete-event", Gtk.main_quit)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.add(box)
+        self.win.add(box)
+
+        label = Gtk.Label(title)
+        label.set_padding(10, 10)
+        label.get_style_context().add_class("KanoProgressBar")
         box.pack_start(label, False, False, 5)
-        box.pack_start(progress, False, False, 0)
+        box.pack_start(self, False, False, 0)
+
+    def run(self):
+        self.win.show_all()
+        # Thread running the long process
+        if self.pulse:
+            wt = WorkerThread(self.work, self)
+            wt.start()
+        Gtk.main()
 
 
+class WorkerThread(threading.Thread):
+    def __init__(self, function, parent):
+        threading.Thread.__init__(self)
+        self.function = function
+        self.parent = parent
 
+    def run(self):
+        self.parent.still_working = True
+        self.function()
+        self.parent.still_working = False
+
+    def stop(self):
+        Gtk.main_quit()
+
+
+if __name__ == "__main__":
+    pb = KanoProgressBar(title="Here is a title")
+    pb.set_work_function(time.sleep, 2)
+    pb.run()
 
