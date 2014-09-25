@@ -134,6 +134,10 @@ GtkRadioButton:active {
     color: @kano_green;
 }
 
+GtkRadioButton:active:insensitive {
+    color: @kano_grey;
+}
+
 GtkCheckButton:hover {
     background: transparent;
 }
@@ -141,6 +145,16 @@ GtkCheckButton:hover {
 GtkRadioButton
 GtkLabel{
     color: @active_writing;
+}
+
+GtkRadioButton
+GtkLabel:insensitive{
+    color: @inactive_writing;
+    background: transparent;
+}
+
+GtkRadioButton:insensitive {
+    border-color: @inactive_writing;
 }
 
 /**

@@ -177,18 +177,23 @@ class WebApp(object):
     def error(self, msg):
         sys.stderr.write("Error: %s\n" % msg)
 
-    def chooseFile(self, default_dir=None):
+    def chooseFile(self, default_dir=None,
+                   filter_patterns=None):
         dialog = gtk.FileChooserDialog(
-            "Open File",
+            title="Open File",
+            parent=self._win,
+            action=gtk.FILE_CHOOSER_ACTION_OPEN,
             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                      gtk.STOCK_OPEN, gtk.RESPONSE_OK))
 
         dialog.set_default_response(gtk.RESPONSE_OK)
 
-        filter = gtk.FileFilter()
-        filter.set_name("XML Files")
-        filter.add_pattern("*.xml")
-        dialog.add_filter(filter)
+        patterns = self._str_to_obj(filter_patterns) or {"xml": "XML Files"}
+        for pattern in patterns:
+            file_filter = gtk.FileFilter()
+            file_filter.set_name(patterns[pattern])
+            file_filter.add_pattern('*.{}'.format(pattern))
+            dialog.add_filter(file_filter)
 
         if default_dir is not None:
             dialog.set_current_folder(os.path.expanduser(default_dir))
@@ -206,6 +211,15 @@ class WebApp(object):
         return path
 
     def readFile(self, path):
+        local = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                             '../..', path)
+        usr = os.path.join('/usr/share', path)
+
+        if os.path.exists(local):
+            path = local
+        elif os.path.exists(usr):
+            path = usr
+
         try:
             with open(path, "r") as f:
                 return f.read()
@@ -273,3 +287,9 @@ class WebApp(object):
             view.execute_script(script % (name, timestamp, retval))
 
         return True
+
+    @staticmethod
+    def _str_to_obj(s):
+        import ast
+
+        return ast.literal_eval(s) if isinstance(s, basestring) else s

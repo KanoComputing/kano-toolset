@@ -9,10 +9,7 @@
 # you'd like to blur it.
 
 from gi.repository import Gtk, Gdk
-from kano.paths import common_css_dir
-from kano.gtk3.apply_styles import apply_styles
-import os
-import sys
+from kano.gtk3.apply_styles import apply_common_to_screen
 
 
 class ApplicationWindow(Gtk.Window):
@@ -35,7 +32,7 @@ class ApplicationWindow(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect('delete-event', Gtk.main_quit)
 
-        apply_styles()
+        apply_common_to_screen()
 
         self._overlay = Gtk.Overlay()
         self.add(self._overlay)
@@ -43,14 +40,20 @@ class ApplicationWindow(Gtk.Window):
         self._blur = Gtk.EventBox()
         self._blur.get_style_context().add_class('blur')
 
+        self._blurred = False
+
         # TODO: Maybe handle the taskbar here to avoid even more code duplication?
 
     def blur(self):
-        self._overlay.add_overlay(self._blur)
-        self._blur.show()
+        if not self._blurred:
+            self._overlay.add_overlay(self._blur)
+            self._blur.show()
+            self._blurred = True
 
     def unblur(self):
-        self._overlay.remove(self._blur)
+        if self._blurred:
+            self._overlay.remove(self._blur)
+            self._blurred = False
 
     def set_main_widget(self, widget):
         self._overlay.add(widget)

@@ -1,0 +1,153 @@
+/*
+# kano_button.css
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# The main button that updates the changes made in each level
+*/
+
+.kano_button {
+    -GtkWidget-focus-line-width: 0;
+    border-radius: 4px;
+    border-color: transparent;
+    border-width: 3px;
+}
+
+.kano_button_padding {
+    padding: 6px 16px 6px 16px;
+}
+
+.kano_button GtkLabel {
+    color: #ffffff;
+    font: Bariol Bold 13;
+}
+
+.kano_button:insensitive {
+    background: #dddddd;
+}
+
+.kano_button GtkLabel:insensitive {
+    color: #aaaaaa;
+    background: #dddddd;
+}
+
+.loading_kano_button GtkLabel:insensitive {
+    color: #ffffff;
+}
+
+.green_background {
+    background: @kano_green;
+}
+
+GtkButton.green_background:active {
+    background: @kano_green_darker;
+}
+
+.green_background:hover {
+    background: @kano_green_lighter;
+}
+
+.green_background:focus {
+    border-color: @kano_green_darker;
+    border-style: solid;
+}
+
+/* When spinner is spinning */
+
+.green_background.loading_kano_button:insensitive {
+    background: @kano_green_darker;
+}
+
+.red_background {
+    background: @kano_red;
+}
+
+GtkButton.red_background:active {
+    background: @kano_red_darker;
+}
+
+.red_background:hover {
+    background: @kano_red_lighter;
+}
+
+.red_background:focus {
+    border-color: @kano_red_darker;
+    border-style: solid;
+}
+
+/* When spinner is spinning */
+
+.red_background.loading_kano_button:insensitive {
+    background: @kano_red_darker;
+}
+
+.orange_background {
+    background: @kano_orange;
+}
+
+GtkButton.orange_background:active {
+    background: @kano_orange_darker;
+}
+
+.orange_background:hover {
+    background: @kano_orange_lighter;
+}
+
+.orange_background:focus {
+    border-color: @kano_orange_darker;
+    border-style: solid;
+}
+
+/* When spinner is spinning */
+
+.orange_background.loading_kano_button:insensitive {
+    background: @kano_orange_darker;
+}
+
+.grey_background {
+    background: @kano_grey;
+}
+
+GtkButton.grey_background:active {
+    background: @kano_grey_darker;
+}
+
+.grey_background:hover {
+    background: @kano_grey_lighter;
+}
+
+.grey_background:focus {
+    border-color: @kano_grey_darker;
+    border-style: solid;
+}
+
+/* When spinner is spinning */
+
+.grey_background.loading_kano_button:insensitive {
+    background: @kano_grey_darker;
+}
+
+.blue_background {
+    background: @kano_blue;
+}
+
+GtkButton.blue_background:active {
+    background: @kano_blue_darker;
+}
+
+.blue_background:hover {
+    background: @kano_blue_lighter;
+}
+
+.blue_background:focus {
+    border-color: @kano_blue_darker;
+    border-style: solid;
+}
+
+/* When spinner is spinning */
+
+.blue_background.loading_kano_button:insensitive {
+    background: @kano_blue_darker;
+}
+
