@@ -49,7 +49,9 @@ def main():
     pulse, title, rate, timeout = parse_items(text)
     pbar = KanoProgressBar(pulse, title, rate)
     pbar.show_all()
-    pbar.set_work_function(time.sleep, timeout)
+    # For now, only use timeout if the progress bar pulses
+    if pulse:
+        pbar.set_work_function(time.sleep, timeout)
     pbar.run()
 
 
