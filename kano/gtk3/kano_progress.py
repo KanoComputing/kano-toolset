@@ -29,11 +29,11 @@ class ProgressBar(Gtk.ProgressBar):
     def __init__(self, pulse=True, rate=0.01):
 
         Gtk.ProgressBar.__init__(self)
-        self.pulse = pulse
+        self.activity_mode = pulse
         self.still_working = True
         self.progress_rate = rate
 
-        if self.pulse:
+        if self.activity_mode:
             self.pulse()
         else:
             self.set_fraction(0.0)
@@ -41,7 +41,7 @@ class ProgressBar(Gtk.ProgressBar):
         GObject.timeout_add(50, self.on_timeout, None)
 
     def on_timeout(self, user_data):
-        if self.pulse:
+        if self.activity_mode:
             self.pulse()
         else:
             new_value = self.get_fraction() + self.progress_rate
@@ -101,7 +101,7 @@ class KanoProgressBar(ProgressBar):
     def run(self):
         self.win.show_all()
         # Thread running the long process
-        if self.pulse:
+        if self.activity_mode:
             wt = WorkerThread(self.work, self)
             wt.start()
         Gtk.main()
