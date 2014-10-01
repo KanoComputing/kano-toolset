@@ -465,15 +465,26 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
 
     elif encrypt == 'wep':
 
-        # WEP encryption keys have to be either 5, 13 or 58 ASCII chars in length (40/104/232 bits)
-        # plus 24 bits for IV giving 64,128,256-bit encryption modes
-        if not seckey.startswith('hex') and len(seckey) not in (5, 13, 58):
-            logger.error("ASCII WEP encryption key lenght incorrect (%d) has to be one of 5/13/58 chars" % (len(seckey)))
-            return False
+        # WEP encryption key length has to be 5, 13 or 58 (ASCII) or 10, 26, 116 in HEX form.
+        # We will accept both forms in plain text and decide which to choose based on its length.
+        # Additionally, if the key starts with "hex" we will also assume it is in HEX form.
+        # Note that routers should accept both forms regardless of which one was used to configure it.
+        if not seckey.startswith('hex'):
+            # it can be either in hex or ascii form. decide based on length
+            if len(seckey) in (5, 13, 58):
+                # Good, this is the correct length for an ASCII key
+                pass
+            elif len(seckey) in (10, 26, 116):
+                # Good, this is the correct length for a HEX key.
+                # Prepend "hex" internally so supplicant settings can be applied.
+                seckey='hex' + seckey
+            else:
+                logger.error("The WEP key lenght is incorrect (%d) should be 5/13/58 (ASCII) or 10/26/116 (HEX)" % (len(seckey)))
+                return False
+        elif len(seckey) not in (10+3, 26+3, 116+3):
+            # For keys that start with "hex", make sure their length is also correct.
+            logger.error("The HEX WEP key lenght is incorrect (%d) should 10/26/116" % (len(seckey)))
 
-        if seckey.startswith('hex') and len(seckey) not in (10+3, 26+3, 116+3):
-            logger.error("HEX WEP encryption key lenght incorrect (%d) has to be one of 10/26/116 chars" % (len(seckey)))
-            return False
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
         wpafile = '/etc/kano_wpa_connect.conf'
