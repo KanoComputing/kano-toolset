@@ -371,21 +371,35 @@ def wpa_conf(essid, psk, confile, wep=False):
              auth_alg=OPEN SHARED
          }
         ''' % (essid, psk)
-    else:
-        wpa_conf = '''
-          ctrl_interface=/var/run/wpa_supplicant
-          network={
-             ssid="%s"
-             scan_ssid=1
-             key_mgmt=WPA-EAP WPA-PSK IEEE8021X NONE
-             pairwise=CCMP TKIP
-             psk="%s"
-          }
-        ''' % (essid, psk)
 
-    f = open(confile, 'w')
-    f.write(wpa_conf)
-    f.close()
+        f = open(confile, 'w')
+        f.write(wpa_conf)
+        f.close()
+
+    else:
+
+        wpa_extra_settings = '''
+        scan_ssid=1
+        key_mgmt=WPA-EAP WPA-PSK IEEE8021X NONE
+        pairwise=CCMP TKIP
+ }
+ctrl_interface=/var/run/wpa_supplicant
+'''
+
+        wpa_conf = subprocess.check_output(['wpa_passphrase', essid, psk])
+        wpa_conf += wpa_extra_settings
+        lines_wpa_conf = []
+
+        for line in wpa_conf.split('\n'):
+            if line.startswith('}'):
+                pass
+            else:
+                lines_wpa_conf.append(line + '\n')
+
+        f=open(confile, 'wt')
+        for k in lines_wpa_conf:
+            f.write(k)
+        f.close()
 
 
 def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt2800usb'):
