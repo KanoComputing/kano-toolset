@@ -276,7 +276,17 @@ def play_sound(audio_file, background=False):
         logger.error('audio file not found: {}'.format(audio_file))
         return False
 
-    cmd = 'aplay -q {}'.format(audio_file)
+    _, extension = os.path.splitext(audio_file)
+
+    if extension in ['wav', 'voc', 'raw', 'au']:
+        cmd = 'aplay -q {}'.format(audio_file)
+    else:
+        volume_percent, _ = get_volume()
+        volume_str = '--vol {}'.format(
+            percent_to_millibel(volume_percent, raspberry_mod=True))
+        cmd = 'omxplayer -o both {volume} {link}'.format(
+            volume=volume_str, link=audio_file)
+
     logger.debug('cmd: {}'.format(cmd))
 
     if background:
