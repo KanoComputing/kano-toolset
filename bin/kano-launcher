@@ -11,6 +11,8 @@
 # Make sure there are no other projects running at the same time
 killall_projects () {
     killall -q python
+    killall -q ruby
+    killall -q scsynth
     killall -q minecraft-pi
     killall -q make-minecraft
     killall -q splash.py
