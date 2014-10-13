@@ -141,7 +141,10 @@ class IWList():
                 return s.strip().split(":")[1]
 
             splitRawData = rawCellData.split("\n")
-            cellData = {}
+
+            # Provide default values for dongle drivers
+            # which do not report all attributes that kano-wifi expects
+            cellData = { 'ESSID':'', 'Channel':'', 'Signal':'0', 'Quality':'' }
             for s in splitRawData:
                 if s.strip().startswith("Cell "):
                     cellData["Number"] = getCellNumber(s)
