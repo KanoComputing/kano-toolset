@@ -19,8 +19,10 @@ import subprocess
 import shlex
 import json
 import re
-from kano.utils import run_cmd, get_user_unsudoed, run_bg
+from kano.utils import run_cmd, get_user_unsudoed, run_bg, write_file_contents
 from kano.logging import logger
+
+DNS_FILE = '/etc/resolv.conf'
 
 
 class IWList():
@@ -640,4 +642,8 @@ def network_info():
     return network_dict
 
 
+def set_dns(servers):
+    server_str = '\n'.join(
+        ['nameserver {}'.format(server) for server in servers])
 
+    write_file_contents(DNS_FILE, server_str)
