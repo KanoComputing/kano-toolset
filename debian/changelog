@@ -1,3 +1,9 @@
+kano-toolset (1.2-4) unstable; urgency=low
+
+  * Adds a sed utility function
+
+ -- Team Kano <dev@kano.me>  Mon, 27 Oct 2014 16:33:11 +0100
+
 kano-toolset (1.2-3) unstable; urgency=low
 
   * New tool: json-get
