@@ -7,6 +7,7 @@
 #
 
 import os
+import re
 import subprocess
 import sys
 import signal
@@ -436,3 +437,35 @@ try:
     proxies = get_requests_proxies()
 except Exception:
     proxies = None
+
+
+def sed(pattern, replacement, file_path, use_regexp=True):
+    """ Search and replace a pattern in a file.
+
+    The search happens line-by-line, multiline patterns won't work
+
+    :param pattern: a regular expression to search for
+    :param replacement: the replacement string
+    :param file_path: location of the file to process
+    :returns: number of lines changed
+    :raises IOError: File doesn't exist
+    """
+
+    changed = 0
+
+    with open(file_path, "r") as file_handle:
+        lines = file_handle.readlines()
+
+    with open(file_path, "w") as file_handle:
+        for line in lines:
+            if use_regexp:
+                modified_line = re.sub(pattern, replacement, line)
+            else:
+                modified_line = line.replace(pattern, replacement)
+
+            file_handle.write(modified_line)
+
+            if line != modified_line:
+                changed += 1
+
+    return changed
