@@ -157,6 +157,7 @@ class KanoDialog():
             text.set_wrap_mode(Gtk.WrapMode.WORD)
             text.set_editable(False)
             scrolledwindow.add_with_viewport(text)
+            scrolledwindow.apply_styling_to_widget(wide=False)
 
             scrolledwindow.set_size_request(400, 200)
             content_area.pack_start(scrolledwindow, False, False, 0)
