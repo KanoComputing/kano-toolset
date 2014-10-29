@@ -23,7 +23,7 @@ from gi.repository import Gtk
 from kano.gtk3.buttons import KanoButton, OrangeButton
 from kano.gtk3.heading import Heading
 from kano.gtk3.scrolled_window import ScrolledWindow
-from kano.gtk3.apply_styles import apply_common_to_screen
+from kano.gtk3.apply_styles import apply_common_to_screen, apply_styling_to_widget, apply_colours_to_widget
 from kano.paths import common_css_dir
 import os
 
@@ -33,8 +33,10 @@ background_colors = ['grey', 'white']
 
 
 class KanoDialog():
+    CSS_PATH = os.path.join(common_css_dir, "dialog.css")
 
-    # button_dict includes the button text, color and button return values
+    # button_dict includes the button text, color and button return values.return_value
+    # It can eitehr be a dictionary for backwards compatibility, or a list
     def __init__(self, title_text="", description_text="", button_dict=None, widget=None,
                  has_entry=False, has_list=False, scrolled_text="", global_style="", parent_window=None,
                  orange_info=None):
@@ -42,7 +44,7 @@ class KanoDialog():
         self.title_text = title_text
         self.description_text = description_text
         self.widget = widget
-        self.button_dict = button_dict
+        self.button_info = button_dict
         self.returnvalue = 0
         self.has_entry = has_entry
         self.has_list = has_list
@@ -52,14 +54,13 @@ class KanoDialog():
         self.orange_info = orange_info
 
         self.dialog = Gtk.Dialog()
+        self.dialog.set_decorated(False)
+        self.dialog.set_resizable(False)
+        self.dialog.set_keep_above(True)
+        self.dialog.set_border_width(5)
 
-        self.dialog_provider = Gtk.CssProvider()
-        dialog_path = os.path.join(common_css_dir, "dialog.css")
-        self.dialog_provider.load_from_path(dialog_path)
-
-        self.colour_provider = Gtk.CssProvider()
-        colours_path = os.path.join(common_css_dir, "colours.css")
-        self.colour_provider.load_from_path(colours_path)
+        apply_styling_to_widget(self.dialog, self.CSS_PATH)
+        apply_colours_to_widget(self.dialog)
 
         # if widget or an orange button is added, to get styling correct
         # the global_styling property should be on.
@@ -67,15 +68,76 @@ class KanoDialog():
         if global_style or (widget is not None or orange_info is not None):
             apply_common_to_screen()
 
-        styleContext = self.dialog.get_style_context()
-        styleContext.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        styleContext.add_provider(self.colour_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        content_area, action_area = self.__colour_dialog_background()
 
-        self.dialog.set_decorated(False)
-        self.dialog.set_resizable(False)
-        self.dialog.set_keep_above(True)
-        self.dialog.set_border_width(5)
+        self.title = Heading(self.title_text, self.description_text)
+        content_area.pack_start(self.title.container, False, False, 0)
 
+        # If button_info is None, or an empty dictionary or list, default to an OK button
+        if not self.button_info:
+            button_defaults["label"] = "OK"
+            self.button_info = [button_defaults]
+
+        # convert button dictionary to list
+        if isinstance(self.button_info, dict):
+            self.__convert_dict_to_list()
+
+        kano_button_box = self.__generate_buttons()
+
+        if orange_info is not None:
+            button_container = self.__add_orange_button(orange_info, kano_button_box)
+        else:
+            button_container = Gtk.Alignment()
+            button_container.add(kano_button_box)
+            # annoying uneven alignment - cannot seem to centre y position
+            button_container.set_padding(6, 3, 0, 0)
+
+        action_area.pack_start(button_container, False, False, 0)
+
+        # Add scrolled window
+        if self.scrolled_text:
+            scrolledwindow = self.__add_scrolled_window()
+            content_area.pack_start(scrolledwindow, False, False, 0)
+
+        # or add widget
+        elif self.widget is not None:
+            content_area.pack_start(self.widget, False, False, 0)
+
+        # Set keyboard focus on first button if no entry
+        if not has_entry:
+            self.buttons[0].grab_focus()
+
+    def __add_scrolled_window(self):
+        text = Gtk.TextView()
+        text.get_buffer().set_text(self.scrolled_text)
+        text.set_wrap_mode(Gtk.WrapMode.WORD)
+        text.set_editable(False)
+
+        scrolledwindow = ScrolledWindow()
+        scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scrolledwindow.add_with_viewport(text)
+        scrolledwindow.set_size_request(400, 200)
+
+        return scrolledwindow
+
+    def __add_orange_button(self, orange_info, kano_button_box):
+        orange_text = orange_info["name"]
+        orange_return_value = orange_info["return_value"]
+
+        button_container = Gtk.ButtonBox(spacing=10)
+        button_container.set_layout(Gtk.ButtonBoxStyle.SPREAD)
+        self.orange_button = OrangeButton(orange_text)
+        self.orange_button.connect("button-release-event", self.exit_dialog, orange_return_value)
+
+        button_container.pack_start(self.orange_button, False, False, 0)
+        button_container.pack_start(kano_button_box, False, False, 0)
+        # The empty label is to centre the kano_button
+        label = Gtk.Label("    ")
+        button_container.pack_start(label, False, False, 0)
+
+        return button_container
+
+    def __colour_dialog_background(self):
         content_area = self.dialog.get_content_area()
         self.content_background = Gtk.EventBox()
         self.add_style(self.content_background, "white")
@@ -87,96 +149,63 @@ class KanoDialog():
         action_area.reparent(self.action_background)
         action_area.set_layout(Gtk.ButtonBoxStyle.CENTER)
 
+        # Set area around the buttons grey by default
+        self.set_action_background("grey")
+
         container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         container.add(self.content_background)
         container.add(self.action_background)
         self.dialog.add(container)
 
-        self.title = Heading(self.title_text, self.description_text)
-        content_area.pack_start(self.title.container, False, False, 0)
+        return content_area, action_area
+
+    def __convert_dict_to_list(self):
+        button_list = []
+
+        for button_name, button_arguments in self.button_info.iteritems():
+            button_arguments["label"] = button_name
+            button_list.append(button_arguments)
+
+        self.button_info = button_list
+
+    def __generate_buttons(self):
         self.buttons = []
-        box = Gtk.Box()
+        kano_button_box = Gtk.Box()
 
-        if self.button_dict is None or self.button_dict == {}:
-            self.button_dict = {"OK": button_defaults}
-
-        # Replace the empty arguments with the defaults
-        for button_name, button_arguments in self.button_dict.iteritems():
+        for button in self.button_info:
             for argument, value in button_defaults.iteritems():
-                if not argument in button_arguments:
-                    button_arguments[argument] = value
+
+                # Use default info if not provided
+                if not argument in button:
+                    button[argument] = value
 
                     # Create default return values for OK and CANCEL buttons
                     if argument == "return_value":
-                        if button_name.upper() == "OK":
-                            button_arguments["return_value"] = 0
-                        if button_name.upper() == "CANCEL":
-                            button_arguments["return_value"] = 1
+                        if hasattr(button, "label"):
+                            if button["label"].upper() == "OK":
+                                button["return_value"] = 0
+                            elif button["label"].upper() == "CANCEL":
+                                button["return_value"] = 1
                     if argument == "color":
-                        if button_name.upper() == "CANCEL":
-                            button_arguments["color"] = "red"
+                        if button["label"].upper() == "CANCEL":
+                            button["color"] = "red"
 
-            color = button_arguments['color']
-            return_value = button_arguments['return_value']
+            color = button['color']
+            return_value = button['return_value']
+            button_name = button["label"]
 
             button = KanoButton(button_name)
             button.set_color(color)
             button.connect("button-release-event", self.exit_dialog, return_value)
             button.connect("key-release-event", self.exit_dialog, return_value)
             self.buttons.append(button)
-            box.pack_start(button, False, False, 6)
+            kano_button_box.pack_start(button, False, False, 6)
 
-        if orange_info is not None:
-            orange_text = orange_info["name"]
-            orange_return_value = orange_info["return_value"]
-
-            button_container = Gtk.ButtonBox(spacing=10)
-            button_container.set_layout(Gtk.ButtonBoxStyle.SPREAD)
-            self.orange_button = OrangeButton(orange_text)
-            self.orange_button.connect("button-release-event", self.exit_dialog, orange_return_value)
-            self.add_style(self.orange_button, "small_orange_text")
-
-            button_container.pack_start(self.orange_button, False, False, 0)
-            button_container.pack_start(box, False, False, 0)
-            # The empty label is to centre the kano_button
-            label = Gtk.Label("    ")
-            button_container.pack_start(label, False, False, 0)
-        else:
-            button_container = Gtk.Alignment()
-            button_container.add(box)
-            # annoying uneven alignment - cannot seem to centre y position
-            button_container.set_padding(6, 3, 0, 0)
-
-        # Add scrolled window
-        if self.scrolled_text:
-            scrolledwindow = ScrolledWindow()
-            scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-
-            text = Gtk.TextView()
-            text.get_buffer().set_text(self.scrolled_text)
-            text.set_wrap_mode(Gtk.WrapMode.WORD)
-            text.set_editable(False)
-            scrolledwindow.add_with_viewport(text)
-
-            scrolledwindow.set_size_request(400, 200)
-            content_area.pack_start(scrolledwindow, False, False, 0)
-
-        # or add widget
-        elif self.widget is not None:
-            content_area.pack_start(self.widget, False, False, 0)
-
-        action_area.pack_start(button_container, False, False, 0)
-
-        # Set keyboard focus on first button if no entry
-        if not has_entry:
-            self.buttons[0].grab_focus()
-
-        # Set area around the buttons grey by default
-        self.set_action_background("grey")
+        return kano_button_box
 
     def add_style(self, widget, app_class):
+        apply_styling_to_widget(widget, self.CSS_PATH)
         style = widget.get_style_context()
-        style.add_provider(self.dialog_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         style.add_class(app_class)
 
     def exit_dialog(self, button, event, return_value):
