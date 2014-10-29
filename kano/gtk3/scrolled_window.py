@@ -9,34 +9,28 @@
 
 from gi.repository import Gtk
 from kano.paths import common_css_dir
+from kano.gtk3.apply_styles import apply_styling_to_widget, apply_styling_to_screen, apply_colours_to_widget
 import os
-import sys
 
 
 class ScrolledWindow(Gtk.ScrolledWindow):
+    NORMAL_CSS_PATH = os.path.join(common_css_dir, 'scrollbar.css')
+    WIDE_CSS_PATH = os.path.join(common_css_dir, 'scrollbar-wide.css')
+
     def __init__(self, hexpand=None, vexpand=None, wide_scrollbar=False):
-        scrollbar_css = Gtk.CssProvider()
-        css_file = os.path.join(common_css_dir, 'scrollbar.css')
-        if wide_scrollbar:
-            css_file = os.path.join(common_css_dir, 'scrollbar-wide.css')
-
-        if not os.path.exists(css_file):
-            sys.exit('CSS file missing!')
-        scrollbar_css.load_from_path(css_file)
-
-        colour_css = Gtk.CssProvider()
-        colour_file = os.path.join(common_css_dir, 'colours.css')
-        if not os.path.exists(colour_file):
-            sys.exit('CSS file missing!')
-        colour_css.load_from_path(colour_file)
-
         Gtk.ScrolledWindow.__init__(self, hexpand=hexpand, vexpand=vexpand)
 
-        styleContext = self.get_style_context()
-        styleContext.add_provider(colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        styleContext.add_provider(scrollbar_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+    @staticmethod
+    def apply_styling_to_screen(wide=False):
+        if wide:
+            apply_styling_to_screen(ScrolledWindow.WIDE_CSS_PATH)
+        else:
+            apply_styling_to_screen(ScrolledWindow.NORMAL_CSS_PATH)
 
+    def apply_styling_to_widget(self, wide=False):
         for bar in [self.get_vscrollbar(), self.get_hscrollbar()]:
-            style = bar.get_style_context()
-            style.add_provider(colour_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-            style.add_provider(scrollbar_css, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            apply_colours_to_widget(bar)
+            if wide:
+                apply_styling_to_widget(bar, self.WIDE_CSS_PATH)
+            else:
+                apply_styling_to_widget(bar, self.NORMAL_CSS_PATH)
