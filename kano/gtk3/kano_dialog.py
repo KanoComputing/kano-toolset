@@ -35,8 +35,8 @@ background_colors = ['grey', 'white']
 class KanoDialog():
     CSS_PATH = os.path.join(common_css_dir, "dialog.css")
 
-    # button_dict includes the button text, color and button return values.return_value
-    # It can eitehr be a dictionary for backwards compatibility, or a list
+    # button_dict includes the button text, color and button return values
+    # It can either be a dictionary for backwards compatibility, or a list
     def __init__(self, title_text="", description_text="", button_dict=None, widget=None,
                  has_entry=False, has_list=False, scrolled_text="", global_style="", parent_window=None,
                  orange_info=None):
