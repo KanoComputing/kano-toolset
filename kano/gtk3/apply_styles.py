@@ -30,12 +30,11 @@ def apply_base_to_screen():
 
 
 # Apply the styling from a filename to the screen
-def apply_styling_to_screen(path, priority="USER"):
+def apply_styling_to_screen(css_file, priority="USER"):
     css = Gtk.CssProvider()
 
-    css_file = os.path.join(path)
     if not os.path.exists(css_file):
-        sys.exit(path + ' CSS file missing!')
+        sys.exit(css_file + ' CSS file missing!')
 
     css.load_from_path(css_file)
 
@@ -58,6 +57,10 @@ def apply_styling_to_screen(path, priority="USER"):
 
 # Apply the styling from a CSS file to a specific widget
 def apply_styling_to_widget(widget, path):
+
+    if not os.path.exists(path):
+        sys.exit('{} CSS file missing!'.format(path))
+
     provider = Gtk.CssProvider()
     provider.load_from_path(path)
     styleContext = widget.get_style_context()
