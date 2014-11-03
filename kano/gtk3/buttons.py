@@ -91,7 +91,7 @@ class KanoButton(GenericButton):
         self.box.props.halign = Gtk.Align.CENTER
 
         # This allows us to set our padding
-        self.align = Gtk.Alignment()
+        self.align = Gtk.Alignment(xscale=0, yscale=0)
         self.align.add(self.box)
 
     def set_padding(self, top, bottom, left, right):
