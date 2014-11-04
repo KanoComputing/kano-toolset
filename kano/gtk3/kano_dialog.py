@@ -117,6 +117,7 @@ class KanoDialog():
         scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scrolledwindow.add_with_viewport(text)
         scrolledwindow.set_size_request(400, 200)
+        scrolledwindow.apply_styling_to_widget(wide=False)
 
         return scrolledwindow
 
