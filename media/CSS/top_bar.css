@@ -13,6 +13,7 @@
 /* The bar at the top that mimics the window bar */
 .top_bar_container {
     background: @top_bar_color;
+    border-radius: 0px;
 }
 
 .top_bar_button {
