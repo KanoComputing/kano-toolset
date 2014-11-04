@@ -1,6 +1,6 @@
 /*
 # top_bar.css
-# 
+#
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
@@ -17,6 +17,7 @@
 
 .top_bar_button {
     background: @top_bar_color;
+    border-radius: 0px;
 }
 
 .top_bar_button:hover {
