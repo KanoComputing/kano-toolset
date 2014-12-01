@@ -24,7 +24,7 @@ if __name__ == '__main__' and __package__ is None:
 import kano.logging as logging
 from kano.logging import logger
 from kano.colours import decorate_string_only_terminal, decorate_with_preset
-from kano.utils import enforce_root, get_user_unsudoed
+from kano.utils import enforce_root
 import pyinotify
 
 
