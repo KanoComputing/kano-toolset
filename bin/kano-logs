@@ -24,13 +24,22 @@ if __name__ == '__main__' and __package__ is None:
 import kano.logging as logging
 from kano.logging import logger
 from kano.colours import decorate_string_only_terminal, decorate_with_preset
-from kano.utils import enforce_root
+from kano.utils import enforce_root, get_user_unsudoed
 import pyinotify
 
 
 def get_logfiles(app=None):
+    log_dirs = [logging.SYSTEM_LOGS_DIR]
+    if os.getuid() != 0:
+        log_dirs.append(logging.USER_LOGS_DIR)
+    else:
+        for f in os.listdir('/home'):
+            user_log_dir = '/home/{}/.kano-logs'.format(f)
+            if os.path.isdir(user_log_dir):
+                log_dirs.append(user_log_dir)
+
     logfiles = []
-    for d in [logging.SYSTEM_LOGS_DIR, logging.USER_LOGS_DIR]:
+    for d in log_dirs:
         if app is not None:
             path = os.path.join(d, app + ".log")
             if os.path.exists(path):
