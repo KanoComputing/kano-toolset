@@ -14,6 +14,7 @@
 #
 
 import os
+import sys
 import time
 import subprocess
 import shlex
@@ -441,6 +442,13 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     in the latter 2 cases, seckey should be the encryption key
     of the wireless network AP.
     '''
+
+    if os.access('/var/run/kano-connect.pid', os.R_OK):
+        client_module=sys.argv[0]
+        if client_module.find('kano-connect') == -1:
+            logger.info ('Cancelling kano-connect to give control to %s' % sys.argv[0])
+            run_cmd('pkill -f kano-connect')
+            time.sleep(1)
 
     udhcpc_cmdline = 'udhcpc -S -t 70 -A 20 -n -a --script=/etc/udhcpc/kano.script -i %s' % iface
     time.sleep(1)
