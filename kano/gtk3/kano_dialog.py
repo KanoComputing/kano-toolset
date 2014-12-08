@@ -207,6 +207,7 @@ class KanoDialog():
             self.parent_window.blur()
 
         self.dialog.show_all()
+        self.dialog.set_icon_name('kano-dialog')
         self.dialog.run()
         self.dialog.destroy()
 

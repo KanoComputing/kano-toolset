@@ -4,6 +4,8 @@ media /usr/share/kano/
 
 js usr/share/kano-toolset/
 
+icons/* usr/share/icons/Kano/66x66/apps/
+
 uinput/uinput usr/bin/
 uinput/pyinputevent.py usr/lib/python2.7/dist-packages/
 uinput/scancodes.py usr/lib/python2.7/dist-packages/
