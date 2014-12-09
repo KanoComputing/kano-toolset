@@ -71,6 +71,7 @@ class WebApp(object):
     _decoration = True
     _taskbar = True
     _app_icon = None
+    _inspector = False
 
     _zenity = None
 
@@ -97,9 +98,8 @@ class WebApp(object):
         view.connect('close-web-view', self._close)
         view.connect('onload-event', self._onload)
 
-        # FIXME: The Inspector cannot be closed once opened.
-        # The following line should be commented out for release until we fix this.
-        # view.get_settings().set_property("enable-developer-extras", True)
+        if self._inspector:
+            view.get_settings().set_property("enable-developer-extras", True)
 
         if hasattr(self.__class__, "_focus_in"):
             view.connect('focus-in-event', self._focus_in)
