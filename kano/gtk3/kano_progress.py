@@ -45,15 +45,14 @@ class ProgressBar(Gtk.ProgressBar):
             self.pulse()
         else:
             new_value = self.get_fraction() + self.progress_rate
-
             if new_value > 1:
                 new_value = 0
-                Gtk.main_quit()
+                self.win.close()
 
             self.set_fraction(new_value)
 
         if not self.still_working:
-            Gtk.main_quit()
+            self.win.close()
 
         # As this is a timeout function, return True so that it
         # continues to get called
@@ -61,6 +60,7 @@ class ProgressBar(Gtk.ProgressBar):
 
     def work(self):  # This would be the actual time-consuming workload
         if hasattr(self, "work_function"):
+
             if hasattr(self, "work_args"):
                 self.work_function(self.work_args)
             else:
@@ -116,14 +116,11 @@ class WorkerThread(threading.Thread):
     def run(self):
         self.parent.still_working = True
         self.function()
+        # This is here to make the GUI progress stop and quit
         self.parent.still_working = False
-
-    def stop(self):
-        Gtk.main_quit()
 
 
 if __name__ == "__main__":
     pb = KanoProgressBar(title="Here is a title")
     pb.set_work_function(time.sleep, 2)
     pb.run()
-
