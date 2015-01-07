@@ -11,7 +11,7 @@
 # Example usage:
 # from kano.gtk3 import kano_dialog
 #
-# kdialog = kano_dialog.KanoDialog("title", "description", {"OK": {"return_value": 0, "color": "orange"},"CANCEL": {"return_value": -1, "color": "red"}})
+# kdialog = kano_dialog.KanoDialog("title", "description", [{"label":"OK", "return_value": 0, "color": "orange"}, {"label": "CANCEL", "return_value": -1, "color": "red"}])
 # response = kdialog.run()
 # if response == 0:
 #   print "OK button was clicked"
