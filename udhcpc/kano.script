@@ -42,12 +42,12 @@ case $1 in
             echo -n "$R" > "$RESOLV_CONF"
         fi
 
-        # set local timezone and network time upon interface up
-        # save the result of this work in small log files under /var/log
+        # find the local timezone based on the IP address, then set local system
         if [ ! -L /etc/localtime ]; then
             tzupdated=`/usr/local/bin/tzupdate 2>&1`
             if [ "$?" -eq 0 ]; then
                 logger_info "tzupdate SUCCESS: $tzupdated"
+                logger_info "tzupdate result: $(file /etc/localtime)"
             else
                 IFS=$'\n'
                 for line in ${tzupdated}; do
@@ -61,7 +61,9 @@ case $1 in
         # Set the system time from a network server, retry if it fails.
         for dateretries in 1 2 3 4 5
         do
-            dated=`/usr/bin/rdate -cv $(cat /etc/timeserver.conf) 2>&1`
+            time_server=`cat /etc/timeserver.conf`
+            logger_info "rdate using ntp server: $time_server"
+            dated=`/usr/bin/rdate -4 -u -v -c -n $time_server 2>&1`
             if [ "$?" -eq 0 ]; then
                 logger_info "rdate SUCCESS: $dated"
                 break

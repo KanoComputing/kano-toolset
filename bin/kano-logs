@@ -25,11 +25,21 @@ import kano.logging as logging
 from kano.logging import logger
 from kano.colours import decorate_string_only_terminal, decorate_with_preset
 from kano.utils import enforce_root
+import pyinotify
 
 
-def show_logs(app=None):
+def get_logfiles(app=None):
+    log_dirs = [logging.SYSTEM_LOGS_DIR]
+    if os.getuid() != 0:
+        log_dirs.append(logging.USER_LOGS_DIR)
+    else:
+        for f in os.listdir('/home'):
+            user_log_dir = '/home/{}/.kano-logs'.format(f)
+            if os.path.isdir(user_log_dir):
+                log_dirs.append(user_log_dir)
+
     logfiles = []
-    for d in [logging.SYSTEM_LOGS_DIR, logging.USER_LOGS_DIR]:
+    for d in log_dirs:
         if app is not None:
             path = os.path.join(d, app + ".log")
             if os.path.exists(path):
@@ -39,31 +49,132 @@ def show_logs(app=None):
                 for log in os.listdir(d):
                     logfiles.append(os.path.join(d, log))
 
-    output = ""
-    for log in logfiles:
-        output += "{}: {}\n".format(decorate_string_only_terminal("LOGFILE", "green"), log)
-        app_name = re.sub(r"\.log$", "", log)
-        with open(log, "r") as f:
-            for line in f:
-                try:
-                    data = json.loads(line)
+    return logfiles
 
-                    dt = datetime.datetime.fromtimestamp(data["time"])
-                    time = dt.strftime('%Y-%m-%d %H:%M:%S')
-                    output += "{} {}[{}] {} {}\n".format(
-                        decorate_string_only_terminal(time, "cyan"),
-                        os.path.basename(app_name),
-                        decorate_string_only_terminal(data["pid"], "yellow"),
-                        decorate_with_preset(data["level"], data["level"], True),
-                        data["message"]
-                    )
-                except:
-                    # Couldn't read the line, skip it
-                    continue
-        output += "\n"
+
+def get_log_data(path):
+    data = []
+    app_name = re.sub(r"\.log$", "", os.path.basename(path))
+    with open(path, "r") as f:
+        for line in f:
+            try:
+                line_data = json.loads(line)
+                line_data["app_name"] = app_name
+                data.append(line_data)
+            except:
+                # Couldn't read the line, skip it
+                continue
+
+    return data
+
+
+def show_logs(app=None, linearised=False):
+    logfiles = get_logfiles(app)
+
+    output = ""
+    if linearised:
+        all_data = []
+        for log in logfiles:
+            all_data += get_log_data(log)
+
+        all_data.sort(lambda a, b: cmp(a["time"], b["time"]))
+        output += format_log_data(all_data)
+    else:
+        for log in logfiles:
+            label = decorate_string_only_terminal("LOGFILE", "green")
+            output += "{}: {}\n".format(label, log)
+            output += format_log_data(get_log_data(log)) + "\n"
 
     if len(output) > 0:
         pydoc.pipepager(output, cmd='less -R')
+
+
+def format_log_data(data, default_app_name=""):
+    output = ""
+
+    for entry in data:
+        app_name = default_app_name
+        if "app_name" in entry:
+            app_name = entry["app_name"]
+
+        dt = datetime.datetime.fromtimestamp(entry["time"])
+        time = dt.strftime('%Y-%m-%d %H:%M:%S')
+        output += "{} {}[{}] {} {}\n".format(
+            decorate_string_only_terminal(time, "cyan"),
+            app_name,
+            decorate_string_only_terminal(entry["pid"], "yellow"),
+            decorate_with_preset(entry["level"], entry["level"], True),
+            entry["message"]
+        )
+
+    return output
+
+
+class EventHandler(pyinotify.ProcessEvent):
+    def __init__(self, app_name=None):
+        self._app_name_filter = app_name
+        self._last_map = {}
+
+        all_data = []
+        for path in get_logfiles(app_name):
+            data = self._process_file(path)
+            all_data += data[-10:]
+
+        all_data.sort(lambda a, b: cmp(a["time"], b["time"]))
+        print format_log_data(all_data),
+
+    def process_IN_CREATE(self, event):
+        new = self._process_file(event.pathname)
+        print format_log_data(new),
+
+    def process_IN_MODIFY(self, event):
+        new = self._process_file(event.pathname)
+        print format_log_data(new),
+
+    def _process_file(self, path):
+        app_name = re.sub(r"\.log$", "", os.path.basename(path))
+        if self._app_name_filter is not None and \
+           self._app_name_filter != app_name:
+            return []
+
+        data = []
+        new_data = []
+        with open(path, "r") as f:
+            for line in f:
+                try:
+                    line_data = json.loads(line)
+                    line_data["app_name"] = app_name
+                except:
+                    # ignore malformed lines
+                    continue
+
+                data.append(line_data)
+
+            if len(data) > 0:
+                data.sort(lambda a, b: cmp(a["time"], b["time"]))
+
+                if path in self._last_map:
+                    latest = self._last_map[path]
+                    new_data = [log for log in data if log['time'] > latest]
+                else:
+                    new_data = data
+
+                self._last_map[path] = data[-1]["time"]
+
+        return new_data
+
+
+def watch_logs(app=None):
+    wm = pyinotify.WatchManager()
+
+    handler = EventHandler(app)
+    notifier = pyinotify.Notifier(wm, handler)
+
+    mask = pyinotify.IN_CREATE | pyinotify.IN_MODIFY
+    dirs = [logging.SYSTEM_LOGS_DIR, logging.USER_LOGS_DIR]
+    wm.add_watch(dirs, mask, rec=True, auto_add=True)
+
+    notifier.loop()
 
 
 def process_args():
@@ -82,6 +193,22 @@ def process_args():
         help="the application to show logs for",
         default=None,
         nargs="?"
+    )
+
+    show.add_argument(
+        "-w", "--watch",
+        help="watch the logs and print new messages as they arrive",
+        action="store_const",
+        const=True,
+        default=False
+    )
+
+    show.add_argument(
+        "-l", "--linearised",
+        help="print a single list of entries sorted by time",
+        action="store_const",
+        const=True,
+        default=False
     )
 
     config = subparsers.add_parser("config", help="configure logging")
@@ -114,7 +241,10 @@ def main():
     args = process_args()
 
     if args["which"] == "show":
-        show_logs(args["app"])
+        if args["watch"]:
+            watch_logs(args["app"])
+        else:
+            show_logs(args["app"], args["linearised"])
     elif args["which"] == "config":
         if args["log_level"] is None and args["output_level"] is None and args["show_value"] is None:
             ll = logger.get_log_level()
