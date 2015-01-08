@@ -382,6 +382,9 @@ def get_volume():
 
 
 def is_model_b_plus():
+    #
+    # TODO: Find a better strategy so we do not depend on a fixed hexadecimal release number
+    #
     try:
         o, _, _ = run_cmd('cat /proc/cpuinfo')
         o = o.splitlines()
