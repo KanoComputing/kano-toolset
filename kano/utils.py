@@ -382,12 +382,23 @@ def get_volume():
 
 
 def is_model_b_plus():
+    #
+    # TODO: Find a better strategy so we do not depend on a fixed hexadecimal release number
+    #
     try:
-        o, _, _ = run_cmd('lsusb -t')
+        o, _, _ = run_cmd('cat /proc/cpuinfo')
         o = o.splitlines()
-        return 'hub/5p' in o[1]
+        
+        # Model B+ resvision number starts at 0x10
+        for entry in o:
+            if entry.startswith('Revision'):
+                v=entry.split(':')[1]
+                if int(v, 16) >= 0x10:
+                    return True
     except Exception:
-        return False
+        pass
+
+    return False
 
 
 def is_monitor():
