@@ -40,6 +40,9 @@ case $1 in
             echo -n "$R" | resolvconf -a "${interface}.udhcpc"
         else
             echo -n "$R" > "$RESOLV_CONF"
+
+            # Add a fallback DNS server to the end of the list, including a new line
+            echo "nameserver 8.8.8.8" >> "$RESOLV_CONF"
         fi
 
         # find the local timezone based on the IP address, then set local system
