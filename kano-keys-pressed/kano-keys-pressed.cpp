@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     is_key_held = look_for_pressed_keys(hhid);
 
     if (argc > 1 && argv[1] == "-v") {
-        printf ("is key held? %d\n", is_key_held ? "Yes" : "No");
+        printf ("is key held? %s\n", is_key_held ? "Yes" : "No");
     }
 
     // Free access to HID devices
