@@ -46,5 +46,5 @@ void hid_terminate(HID_HANDLE hid);
 
 #ifdef __cplusplus
 extern "C"
-bool look_for_pressed_keys(HID_HANDLE hid);
+bool is_hotkey_pressed(HID_HANDLE hid);
 #endif

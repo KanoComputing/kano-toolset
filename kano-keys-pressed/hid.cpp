@@ -20,34 +20,51 @@
 #include "hid.h"
 
 // internal function
-bool is_key_pressed(int udev_handle);
+bool is_ctrl_alt_pressed(int udev_handle);
 
 
-bool look_for_pressed_keys(HID_HANDLE hid)
+bool is_hotkey_pressed(HID_HANDLE hid)
 {
-    if (is_key_pressed(hid->fdkbd0)) {
+    if (is_ctrl_alt_pressed(hid->fdkbd0)) {
         return true;
     }
 
-    if (is_key_pressed(hid->fdkbd1)) {
+    if (is_ctrl_alt_pressed(hid->fdkbd1)) {
         return true;
     }
 
-    if (is_key_pressed(hid->fdkbd2)) {
+    if (is_ctrl_alt_pressed(hid->fdkbd2)) {
         return true;
     }
 
     return false;
 }
 
-bool is_key_pressed(int udev_handle)
+bool is_ctrl_alt_pressed(int udev_handle)
 {
+    // TODO: refactor this function to accept a combination of keys to expect
     //
     // This routine is based on an IOCTL documented on this article:
     // http://baruch.siach.name/blog/posts/linux_input_keys_status/
     //
 
-    bool key_is_held=false;
+    //
+    // The combination of modifier keys returned by the IOCTL are as follows
+    // (discovered by testing several keyboards):
+    //
+    //  Key name      |  keys[idx]  |   value in decimal notation
+    //  ---------------------------------------------------------
+    //  Left Shift    |  5          | 4d
+    //  Right Shift   |  6          | 64d
+    //  Left Ctrl     |  3          | 32d
+    //  Right Ctrl    |  12         | 2d
+    //  Fn            |  nothing    | nothing
+    //  Windows       |  15         | 32d
+    //  Alt Gr        |  12         | 16d (careful with Right Ctrl)
+    //  Alt           |  7          | 1d
+    //
+
+    bool ctrl_alt_keys_pressed=false;
     uint8_t keys[16];
     int rc,i,j;
     
@@ -56,15 +73,22 @@ bool is_key_pressed(int udev_handle)
         return false;
     }
 
-    for (i = 0; i < sizeof keys; i++) {
+    // Detect if Left or Right Ctrl + Alt keys are pressed
+    if ( (keys[3] == 32 || keys[12] == 2) && (keys[7] == 1) ) {
 
-        // TODO: Investigate the mapping to which key modifiers the kernel is deciding
-        if (keys[i] != 0) {
-            key_is_held=true;
+        ctrl_alt_keys_pressed=true;
+
+        // make sure no other keys are pressed
+        for (i=0; i < 16; i++) {
+            if ((i != 3 && i != 12 && i != 7) && keys[i]) {
+                // There is an extra key being pressed, assume the hotkey is not up
+                ctrl_alt_keys_pressed=false;
+                break;
+            }
         }
     }
 
-    return key_is_held;
+    return ctrl_alt_keys_pressed;
 }
 
 HID_HANDLE hid_init(int flags)
