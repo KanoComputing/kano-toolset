@@ -14,19 +14,19 @@
 
 APP_NAME="$0"
 
-function logger_set_app_name
+logger_set_app_name()
 {
     export APP_NAME="$1"
 }
 
-function logger_write
+logger_write()
 {
-    local msg="$1"
-    local level=$2
+    __msg="$1"
+    __level=$2
 
-    local kwargs=""
-    if [ -n "$level" ]; then
-        kwargs="$kwargs, level=\"$level\""
+    __kwargs=""
+    if [ -n "$__level" ]; then
+        kwargs="$__kwargs, level=\"$__level\""
     fi
 
     if [ -z "$LOG_LEVEL" ]; then
@@ -48,12 +48,12 @@ logger._cached_output_level = normalise_level("$OUTPUT_LEVEL")
 
 logger.set_app_name("$APP_NAME")
 
-logger.write("""$msg""" $kwargs)
+logger.write("""$__msg""" $__kwargs)
 EOF
     fi
 }
 
-function logger_error { logger_write "$1" "error"; }
-function logger_info  { logger_write "$1" "info"; }
-function logger_warn  { logger_write "$1" "warning"; }
-function logger_debug { logger_write "$1" "debug"; }
+logger_error() { logger_write "$1" "error"; }
+logger_info()  { logger_write "$1" "info"; }
+logger_warn()  { logger_write "$1" "warning"; }
+logger_debug() { logger_write "$1" "debug"; }
