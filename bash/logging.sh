@@ -26,20 +26,10 @@ logger_write()
 
     __kwargs=""
     if [ -n "$__level" ]; then
-        kwargs="$__kwargs, level=\"$__level\""
+        __kwargs="$__kwargs, level=\"$__level\""
     fi
 
-    if [ -z "$LOG_LEVEL" ]; then
-        LOG_LEVEL="`kano-logs config -s log_level`"
-    fi
-
-    if [ -z "$OUTPUT_LEVEL" ]; then
-        OUTPUT_LEVEL="`kano-logs config -s output_level`"
-    fi
-
-    # Optimisation: Don't launch python unless logging is enabled
-    if [ "$LOG_LEVEL" != "none" ] || [ "$OUTPUT_LEVEL" != "none" ]; then
-        python <<EOF
+    python <<EOF
 from kano.logging import logger, normalise_level
 
 logger._pid = $$
@@ -50,7 +40,6 @@ logger.set_app_name("$APP_NAME")
 
 logger.write("""$__msg""" $__kwargs)
 EOF
-    fi
 }
 
 logger_error() { logger_write "$1" "error"; }
