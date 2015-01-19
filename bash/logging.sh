@@ -33,11 +33,7 @@ logger_write()
 from kano.logging import logger, normalise_level
 
 logger._pid = $$
-logger._cached_log_level = normalise_level("$LOG_LEVEL")
-logger._cached_output_level = normalise_level("$OUTPUT_LEVEL")
-
 logger.set_app_name("$APP_NAME")
-
 logger.write("""$__msg""" $__kwargs)
 EOF
 }
