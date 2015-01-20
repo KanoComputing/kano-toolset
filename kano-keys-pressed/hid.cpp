@@ -20,27 +20,27 @@
 #include "hid.h"
 
 // internal function
-bool is_ctrl_alt_pressed(int udev_handle);
+bool is_ctrl_alt_pressed(int udev_handle, bool verbose);
 
 
-bool is_hotkey_pressed(HID_HANDLE hid)
+bool is_hotkey_pressed(HID_HANDLE hid, bool verbose)
 {
-    if (is_ctrl_alt_pressed(hid->fdkbd0)) {
+    if (is_ctrl_alt_pressed(hid->fdkbd0, verbose)) {
         return true;
     }
 
-    if (is_ctrl_alt_pressed(hid->fdkbd1)) {
+    if (is_ctrl_alt_pressed(hid->fdkbd1, verbose)) {
         return true;
     }
 
-    if (is_ctrl_alt_pressed(hid->fdkbd2)) {
+    if (is_ctrl_alt_pressed(hid->fdkbd2, verbose)) {
         return true;
     }
 
     return false;
 }
 
-bool is_ctrl_alt_pressed(int udev_handle)
+bool is_ctrl_alt_pressed(int udev_handle, bool verbose)
 {
     // TODO: refactor this function to accept a combination of keys to expect
     //
@@ -73,10 +73,22 @@ bool is_ctrl_alt_pressed(int udev_handle)
         return false;
     }
 
+    if (verbose) {
+        // Dump the key value masks returned by IOCTL EVIOCGKEY
+        printf ("key device id: %d\n", udev_handle);
+        for (i=0; i < 16; i++) {
+            printf ("  key[%02d]=%04dd\n", i, keys[i]);
+        }
+        printf ("\n");
+    }
+
     // Detect if Left or Right Ctrl + Alt keys are pressed
     if ( (keys[3] == 32 || keys[12] == 2) && (keys[7] == 1) ) {
 
-        ctrl_alt_keys_pressed=true;
+        if (verbose) {
+            printf ("Ctrl + Alt reported to be pressed, making sure no more keys are pressed\n");
+            ctrl_alt_keys_pressed=true;
+        }
 
         // make sure no other keys are pressed
         for (i=0; i < 16; i++) {
