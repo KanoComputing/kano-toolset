@@ -85,9 +85,9 @@ bool is_ctrl_alt_pressed(int udev_handle, bool verbose)
     // Detect if Left or Right Ctrl + Alt keys are pressed
     if ( (keys[3] == 32 || keys[12] == 2) && (keys[7] == 1) ) {
 
+        ctrl_alt_keys_pressed=true;
         if (verbose) {
             printf ("Ctrl + Alt reported to be pressed, making sure no more keys are pressed\n");
-            ctrl_alt_keys_pressed=true;
         }
 
         // make sure no other keys are pressed
