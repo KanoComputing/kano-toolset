@@ -29,6 +29,19 @@ def run_cmd(cmd):
     return stdout, stderr, returncode
 
 
+def run_cmd_lang(cmd, language='C'):
+    env = os.environ.copy()
+    env['LANG'] = language
+
+    process = subprocess.Popen(cmd, shell=True, env=env,
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               preexec_fn=restore_signals)
+
+    stdout, stderr = process.communicate()
+    returncode = process.returncode
+    return stdout, stderr, returncode
+
+
 def run_cmd_log(cmd):
     from kano.logging import logger
 
