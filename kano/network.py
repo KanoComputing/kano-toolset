@@ -19,10 +19,13 @@ import subprocess
 import shlex
 import json
 import re
+import shutil
 from kano.utils import run_cmd, get_user_unsudoed, run_bg, write_file_contents
 from kano.logging import logger
 
-DNS_FILE = '/etc/resolv.conf'
+DNS_FILE = '/etc/resolvconf/resolv.conf.d/base'
+DNS_INTERFACES_FILE = '/etc/resolvconf/interface-order'
+DNS_INTERFACES_BACKUP_FILE = '/etc/resolvconf/interface-order.backup'
 
 
 class IWList():
@@ -647,3 +650,23 @@ def set_dns(servers):
         ['nameserver {}'.format(server) for server in servers])
 
     write_file_contents(DNS_FILE, server_str)
+
+
+def clear_dns_interfaces():
+    if os.path.exists(DNS_INTERFACES_BACKUP_FILE):
+        # Already cleared
+        return
+
+    shutil.move(DNS_INTERFACES_FILE, DNS_INTERFACES_BACKUP_FILE)
+
+    with open(DNS_INTERFACES_FILE, 'w') as f:
+        f.close()
+
+
+def restore_dns_interfaces():
+    if os.path.exists(DNS_INTERFACES_BACKUP_FILE):
+        shutil.move(DNS_INTERFACES_BACKUP_FILE, DNS_INTERFACES_FILE)
+
+
+def refresh_resolvconf():
+    run_bg('resolvconf -u')
