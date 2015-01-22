@@ -22,11 +22,23 @@ def led_blinking(ticks_second=10, duration_secs=5):
 
 if __name__ == '__main__':
 
+    modloaded=False
+
+    # Load the kernel module that allows us to blink the LED, if not there
+    if not os.path.exists('/sys/class/leds/led0/trigger'):
+        os.system('modprobe leds_gpio')
+        modloaded=True
+
     # acquire the board LED for application use
-    os.system('echo none >/sys/class/leds/led0/trigger')
+    rc = os.system('echo none >/sys/class/leds/led0/trigger')
+    if not rc == 0:
+        sys.exit(1)
 
     led_blinking()
 
-    # restore LED for system disk IO monitoring
+    # restore LED for system disk IO monitoring and unload module
     os.system('echo mmc0 >/sys/class/leds/led0/trigger')
+    if modloaded:
+        os.system('rmmod leds_gpio')
+
     sys.exit(0)
