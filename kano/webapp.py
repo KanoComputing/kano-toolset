@@ -20,6 +20,7 @@ import thread
 import atexit
 
 from kano.window import gdk_window_settings
+from kano.profiling import declare_timepoint
 
 def asynchronous_gtk_message(fun):
 
@@ -164,6 +165,7 @@ class WebApp(object):
         return inspector_view
 
     def _onload(self, wv, frame, user_data=None):
+        declare_timepoint("load",False)
         if self._zenity:
             try:
                 self._zenity.stdin.write("100\n")
