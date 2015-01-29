@@ -31,7 +31,7 @@ def run_cmd(cmd):
 
 def run_cmd_lang(cmd, language='C'):
     env = os.environ.copy()
-    env['LANG'] = language
+    env['LC_ALL'] = language
 
     process = subprocess.Popen(cmd, shell=True, env=env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
