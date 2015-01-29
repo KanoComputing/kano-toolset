@@ -30,7 +30,7 @@
 
 
 import os
-CONF_FILE='/etc/kano-profile.conf'
+CONF_FILE='/etc/kano-profiling.conf'
 
 isConf=os.path.exists(CONF_FILE)
 
