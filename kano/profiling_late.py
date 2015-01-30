@@ -14,18 +14,19 @@ conf = yaml.load(open(CONF_FILE, "r"))
 myProfile=None
 app_name=sys.argv[0]
 
-
+def has_key(d,k):
+    return type(d) is dict and d.has_key(k)
 
 def declare_timepoint(name,isStart):
     global myProfile
-    logger.info(name,isStart=isStart)
+    logger.info("timepoint "+name,transition=name,isStart=isStart)
 
-    if conf.has_key(app_name):
-        if conf[app_name].has_key(name):
+    if has_key(conf,app_name):
+        if has_key(conf[app_name],name):
             ct=conf[app_name][name]
 
             # check if python profiler should be started for this timepoint
-            if ct.has_key('python'):
+            if has_key(ct,'python'):
                 if isStart:
                     myProfile=cProfile.Profile()
                     myProfile.enable()
@@ -38,9 +39,9 @@ def declare_timepoint(name,isStart):
                         myProfile=None
 
             # check if we want to run some other command at this timepoint
-            if isStart and ct.has_key('start_exec'):
+            if isStart and has_key(ct,'start_exec'):
                 os.system(ct['start_exec'])
-            if not isStart and ct.has_key('end_exec'):
+            if not isStart and has_key(ct,'end_exec'):
                 os.system(ct['end_exec'])
 
 
