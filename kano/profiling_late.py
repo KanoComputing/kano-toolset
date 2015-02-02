@@ -19,7 +19,8 @@ def has_key(d,k):
 
 def declare_timepoint(name,isStart):
     global myProfile
-    logger.info("timepoint "+name,transition=name,isStart=isStart)
+    cmd=None
+    pythonProfile=False
 
     if has_key(conf,app_name):
         if has_key(conf[app_name],name):
@@ -27,6 +28,7 @@ def declare_timepoint(name,isStart):
 
             # check if python profiler should be started for this timepoint
             if has_key(ct,'python'):
+                pythonProfile=True
                 if isStart:
                     myProfile=cProfile.Profile()
                     myProfile.enable()
@@ -40,10 +42,13 @@ def declare_timepoint(name,isStart):
 
             # check if we want to run some other command at this timepoint
             if isStart and has_key(ct,'start_exec'):
-                os.system(ct['start_exec'])
+                cmd=ct['start_exec']
+                os.system(cmd)
             if not isStart and has_key(ct,'end_exec'):
-                os.system(ct['end_exec'])
+                cmd=ct['end_exec']
+                os.system(cmd)
 
+    logger.info("timepoint "+name,transition=name,isStart=isStart,cmd=cmd,pythonProfile=pythonProfile)
 
 
     
