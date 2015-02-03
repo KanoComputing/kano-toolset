@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+
+# kano-led
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Blink the RaspberryPI board LED at a constant rate
+# This tool requires the "leds_gpio" kernel module
+#
+
+import os, time, sys
+
+def led_blinking(ticks_second=10, duration_secs=5):
+
+    for duration in range(0, duration_secs):
+        for ticks in range(0, ticks_second):
+            os.system ('echo 1 >/sys/class/leds/led0/brightness')
+            time.sleep (0.035)
+            os.system ('echo 0 >/sys/class/leds/led0/brightness')
+            time.sleep (0.035)
+
+if __name__ == '__main__':
+
+    modloaded=False
+
+    # Load the kernel module that allows us to blink the LED, if not there
+    if not os.path.exists('/sys/class/leds/led0/trigger'):
+        os.system('modprobe leds_gpio')
+        modloaded=True
+
+    # acquire the board LED for application use
+    rc = os.system('echo none >/sys/class/leds/led0/trigger')
+    if not rc == 0:
+        sys.exit(1)
+
+    led_blinking()
+
+    # restore LED for system disk IO monitoring and unload module
+    os.system('echo mmc0 >/sys/class/leds/led0/trigger')
+    if modloaded:
+        os.system('rmmod leds_gpio')
+
+    sys.exit(0)
