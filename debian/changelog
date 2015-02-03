@@ -1,3 +1,9 @@
+kano-toolset (1.3-7) unstable; urgency=low
+
+  * New python library: kano.profiling. Calls to it should be a no-on on release builds.
+
+ -- Team Kano <dev@kano.me>  Fri, 3 Feb 2014 09:24:00 +0000
+
 kano-toolset (1.3-6) unstable; urgency=low
 
   * resolvconf now used for handling DNS
