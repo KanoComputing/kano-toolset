@@ -469,7 +469,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     if wpa_custom_file:
         logger.info("Starting wpa_supplicant with custom config: %s" % wpa_custom_file)
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
+        run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
 
     elif encrypt == 'wep':
 
@@ -500,7 +500,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         wpa_conf(essid, seckey, confile=wpafile, wep=True)
 
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+        run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
 
         # Wait for wpa_supplicant to become associated to the AP - key validation.
         # For WEP Open networks it will always proceed, beacuse there is no real authentication,
@@ -525,7 +525,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         wpa_conf(essid, seckey, confile=wpafile)
 
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+        run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
 
         # Wait for wpa_supplicant to become associated to the AP
         # or give up if it takes too long
