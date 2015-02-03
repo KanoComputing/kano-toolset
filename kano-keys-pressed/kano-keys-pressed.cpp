@@ -1,5 +1,8 @@
 //
-// kano-keys-pressed.cpp
+//  kano-keys-pressed.cpp
+//
+//  Copyright (C) 2015 Kano Computing Ltd.
+//  License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 //
 //  A tool to detect key modifers being pressed (Shift, Ctrl, Alt, ...)
 //

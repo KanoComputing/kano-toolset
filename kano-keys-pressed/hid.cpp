@@ -1,8 +1,8 @@
 //
 //  hid.cpp - Human Input Device
 //
-//  This module encapsulates functions to deal with user keyboard and mouse activity
-//  needed to decide when the screen saver needs to stop.
+//  Copyright (C) 2014, 2015 Kano Computing Ltd.
+//  License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 //
 
 #include <stdio.h>
