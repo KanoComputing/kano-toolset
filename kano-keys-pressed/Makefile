@@ -7,10 +7,10 @@
 all: kano-keys-pressed
 
 kano-keys-pressed: kano-keys-pressed.o hid.o
-	gcc kano-keys-pressed.o hid.o -o kano-keys-pressed
+	g++ -g kano-keys-pressed.o hid.o -o kano-keys-pressed
 
 hid.o: hid.cpp
-	gcc -c hid.cpp
+	g++ -c -g hid.cpp
 
 kano-keys-pressed.o: kano-keys-pressed.cpp
-	gcc -c kano-keys-pressed.cpp
+	g++ -c kano-keys-pressed.cpp

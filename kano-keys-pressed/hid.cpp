@@ -1,14 +1,18 @@
 //
 //  hid.cpp - Human Input Device
 //
-//  This module encapsulates functions to deal with user keyboard and mouse activity
-//  needed to decide when the screen saver needs to stop.
+//  Copyright (C) 2014, 2015 Kano Computing Ltd.
+//  License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 //
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <memory.h>
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -75,11 +79,15 @@ bool is_ctrl_alt_pressed(int udev_handle, bool verbose)
 
     if (verbose) {
         // Dump the key value masks returned by IOCTL EVIOCGKEY
-        printf ("key device id: %d\n", udev_handle);
+        cout << "key device id: " << udev_handle << endl;
         for (i=0; i < 16; i++) {
-            printf ("  key[%02d]=%04dd\n", i, keys[i]);
+            // FIXME: how to tell cout to print an int=0 instead of spaces (setfill('0') does not)
+            printf ("  key[%02d]=%04dd ", i, keys[i]);
+            if (i == 7) {
+                cout << endl;
+            }
         }
-        printf ("\n");
+        cout << endl;
     }
 
     // Detect if Left or Right Ctrl + Alt keys are pressed
@@ -87,7 +95,7 @@ bool is_ctrl_alt_pressed(int udev_handle, bool verbose)
 
         ctrl_alt_keys_pressed=true;
         if (verbose) {
-            printf ("Ctrl + Alt reported to be pressed, making sure no more keys are pressed\n");
+            cout << "Ctrl + Alt reported to be pressed, making sure no more keys are pressed" << endl;
         }
 
         // make sure no other keys are pressed
