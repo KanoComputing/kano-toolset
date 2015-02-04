@@ -1,3 +1,8 @@
+# profiling.py
+#
+# Copyright (C) 2015 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
 # This file is intended to allow profiling of individual 'transitions'
 # it should be low overhead if its configuration file does not exist, which
 # will be the case on production images.
