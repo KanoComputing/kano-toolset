@@ -53,7 +53,5 @@ def declare_timepoint(name,isStart):
                 cmd=ct['end_exec']
                 os.system(cmd)
 
-    logger.info("timepoint "+name,transition=name,isStart=isStart,cmd=cmd,pythonProfile=pythonProfile)
+    logger.debug("timepoint "+name,transition=name,isStart=isStart,cmd=cmd,pythonProfile=pythonProfile)
 
-
-    

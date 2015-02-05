@@ -13,14 +13,14 @@
 
 # To declare a transition, at the start do
 #   declare_timepoint("transition_name",True)
-# and at the end do 
+# and at the end do
 #   declare_timepoint("transittion_name",False)
 
 # The configuration file can enable profiling for each individual time point
 # Example 1: Enable python profiling in the "load" timepoint of make-pong,
 #  saving the profile data to /tmp/make-pong/load.prof
 
-# /usr/bin/make-pong: 
+# /usr/bin/make-pong:
 #     load:
 #        python:
 #            statfile: /tmp/make-pong-load.prof
@@ -44,9 +44,6 @@ def declare_timepoint(name,isStart):
     if not isConf:
         return
     else:
-        import kano.profiling_late 
+        import kano.profiling_late
         kano.profiling_late.declare_timepoint(name,isStart)
 
-
-
-    

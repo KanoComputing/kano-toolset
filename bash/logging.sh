@@ -6,7 +6,7 @@
 # bash wrapper for kano.logging
 # Usage:
 #
-# . /usr/share/kano-toolset/logger.sh
+# . /usr/share/kano-toolset/logging.sh
 #
 # set_app_name "make-minecraft"
 #
@@ -42,3 +42,4 @@ logger_error() { logger_write "$1" "error"; }
 logger_info()  { logger_write "$1" "info"; }
 logger_warn()  { logger_write "$1" "warning"; }
 logger_debug() { logger_write "$1" "debug"; }
+
