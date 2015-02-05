@@ -1,12 +1,37 @@
 #!/bin/bash
+
 # Busybox udhcpc dispatcher script. Copyright (C) 2009 by Axel Beckert.
 #
 # Based on the busybox example scripts and the old udhcp source
 # package default.* scripts.
 
+# kano.script
+#
+# Copyright (C) 2014, 2015 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This script is called by the udhcpc daemon, it prepares and releases DHCP leases
+#
+
 RESOLV_CONF="/etc/resolv.conf"
 
 . /usr/share/kano-toolset/logging.sh
+
+# Hook script to be called when network DHCP events occur
+network_hook="/usr/bin/kano-network-hook"
+
+function call_hook {
+
+    # The network hook script is resolved as a soft dependency,
+    # currently it is provided by Kano Profile.
+    # The first parameter can be one of: bound, renew, deconfig, leasefail, nak.
+    # If bound or renew, the IP address of the lease will be given through the second parameter
+    # The script will run as the superuser
+
+    if [ -x $network_hook ]; then
+        $network_hook $@
+    fi
+}
 
 case $1 in
     bound|renew)
@@ -78,6 +103,8 @@ case $1 in
                 sleep 1
             fi
         done
+
+        call_hook $1 $ip
         ;;
 
     deconfig)
@@ -85,18 +112,23 @@ case $1 in
             resolvconf -d "${interface}.udhcpc"
         fi
         /sbin/ifconfig $interface 0.0.0.0
+
+        call_hook $1
         ;;
 
     leasefail)
         echo "$0: Lease failed: $message"
+        call_hook $1
         ;;
 
     nak)
         echo "$0: Received a NAK: $message"
+        call_hook $1
         ;;
 
     *)
         echo "$0: Unknown udhcpc command: $1";
+        call_hook $1
         exit 1;
         ;;
 esac
