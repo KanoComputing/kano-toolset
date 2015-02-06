@@ -26,10 +26,10 @@ function call_hook {
     # currently it is provided by Kano Profile.
     # The first parameter can be one of: bound, renew, deconfig, leasefail, nak.
     # If bound or renew, the IP address of the lease will be given through the second parameter
-    # The script will run as the superuser
+    # The script will run as the superuser and started in the background, the return code is meaningless.
 
     if [ -x $network_hook ]; then
-        $network_hook $@
+        $network_hook $@ &
     fi
 }
 
