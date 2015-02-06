@@ -375,7 +375,7 @@ def wpa_conf(essid, psk, confile, wep=False):
             psk = psk.replace ('"', '\"')
             psk='"%s"' % psk
 
-        wpa_conf = '''
+        lines_wpa_conf = '''
           ctrl_interface=/var/run/wpa_supplicant
           network={
              ssid="%s"
@@ -397,11 +397,11 @@ def wpa_conf(essid, psk, confile, wep=False):
 
         if psk.startswith('hex'):
             # In WPA hex mode, the provided key needs to go as is
-            wpa_conf = '''
+            lines_wpa_conf = '''
              network={
                ssid="%s"
                psk=%s
-               %s
+               %s\n
             ''' % (essid, psk[3:], wpa_epilog)
         else:
             # In plain text form, the wpa_passphrase tool will give us 
