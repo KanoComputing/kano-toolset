@@ -359,16 +359,22 @@ def is_internet():
 
 
 def wpa_conf(essid, psk, confile, wep=False):
+    '''
+    Prepare and save a configuration file for WPA Supplicant daemon
+    '''
 
+    # Prepare settings section for WEP or WPA
     if wep is True:
-
         # If the key starts with "hex" lowercase, what follows is the Hexadecimal form
         # Otherwise it is in string form. Double quotes is how wpa_supplicant distinguishes.
         if psk.startswith('hex'):
             psk=psk[3:]
         else:
+            # Escape single & double quotes manually
+            psk = psk.replace ("'", "\'")
+            psk = psk.replace ('"', '\"')
             psk='"%s"' % psk
-        
+
         wpa_conf = '''
           ctrl_interface=/var/run/wpa_supplicant
           network={
@@ -380,35 +386,41 @@ def wpa_conf(essid, psk, confile, wep=False):
              auth_alg=OPEN SHARED
          }
         ''' % (essid, psk)
-
-        f = open(confile, 'w')
-        f.write(wpa_conf)
-        f.close()
-
     else:
+        wpa_epilog = '''
+          scan_ssid=1
+          key_mgmt=WPA-EAP WPA-PSK IEEE8021X NONE
+          pairwise=CCMP TKIP
+         }
+         ctrl_interface=/var/run/wpa_supplicant
+        '''
 
-        wpa_extra_settings = '''
-        scan_ssid=1
-        key_mgmt=WPA-EAP WPA-PSK IEEE8021X NONE
-        pairwise=CCMP TKIP
- }
-ctrl_interface=/var/run/wpa_supplicant
-'''
+        if psk.startswith('hex'):
+            # In WPA hex mode, the provided key needs to go as is
+            wpa_conf = '''
+             network={
+               ssid="%s"
+               psk=%s
+               %s
+            ''' % (essid, psk[3:], wpa_epilog)
+        else:
+            # In plain text form, the wpa_passphrase tool will give us 
+            # the passphrase and essid encoded correctly
+            # and it carefully takes care of escaping single/double quotes for us
+            wpa_conf = subprocess.check_output(['wpa_passphrase', essid, psk])
+            wpa_conf += wpa_epilog
+            lines_wpa_conf = []
+            for line in wpa_conf.split('\n'):
+                if line.startswith('}'):
+                    pass
+                else:
+                    lines_wpa_conf.append(line + '\n')
 
-        wpa_conf = subprocess.check_output(['wpa_passphrase', essid, psk])
-        wpa_conf += wpa_extra_settings
-        lines_wpa_conf = []
-
-        for line in wpa_conf.split('\n'):
-            if line.startswith('}'):
-                pass
-            else:
-                lines_wpa_conf.append(line + '\n')
-
-        f=open(confile, 'wt')
-        for k in lines_wpa_conf:
-            f.write(k)
-        f.close()
+    # save the WPA configuration file
+    f=open(confile, 'wt')
+    for k in lines_wpa_conf:
+        f.write(k)
+    f.close()
 
 
 def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt2800usb'):
@@ -478,9 +490,10 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
 
     #
     # Set the ESSID of the wireless network to associate
+    # escaping single / double quotation marks
     #
-    escaped_essid = essid.replace('\'', '\\\'')
-    escaped_essid = escaped_essid.replace('\"', '\\\"')
+    escaped_essid = essid.replace("'", "\'")
+    escaped_essid = escaped_essid.replace('"', '\"')
 
     run_cmd("iwconfig %s power off" % iface)
     run_cmd("ifconfig %s down" % iface)
