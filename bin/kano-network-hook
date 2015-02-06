@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+# kano-network-hook
+#
+# Copyright (C) 2015 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This script is called when network DHCP events occur
+# It is called from /etc/udhcpc/kano.script (Kano Toolset packge)
+# and sends the RaspberryPI CPU Serial Number to Kano. It runs as the superuser.
+#
+
+import os
+import sys
+
+from kano.logging import logger
+from kano.utils import get_cpu_id, get_rpi_model, run_cmd
+
+def send_cpu_id():
+    sent=False
+
+    # Get the unit CPU Serial number and send it, save a local copy
+    cpuid_filename = '/etc/cpuid-{}'.format(get_cpu_id())
+    if os.path.isfile(cpuid_filename):
+        # We have already sent the CPU ID
+        pass
+    else:
+        try:
+            # Save a trace of the CPUID so we dont send it over again
+            # The file's timestamp will tell us when this happened
+            with open(cpuid_filename, 'a') as f:
+                os.utime(cpuid_filename, None)
+                f.write('RaspberryPI model: {}\n'.format(get_rpi_model()))
+
+            # Send this file over the network
+            cmdline='curl --retry 5 --retry-delay 3 -T "{}" ' \
+                '--user "cpuname:mko821fgx" http://dev.kano.me//cpuserialnos/'.format(cpuid_filename)
+            _, _,rc = run_cmd(cmdline)
+            assert (rc==0)
+            sent=True
+        except:
+            if os.path.isfile(cpuid_filename): os.unlink(cpuid_filename)
+            logger.error('Error sending Kit serial number')
+ 
+    return sent
+
+if __name__ == '__main__':
+    rc = 1
+    if len(sys.argv) > 1 and sys.argv[1] == 'bound':
+        if send_cpu_id() == True:
+            logger.info('Kit serial number has been sent')
+            rc=0
+
+    exit (rc)

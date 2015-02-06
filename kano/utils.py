@@ -381,24 +381,50 @@ def get_volume():
     return percent, millibel
 
 
+def is_model_a():
+    return get_rpi_model() == 'RPI/A'
+
+
+def is_model_b():
+    return get_rpi_model() == 'RPI/B'
+
+
 def is_model_b_plus():
+    return get_rpi_model() == 'RPI/B+'
+
+
+def is_model_2_b():
+    return get_rpi_model() == 'RPI/2/B'
+
+
+def get_rpi_model():
     #
-    # TODO: Find a better strategy so we do not depend on a fixed hexadecimal release number
+    # TODO: The strategy below is based on pure heuristics, find a better way
     #
+    revision=None
     try:
         o, _, _ = run_cmd('cat /proc/cpuinfo')
         o = o.splitlines()
-        
-        # Model B+ resvision number starts at 0x10
         for entry in o:
             if entry.startswith('Revision'):
-                v=entry.split(':')[1]
-                if int(v, 16) >= 0x10:
-                    return True
-    except Exception:
-        pass
+                revision=entry.split(':')[1]
 
-    return False
+        if int(revision, 16) <= 0x08:
+            return 'RPI/A'
+
+        if int(revision, 16) == 0x0D:
+            return 'RPI/B'
+
+        if int(revision, 16) == 0x10:
+            return 'RPI/B+'
+
+        if int(revision,16) >= 0xA01041:
+            return 'RPI/2/B'
+
+        return 'unknown revision: {}'.format(revision)
+
+    except:
+        return 'Error getting model name'
 
 
 def is_monitor():
