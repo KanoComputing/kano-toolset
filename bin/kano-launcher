@@ -31,6 +31,21 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+# Show a splash if the app is configured to do so.
+SPLASH=/usr/bin/kano-splash
+CMDNAME=$2
+if test -z "$2" ; then
+    CMDNAME=$(basename $1)
+fi
+SPLASH_PNG=/usr/share/$CMDNAME/splash.png
+
+if test -e $SPLASH_PNG ;  then
+    $SPLASH $SPLASH_PNG &
+	SPLASH_PID=$!
+	SPLASH_START_TIME=$(kano-get-start-time $SPLASH_PID)
+	export SPLASH_PID SPLASH_START_TIME
+	
+fi
 eval "$1 &"
 
 # Apply window presets

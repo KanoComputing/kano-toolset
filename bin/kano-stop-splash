@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# kano-stop-splash-screen
+#
+# Copyright (C) 2014 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# 
+# Terminate  a splash window when the app has finished loading.
+
+
+if test -n "$SPLASH_PID" ; then 
+   if test -n "$SPLASH_START_TIME" ; then
+       NSTART=$(kano-get-start-time $SPLASH_PID)
+       if test "$SPLASH_START" = "NSTART" ; then
+	   kill -ALARM $SPLASH_PID
+       fi
+   fi
+fi
+
