@@ -31,6 +31,7 @@ profiling_conf_file="/etc/kano-profiling.conf"
 #The main purpose for this is to help profile the code
 #Thus it doesn't call the python interpreter, but is more rudimentary
 # It only takes one argument, the message that accompanies the timestamp in the log
+# NOTE: please make sure that you have set the APP_NAME variable using logger_set_app_name
 function log_timestamp
 {
     # ideally we want to check for the file only once per program execution.
@@ -45,13 +46,9 @@ function log_timestamp
     fi
 
     if [ "$prof_log_en" == "y"  ]; then
-        log_msg_to_json debug $1
+        log_msg_to_json debug "$1"
     fi
 }
-
-dot_slash="./"
-log_msg_location="$HOME/.kano-logs/$APP_NAME.log"
-log_msg_location="${log_msg_location/$dot_slash/}"
 
 # Parameters for this function, with regard to position:
 # 1: level, can be "error", "warning", "info", "debug", else it defaults to "none"
@@ -59,6 +56,7 @@ log_msg_location="${log_msg_location/$dot_slash/}"
 function log_msg_to_json
 {
     local level="$1"
+    local log_msg_location="$HOME/.kano-logs/$APP_NAME.log"
 
     if [ "$level" != "error" ] && [ "$level" != "warning" ] &&
        [ "$level" != "info" ] && [ "$level" != "debug" ]; then
