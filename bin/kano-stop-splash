@@ -12,8 +12,8 @@
 if test -n "$SPLASH_PID" ; then 
    if test -n "$SPLASH_START_TIME" ; then
        NSTART=$(kano-get-start-time $SPLASH_PID)
-       if test "$SPLASH_START" = "NSTART" ; then
-	   kill -ALARM $SPLASH_PID
+       if test "$SPLASH_START_TIME" = "$NSTART" ; then
+	   kill -ALRM $SPLASH_PID
        fi
    fi
 fi
