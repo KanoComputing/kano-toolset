@@ -1,3 +1,9 @@
+kano-toolset (1.3-8) unstable; urgency=low
+
+  * New tools: kano-splash and kano-stop-splash. Display an image before starting an app.
+
+ -- Team Kano <dev@kano.me>  Mon, 8 Feb 2014 17:55:00 +0000
+
 kano-toolset (1.3-7) unstable; urgency=low
 
   * New python library: kano.profiling. Calls to it should be a no-on on release builds.
