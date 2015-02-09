@@ -2,7 +2,7 @@
 # Placeholder makefile so "debuild" can be gently persuaded to work
 #
 
-.PHONY: kano-keys-pressed
+.PHONY: kano-keys-pressed kano-splash
 
 all: kano-keys-pressed kano-splash
 
