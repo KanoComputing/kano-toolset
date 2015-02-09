@@ -166,6 +166,7 @@ class WebApp(object):
 
     def _onload(self, wv, frame, user_data=None):
         declare_timepoint("load",False)
+        os.system("kano-stop-splash")
         if self._zenity:
             try:
                 self._zenity.stdin.write("100\n")
