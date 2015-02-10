@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     // Parse command arguments
     // As we are acting as an 'interpreter' arguments are as follows:
     // argv[0] path to this binary
-    // argv[1] arguments on the #! line
+    // argv[1] arguments on the #! line, if any (otherwise skipped..)
     // argv[2] the script we are called on
     // argv[3..] command line arguments
 
@@ -96,6 +96,10 @@ int main(int argc, char *argv[])
       exit(1);
     }
 
+    if(argv[1]==0){
+      argv++;
+      argc--;
+    }
     // save back to argv for exec
     argv[0]=real_interp;
 
