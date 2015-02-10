@@ -3,6 +3,7 @@
 // The MIT License (MIT)
 //
 // Copyright (c) 2013 Andrew Duncan
+// Copyright (c) 2015 Kano Computing Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -36,7 +37,6 @@
 
 #include "backgroundLayer.h"
 #include "imageLayer.h"
-#include "key.h"
 #include "loadpng.h"
 #include "get-start-time.h"
 
@@ -48,78 +48,69 @@
 
 //-------------------------------------------------------------------------
 
-const char *program = NULL;
 
 //-------------------------------------------------------------------------
 
-void usage(void)
-{
-    fprintf(stderr, "Usage: %s [-b <RGBA>] <file.png>\n", program);
-    fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
-    fprintf(stderr, "         e.g. 0x000F is opaque black\n");
-
-    exit(EXIT_FAILURE);
-}
 
 //-------------------------------------------------------------------------
 
 int main(int argc, char *argv[])
 {
     uint16_t background = 0x000F;
-    int is_interp=0;
-    int opt = 0;
     char *real_interp;
-    char *script;
     char *file;
 
-    program = basename(argv[0]);
-    is_interp= !strcmp(program,"kano-splash");
+    // Parse command arguments
+    // As we are acting as an 'interpreter' arguments are as follows:
+    // argv[0] path to this binary
+    // argv[1] arguments on the #! line
+    // argv[2] the script we are called on
+    // argv[3..] command line arguments
 
-    if(is_interp) {
-      // if we are running as kano-splash, we are an interpreter
-      background=0; // full transparency
+    // we expect argv[1] to contain the filename followed by the next interpreter we want to invoke and
+    // its arguments. so we extract these and then do the following mapping:
 
-      if(argc<2) usage();
-
-      file=strsep(&argv[1]," ");
-
-      if(!file) usage();
-
-      real_interp=strsep(&argv[1]," ");
-      
-      if(!real_interp) usage();
-
-      // save back to argv for exec
-      argv[0]=real_interp;
-    } 
-    else
-    {
-
-        //---------------------------------------------------------------------
-        
-        
-        while ((opt = getopt(argc, argv, "b:")) != -1)
-        {
-            switch(opt)
-            {
-            case 'b':
-        
-                background = strtol(optarg, NULL, 16);
-                break;
-        
-            default:
-        
-                usage();
-                break;
-            }
-        }
-        file=argv[optind];
-        //---------------------------------------------------------------------
+    // splash file = arg[1][0]
+    // argv[0] = argv[1][1..]
+    // 
+    // This leaves the command line 
     
-        if (optind >= argc)
-        {
-            usage();
-        }
+
+    background=0; // full transparency
+
+    if(argc<2) {
+      fprintf(stderr,"Insufficient arguments\n");
+      exit(1);
+    }
+
+    file=strsep(&argv[1]," ");
+
+    if(!file) {
+      fprintf(stderr,"filename is NULL \n");      
+    }
+
+    real_interp=strsep(&argv[1]," ");
+      
+    if(!real_interp) {
+      fprintf(stderr,"real interpreter is not specified!\n");
+      exit(1);
+    }
+
+    // save back to argv for exec
+    argv[0]=real_interp;
+
+    // save pid info so child can halt the splash
+
+    char pid_str[32];
+    char start_time_str[32];
+    pid_t mypid=getpid();
+    snprintf(pid_str,32,"%u",mypid);
+    snprintf(start_time_str,32,"%llu",get_process_start_time(mypid));
+    setenv("SPLASH_PID",pid_str,1);
+    setenv("SPLASH_START_TIME",start_time_str,1);
+    pid_t pid=fork();
+    if(pid==0){
+      execvp(real_interp,argv);	
     }
     
     //---------------------------------------------------------------------
@@ -203,34 +194,10 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
     
-    // if we are acting as an 'interpreter', fork the real command with 
-    // the real interpreter and wait for 15 seconds.
-    if(is_interp){
 
-      // save pid info so child can halt the splash
-      char pid_str[32];
-      char start_time_str[32];
-      pid_t mypid=getpid();
-      snprintf(pid_str,32,"%u",mypid);
-      snprintf(start_time_str,32,"%llu",get_process_start_time(mypid));
-      setenv("SPLASH_PID",pid_str,1);
-      setenv("SPLASH_START_TIME",start_time_str,1);
-      
-      pid_t pid=fork();
-      if(pid==0){
-	execvp(real_interp,argv);	
-      }
-      sleep(15);
-    }else
-    {
-    while (keyPressed(NULL) == false)
-        {
-            usleep(100000);
-        }
-    }
+    sleep(15);
     //---------------------------------------------------------------------
 
-    keyboardReset();
 
     //---------------------------------------------------------------------
 

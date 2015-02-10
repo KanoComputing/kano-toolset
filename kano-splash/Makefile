@@ -6,7 +6,7 @@
 # Build file for kano-splash and related utilities.
 #
 OBJS=kano-splash.o backgroundLayer.o imageLayer.o \
-	 loadpng.o image.o key.o get-start-time.o
+	 loadpng.o image.o get-start-time.o
 BIN= kano-splash kano-get-start-time
 CFLAGS+=-Wall -g -O3  $(shell libpng-config --cflags)
 LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags)
