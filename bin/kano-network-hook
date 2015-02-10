@@ -34,7 +34,7 @@ def send_cpu_id():
 
             # Send this file over the network
             cmdline='curl --retry 5 --retry-delay 3 -T "{}" ' \
-                '--user "cpuname:mko821fgx" http://dev.kano.me//cpuserialnos/'.format(cpuid_filename)
+                '--user "cpuname:mko821fgx" http://cpuids.kano.me//cpuserialnos/'.format(cpuid_filename)
             _, _,rc = run_cmd(cmdline)
             assert (rc==0)
             sent=True
