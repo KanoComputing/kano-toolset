@@ -7,4 +7,5 @@ openbox
 ssh-agent
 lxpanel
 menu-cached
-python /usr/bin/kano-feedback
+python /usr/bin/kano-feedback-widget
+python /usr/bin/kano-tracker-ctl
