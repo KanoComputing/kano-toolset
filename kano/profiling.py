@@ -10,7 +10,6 @@
 # which is only loaded if the configuration file is detected.
 
 
-
 # To declare a transition, at the start do
 #   declare_timepoint("transition_name",True)
 # and at the end do
@@ -26,7 +25,7 @@
 #            statfile: /tmp/make-pong-load.prof
 
 # Example 2: Run a command at start and end of a timepoint (eg perf or bootchartd)
-#/usr/bin/make-pong:
+# /usr/bin/make-pong:
 #    load:
 #        start_exec:
 #            touch /tmp/pong_load_started
@@ -35,15 +34,14 @@
 
 
 import os
-CONF_FILE='/etc/kano-profiling.conf'
+CONF_FILE = '/etc/kano-profiling.conf'
 
-isConf=os.path.exists(CONF_FILE)
+isConf = os.path.exists(CONF_FILE)
 
 
-def declare_timepoint(name,isStart):
+def declare_timepoint(name, isStart):
     if not isConf:
         return
     else:
         import kano.profiling_late
-        kano.profiling_late.declare_timepoint(name,isStart)
-
+        kano.profiling_late.declare_timepoint(name, isStart)

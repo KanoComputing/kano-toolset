@@ -51,6 +51,13 @@ LEVELS = {
 
 
 def normalise_level(level):
+    """Normalise the input string, i.e.
+    convert it into lowercase and see if it matches with
+    the specified levels held in the dict LEVELS.
+    It will try to match the input to the first n chars
+    of the dict. ex 'd', 'de' is turned into debug.
+    """
+
     if level is None:
         return "none"
 
