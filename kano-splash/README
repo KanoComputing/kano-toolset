@@ -1,0 +1,21 @@
+This directory builds kano-splash and kano-get-start-time
+
+The former is derived from pngview in https://github.com/AndrewFromMelbourne/raspidmx
+which uses low-level rpi gpu apis.
+
+kano-splash can be added as a command line interpreter to launch a splash screen.
+Eg, change
+
+#!/usr/bin/env python 
+
+to 
+
+#!/usr/bin/kano-splash /usr/share/kano-foo/splash/png /usr/bin/env python 
+
+The app mush then call 
+system("kano-stop-splash") 
+
+to stop the splash (or wait for it to time out at 15 seconds). 
+
+
+

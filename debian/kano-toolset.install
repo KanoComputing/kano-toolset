@@ -15,3 +15,6 @@ udhcpc/kano.script etc/udhcpc
 bash/logging.sh usr/share/kano-toolset/
 
 kano-keys-pressed/kano-keys-pressed /usr/bin
+
+kano-splash/kano-splash /usr/bin
+kano-splash/kano-get-start-time /usr/bin

@@ -1,3 +1,11 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Contact: Kano developers <dev@kano.me>
+
 Files: *
-Copyright: 2013 Kano Computing Ltd.
+Copyright: 2013,2014,2015 Kano Computing Ltd.
 License: GPL-2+
+
+Files: kano-splash
+Copyright: 2013 Andrew Duncan, 2015 Kano Computing Ltd
+License: MIT
+Source: https://github.com/AndrewFromMelbourne/raspidmx

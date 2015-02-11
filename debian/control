@@ -3,13 +3,13 @@ Maintainer: Team Kano <dev@kano.me>
 Section: admin
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 9), libraspberrypi-dev, libpng12-dev
 
 Package: kano-toolset
 Architecture: all
 Depends: ${misc:Depends}, python-gtk2, python-webkit,
          fping, python, zenity, bc, ifplugd, python-yaml, python-pyinotify,
-         resolvconf
+         resolvconf, libpng12-0, libraspberrypi-bin
 Replaces: kano-init (<< 1.0-46)
 Breaks: kano-init (<< 1.0-46)
 Description: Collection of tools for Kanux

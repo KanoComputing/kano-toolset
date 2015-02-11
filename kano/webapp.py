@@ -74,24 +74,14 @@ class WebApp(object):
     _app_icon = None
     _inspector = False
 
-    _zenity = None
 
     _pipe = True
 
     def run(self):
         warnings.simplefilter("ignore")
 
-        zenity_cmd = ["zenity", "--progress", "--no-cancel",
-                      "--title=Loading",
-                      "--text=Loading...",
-                      "--width=300", "--height=90", "--auto-close",
-                      "--timeout=10", "--auto-kill"]
-
         self._pipe_name = '/tmp/webapp.pipe'
 
-        self._zenity = subprocess.Popen(zenity_cmd, stdin=subprocess.PIPE)
-        zin = self._zenity.stdin
-        zin.write("20\n")
 
         self._view = view = webkit.WebView()
         view.connect('navigation-policy-decision-requested',
@@ -111,8 +101,6 @@ class WebApp(object):
         if hasattr(self.__class__, "_download"):
             view.connect('download-requested', self._download)
 
-        zin.write("40\n")
-
         splitter = gtk.VPaned()
         sw = gtk.ScrolledWindow()
         sw.add(view)
@@ -120,8 +108,6 @@ class WebApp(object):
 
         inspector = view.get_web_inspector()
         inspector.connect("inspect-web-view", self._activate_inspector, splitter)
-
-        zin.write("50\n")
 
         self._win = win = gtk.Window(gtk.WINDOW_TOPLEVEL)
         win.set_title(self._title)
@@ -136,8 +122,6 @@ class WebApp(object):
         if self._taskbar is False:
             gtk.Window.set_skip_taskbar_hint(win, True)
 
-        zin.write("70\n")
-
         win.add(splitter)
         win.realize()
         win.show_all()
@@ -146,11 +130,7 @@ class WebApp(object):
                             self._width, self._height, self._decoration,
                             self._maximized, self._centered)
 
-        zin.write("90\n")
-
         view.open(self._index)
-
-        zin.write("99\n")
 
         # Start a thread that injects Javascript code coming from a filesystem pipe.
         if self._pipe == True:
@@ -166,12 +146,7 @@ class WebApp(object):
 
     def _onload(self, wv, frame, user_data=None):
         declare_timepoint("load",False)
-        if self._zenity:
-            try:
-                self._zenity.stdin.write("100\n")
-            except:
-                pass
-            del self._zenity
+        os.system("kano-stop-splash")
 
     def exit(self):
         sys.exit(0)
