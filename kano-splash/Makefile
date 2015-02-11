@@ -1,7 +1,7 @@
 #kano-get-start-time/* kano-get-start-time.c
 # 
 # Copyright (C) 2015 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# License: http://opensource.org/licenses/MIT
 # 
 # Build file for kano-splash and related utilities.
 #
