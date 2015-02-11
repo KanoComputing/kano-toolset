@@ -1,0 +1,10 @@
+kano-launcher
+dbus-daemon
+dbus-launch
+kdesk
+lxsession
+openbox
+ssh-agent
+lxpanel
+menu-cached
+python /usr/bin/kano-feedback
