@@ -27,6 +27,9 @@ function set_log_envs
 }
 
 
+set_log_envs
+
+
 logger_set_app_name()
 {
     export APP_NAME="$1"
