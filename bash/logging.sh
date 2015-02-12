@@ -9,9 +9,8 @@
 #
 # . /usr/share/kano-toolset/logging.sh
 #
-# set_app_name "make-minecraft"
 # log_timestamp "This is an interesting point to take note of"
-# logger_log_msg warning "tread carefully"
+# logger_warn "tread carefully"
 
 APP_NAME="`basename $0`"
 
