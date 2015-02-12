@@ -11,9 +11,21 @@
 #
 # set_app_name "make-minecraft"
 # log_timestamp "This is an interesting point to take note of"
-# logger_log_msg warn "tread carefully"
+# logger_log_msg warning "tread carefully"
 
-APP_NAME="$0"
+APP_NAME="`basename $0`"
+
+
+# Takes and exports the variables from the logging conf file
+# it expects that in this file there will be the following:
+# log_level:_value_
+# output_level:_value_
+function set_log_envs
+{
+    local kano_conf_file="/etc/kano-logs.conf"
+    eval `awk 'print "export "toupper(substr($1, 0, length($1)))"=" "\""$2"\""' "$kano_conf_file"`
+}
+
 
 logger_set_app_name()
 {
@@ -31,7 +43,7 @@ profiling_conf_file="/etc/kano-profiling.conf"
 logging_lvls=("none"
               "debug"
               "info"
-              "warn"
+              "warning"
               "error")
 
 # Returns the level to lowercase and checks whether it has an acceptable value
@@ -177,5 +189,25 @@ function logger_log_msg
         ret=0
     fi
     return "$ret"
+}
+
+function logger_debug
+{
+    logger_log_msg "debug" "$1"
+}
+
+function logger_info
+{
+    logger_log_msg "info" "$1"
+}
+
+function logger_warn
+{
+    logger_log_msg "warning" "$1"
+}
+
+function logger_error
+{
+    logger_log_msg "error" "$1"
 }
 
