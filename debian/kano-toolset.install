@@ -13,7 +13,7 @@ uinput/scancodes.py usr/lib/python2.7/dist-packages/
 udhcpc/kano.script etc/udhcpc
 
 bash/logging.sh usr/share/kano-toolset/
-bash/logging_bash.sh usr/share/kano-toolset/
+bash/logging_py.sh usr/share/kano-toolset/
 
 kano-keys-pressed/kano-keys-pressed /usr/bin
 
