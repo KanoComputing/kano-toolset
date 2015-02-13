@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "backgroundLayer.h"
 #include "imageLayer.h"
@@ -72,6 +73,12 @@ int main(int argc, char *argv[])
     char *file;
     char *binary;
     int is_interp;
+    
+    signal(SIGKILL,SIG_IGN); // don't allow us to be killed, because this causes a videocore memory leak
+
+    sigset_t waitfor;
+    sigaddset(&waitfor,SIGALRM);
+    sigprocmask(SIG_BLOCK,&waitfor,NULL); // switch off ALRM in case we are sent it before we want
 
     binary=basename(argv[0]);
     is_interp=strcmp(binary,"kano-splash")==0;
@@ -250,9 +257,12 @@ int main(int argc, char *argv[])
     assert(result == 0);
 
     //---------------------------------------------------------------------
-    
-
-    sleep(timeout);
+    // wait to be signalled with SIGARLM or timeout
+    struct timespec ts;
+    ts.tv_sec=timeout;
+    ts.tv_nsec=0;
+      
+    sigtimedwait(&waitfor,NULL, &ts);
     //---------------------------------------------------------------------
 
 
