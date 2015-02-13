@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
     
         if(!file) {
           fprintf(stderr,"filename is NULL \n");      
+	  exit(1);
         }
     
         real_interp=strsep(&argv[1]," ");
