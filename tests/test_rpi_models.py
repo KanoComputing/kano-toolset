@@ -88,6 +88,11 @@ class TestModelAsserters(unittest.TestCase):
         self.assertTrue (kano.utils.is_model_b_plus('0010'))
         self.assertTrue (kano.utils.is_model_2_b('0xA01041'))
 
+class TestModelAsserters(unittest.TestCase):
+
+    def test_unknown(self):
+        self.assertIn ('unknown', getrpi('ABCD'))
+
 
 if __name__ == '__main__':
     unittest.main()
