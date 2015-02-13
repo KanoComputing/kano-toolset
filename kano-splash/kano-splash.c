@@ -74,11 +74,6 @@ int main(int argc, char *argv[])
     char *binary;
     int is_interp;
     
-    signal(SIGKILL,SIG_IGN); // don't allow us to be killed, because this causes a videocore memory leak
-
-    sigset_t waitfor;
-    sigaddset(&waitfor,SIGALRM);
-    sigprocmask(SIG_BLOCK,&waitfor,NULL); // switch off ALRM in case we are sent it before we want
 
     binary=basename(argv[0]);
     is_interp=strcmp(binary,"kano-splash")==0;
@@ -177,6 +172,13 @@ int main(int argc, char *argv[])
             usage();
         }
     }
+
+    // don't allow us to be killed, because this causes a videocore memory leak
+    signal(SIGKILL,SIG_IGN); 
+
+    sigset_t waitfor;
+    sigaddset(&waitfor,SIGALRM);
+    sigprocmask(SIG_BLOCK,&waitfor,NULL); // switch off ALRM in case we are sent it before we want
         
     //---------------------------------------------------------------------
 
