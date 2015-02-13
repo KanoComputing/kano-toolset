@@ -381,47 +381,55 @@ def get_volume():
     return percent, millibel
 
 
-def is_model_a():
-    return get_rpi_model() == 'RPI/A'
+def is_model_a(revision=None):
+    return get_rpi_model(revision) == 'RPI/A'
 
 
-def is_model_b():
-    return get_rpi_model() == 'RPI/B'
+def is_model_b(revision=None):
+    return get_rpi_model(revision) == 'RPI/B'
 
 
-def is_model_b_plus():
-    return get_rpi_model() == 'RPI/B+'
+def is_model_b_plus(revision=None):
+    return get_rpi_model(revision) == 'RPI/B+'
 
 
-def is_model_2_b():
-    return get_rpi_model() == 'RPI/2/B'
+def is_model_2_b(revision=None):
+    return get_rpi_model(revision) == 'RPI/2/B'
 
 
-def get_rpi_model():
-    #
-    # TODO: The strategy below is based on pure heuristics, find a better way
-    #
-    revision=None
+def get_rpi_model(revision=None):
+    '''
+    Source for RaspberrPI model numbers
+    documented at: http://elinux.org/RPi_HardwareHistory
+    '''
     try:
-        o, _, _ = run_cmd('cat /proc/cpuinfo')
-        o = o.splitlines()
-        for entry in o:
-            if entry.startswith('Revision'):
-                revision=entry.split(':')[1]
+        model_name=overclocked=''
 
-        if int(revision, 16) <= 0x08:
-            return 'RPI/A'
+        if not revision:
+            o, _, _ = run_cmd('cat {}'.format('/proc/cpuinfo'))
+            o = o.splitlines()
+            for entry in o:
+                if entry.startswith('Revision'):
+                    revision=entry.split(':')[1]
 
-        if int(revision, 16) == 0x0D:
-            return 'RPI/B'
+        if revision == 'Beta':
+            model_name='RPI/B (Beta)'
+        elif int(revision, 16)  & 0x00ff in (0x2, 0x3, 0x4, 0x5, 0x6, 0xd, 0xe, 0xf):
+            model_name='RPI/B'
+        elif int(revision, 16) & 0x00ff in (0x7, 0x8, 0x9):
+            model_name='RPI/A'
+        elif int(revision, 16) & 0x00ff == 0x10:
+            model_name='RPI/B+'
+        elif int(revision,16) & 0x00ff == 0x11:
+            model_name='Compute Module'
+        elif int(revision,16) & 0x00ff == 0x12:
+            model_name='RPI/A+'
+        elif int(revision,16) & 0x00FFFFFF >= 0x00A01041:
+            model_name='RPI/2/B'
+        else:
+            model_name='unknown revision: {}'.format(revision)
 
-        if int(revision, 16) == 0x10:
-            return 'RPI/B+'
-
-        if int(revision,16) >= 0xA01041:
-            return 'RPI/2/B'
-
-        return 'unknown revision: {}'.format(revision)
+        return '{} {}'.format(model_name, overclocked).strip()
 
     except:
         return 'Error getting model name'
