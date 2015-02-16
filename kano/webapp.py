@@ -14,7 +14,6 @@ import re
 import os
 import urllib
 import warnings
-import subprocess
 
 import thread
 import atexit
