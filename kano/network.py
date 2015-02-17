@@ -407,20 +407,25 @@ def wpa_conf(essid, psk, confile, wep=False):
             # In plain text form, the wpa_passphrase tool will give us 
             # the passphrase and essid encoded correctly
             # and it carefully takes care of escaping single/double quotes for us
-            wpa_conf = subprocess.check_output(['wpa_passphrase', essid, psk])
-            wpa_conf += wpa_epilog
-            lines_wpa_conf = []
-            for line in wpa_conf.split('\n'):
-                if line.startswith('}'):
-                    pass
-                else:
-                    lines_wpa_conf.append(line + '\n')
+            try:
+                wpa_conf = subprocess.check_output(['wpa_passphrase', essid, psk])
+                wpa_conf += wpa_epilog
+                lines_wpa_conf = []
+                for line in wpa_conf.split('\n'):
+                    if line.startswith('}'):
+                        pass
+                    else:
+                        lines_wpa_conf.append(line + '\n')
+            except:
+                logger.error('Error calling wpa_passphrase to translate essid/psk pair')
+                return False
 
     # save the WPA configuration file
     f=open(confile, 'wt')
     for k in lines_wpa_conf:
         f.write(k)
     f.close()
+    return True
 
 
 def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt2800usb'):
@@ -527,12 +532,13 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         elif len(seckey) not in (10+3, 26+3, 116+3):
             # For keys that start with "hex", make sure their length is also correct.
             logger.error("The HEX WEP key lenght is incorrect (%d) should 10/26/116" % (len(seckey)))
-
+            return False
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
         wpafile = '/etc/kano_wpa_connect.conf'
         associated = False
-        wpa_conf(essid, seckey, confile=wpafile, wep=True)
+        if not wpa_conf(essid, seckey, confile=wpafile, wep=True):
+            return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
         run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
@@ -554,10 +560,20 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             return False
 
     elif encrypt == 'wpa':
+
+        if not seckey.startswith('hex'):
+            wpalen=len(seckey)
+            if wpalen < 8 or wpalen > 63:
+                # WPA passphrases lenght is not correct
+                logger.error("The WPA key lenght is incorrect " \
+                                 "(%d) should be between 8 and 63 chars" % wpalen)
+                return False
+
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
         wpafile = '/etc/kano_wpa_connect.conf'
         associated = False
-        wpa_conf(essid, seckey, confile=wpafile)
+        if not wpa_conf(essid, seckey, confile=wpafile):
+            return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
         run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
