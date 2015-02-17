@@ -11,3 +11,4 @@ python /usr/bin/kano-feedback-widget
 python /usr/bin/kano-tracker-ctl
 /usr/bin/xbindkeys
 x11vnc
+lxterminal
