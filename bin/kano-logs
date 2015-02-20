@@ -249,8 +249,8 @@ def main():
         if args["log_level"] is None and args["output_level"] is None and args["show_value"] is None:
             ll = logger.get_log_level()
             dl = logger.get_output_level()
-            print "Logging set to {}".format(decorate_with_preset(ll, ll), True)
-            print "Debugging set to {}".format(decorate_with_preset(dl, dl), True)
+            print "Logging to file set to {}".format(decorate_with_preset(ll, ll), True)
+            print "Output set to {}".format(decorate_with_preset(dl, dl), True)
             return 0
 
         if args["show_value"] is not None:
