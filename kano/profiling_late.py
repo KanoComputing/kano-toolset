@@ -21,7 +21,7 @@ app_name = sys.argv[0]
 
 
 def has_key(d, k):
-    return type(d) is dict and d.has_key(k)
+    return type(d) is dict and k in d
 
 
 def declare_timepoint(name, isStart):
