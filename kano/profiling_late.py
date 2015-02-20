@@ -30,11 +30,13 @@ def declare_timepoint(name, isStart):
     cmd = None
     pythonProfile = False
 
+    # Check if the app is contained in the profiling conf file
     if has_key(conf, app_name):
+        # Check if the timepoint name is contained in the profiling conf file
         if has_key(conf[app_name], name):
             ct = conf[app_name][name]
 
-            # check if python profiler should be started for this timepoint
+            # Check if python profiler should be started for this timepoint
             if has_key(ct, 'python'):
                 pythonProfile = True
                 if isStart:
@@ -45,15 +47,25 @@ def declare_timepoint(name, isStart):
                         logger.error(' timepoint '+name+' not started')
                     else:
                         myProfile.disable()
-                        myProfile.dump_stats(ct['python']['statfile'])
+                        # Check if the statfile location in specified
+                        if ct['python']['statfile']:
+                            myProfile.dump_stats(ct['python']['statfile'])
+                        else:
+                            logger.error('No statfile entry in profiling conf file')
                         myProfile = None
+            else:
+                logger.info('Profiling conf file doesnt enable the Python profiler for point {} at app {}'.format(name, app_name))
 
-            # check if we want to run some other command at this timepoint
+            # Check if we want to run some other command at this timepoint
             if isStart and has_key(ct, 'start_exec'):
                 cmd = ct['start_exec']
                 os.system(cmd)
             if not isStart and has_key(ct, 'end_exec'):
                 cmd = ct['end_exec']
                 os.system(cmd)
+        else:
+            logger.info('Profiling conf file doesnt include point:{} for app {}'.format(name, app_name))
+    else:
+        logger.info('Profiling conf file doesnt include app:{}'.format(app_name))
 
     logger.debug('timepoint '+name, transition=name, isStart=isStart, cmd=cmd, pythonProfile=pythonProfile)
