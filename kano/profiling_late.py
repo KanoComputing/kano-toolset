@@ -15,7 +15,7 @@ from kano.logging import logger
 from kano.profiling import CONF_FILE
 
 # load the configuration file
-conf = yaml.load(open(CONF_FILE, "r"))
+conf = yaml.load(open(CONF_FILE, 'r'))
 myProfile = None
 app_name = sys.argv[0]
 
@@ -41,7 +41,7 @@ def declare_timepoint(name, isStart):
                     myProfile.enable()
                 else:
                     if myProfile is None:
-                        logger.error(" timepoint "+name+" not started")
+                        logger.error(' timepoint '+name+' not started')
                     else:
                         myProfile.disable()
                         myProfile.dump_stats(ct['python']['statfile'])
@@ -55,4 +55,4 @@ def declare_timepoint(name, isStart):
                 cmd = ct['end_exec']
                 os.system(cmd)
 
-    logger.debug("timepoint "+name, transition=name, isStart=isStart, cmd=cmd, pythonProfile=pythonProfile)
+    logger.debug('timepoint '+name, transition=name, isStart=isStart, cmd=cmd, pythonProfile=pythonProfile)
