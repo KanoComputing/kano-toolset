@@ -46,7 +46,7 @@ def declare_timepoint(name, isStart):
                         logger.error(' timepoint '+name+' not started')
                     else:
                         myProfile.disable()
-                        # Check if the statfile location in spefified
+                        # Check if the statfile location in specified
                         if ct['python']['statfile']:
                             myProfile.dump_stats(ct['python']['statfile'])
                             myProfile.clear()
