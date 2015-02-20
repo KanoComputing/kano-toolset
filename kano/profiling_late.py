@@ -17,7 +17,7 @@ from kano.profiling import CONF_FILE
 # load the configuration file
 with open(CONF_FILE, 'r') as inp_conf:
     conf = yaml.load(inp_conf)
-myProfile = None
+myProfile = cProfile.Profile()
 app_name = sys.argv[0]
 
 
@@ -40,7 +40,6 @@ def declare_timepoint(name, isStart):
             if has_key(ct, 'python'):
                 pythonProfile = True
                 if isStart:
-                    myProfile = cProfile.Profile()
                     myProfile.enable()
                 else:
                     if myProfile is None:
@@ -52,7 +51,7 @@ def declare_timepoint(name, isStart):
                             myProfile.dump_stats(ct['python']['statfile'])
                         else:
                             logger.error('No statfile entry in profiling conf file')
-                        myProfile = None
+                        myProfile.clear()
             else:
                 logger.info('Profiling conf file doesnt enable the Python profiler for point {} at app {}'.format(name, app_name))
 
