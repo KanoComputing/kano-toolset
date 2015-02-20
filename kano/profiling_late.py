@@ -15,7 +15,8 @@ from kano.logging import logger
 from kano.profiling import CONF_FILE
 
 # load the configuration file
-conf = yaml.load(open(CONF_FILE, 'r'))
+with open(CONF_FILE, 'r') as inp_conf:
+    conf = yaml.load(inp_conf)
 myProfile = None
 app_name = sys.argv[0]
 
