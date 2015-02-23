@@ -19,6 +19,7 @@ with open(CONF_FILE, 'r') as inp_conf:
     conf = yaml.load(inp_conf)
 myProfile = cProfile.Profile()
 app_name = sys.argv[0]
+point_current = ""
 
 
 def has_key(d, k):
@@ -27,6 +28,7 @@ def has_key(d, k):
 
 def declare_timepoint(name, isStart):
     global myProfile
+    global point_current
     cmd = None
     pythonProfile = False
 
@@ -40,18 +42,30 @@ def declare_timepoint(name, isStart):
             if has_key(ct, 'python'):
                 pythonProfile = True
                 if isStart:
+                    if point_current:
+                        logger.error('Stop profiling for point "{0}" and do "{1}" instead'.format(point_current, name))
+                        myProfile.disable()
+                        myProfile.clear()
+                    point_current = name
                     myProfile.enable()
                 else:
-                    if myProfile is None:
-                        logger.error(' timepoint '+name+' not started')
+                    if point_current != name:
+                        logger.error('Can\'t stop point "{0}" since a profiling session for "{1}" is being run'.format(name, point_current))
                     else:
                         myProfile.disable()
                         # Check if the statfile location in specified
                         if ct['python']['statfile']:
-                            myProfile.dump_stats(ct['python']['statfile'])
+                            try:
+                                myProfile.dump_stats(ct['python']['statfile'])
+                            except IOError as e:
+                                if e.errno == 2:
+                                    logger.error('Path to "{}" probably does not exist'.format(ct['python']['statfile']))
+                                else:
+                                    logger.error('dump_stats IOError: errno:{0}: {1} '.format(e.errno, e.strerror))
                         else:
-                            logger.error('No statfile entry in profiling conf file')
+                            logger.error('No statfile entry in profiling conf file "{}"'.format(CONF_FILE))
                         myProfile.clear()
+                        point_current = ""
             else:
                 logger.info('Profiling conf file doesnt enable the Python profiler for point {} at app {}'.format(name, app_name))
 
