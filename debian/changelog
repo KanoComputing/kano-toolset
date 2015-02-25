@@ -1,3 +1,9 @@
+kano-toolset (1.3-10) unstable; urgency=low
+
+  * run_cmd_* functions from kano.utils now support localisation
+
+ -- Team Kano <dev@kano.me>  Wed, 25 Feb 2015 11:14:00 +0000
+
 kano-toolset (1.3-9) unstable; urgency=low
 
   * logging.sh is now in native bash, the old logging.sh has been moved to logging_py.sh
