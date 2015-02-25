@@ -19,8 +19,12 @@ import grp
 import json
 
 
-def run_cmd(cmd):
-    process = subprocess.Popen(cmd, shell=True,
+def run_cmd(cmd, localised=False):
+    env = os.environ.copy()
+    if not localised:
+        env['LC_ALL'] = 'C'
+
+    process = subprocess.Popen(cmd, shell=True, env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                preexec_fn=restore_signals)
 
@@ -29,10 +33,10 @@ def run_cmd(cmd):
     return stdout, stderr, returncode
 
 
-def run_cmd_log(cmd):
+def run_cmd_log(cmd, localised=False):
     from kano.logging import logger
 
-    out, err, rv = run_cmd(cmd)
+    out, err, rv = run_cmd(cmd, localised)
     logger.info("Command: {}".format(cmd))
 
     if len(out.strip()) > 0:
@@ -46,19 +50,23 @@ def run_cmd_log(cmd):
     return out, err, rv
 
 
-def run_bg(cmd):
-    subprocess.Popen(cmd, shell=True)
+def run_bg(cmd, localised=False):
+    env = os.environ.copy()
+    if not localised:
+        env['LC_ALL'] = 'C'
+
+    subprocess.Popen(cmd, shell=True, env=env)
 
 
-def run_term_on_error(cmd):
-    o, e, rc = run_cmd(cmd)
+def run_term_on_error(cmd, localised=False):
+    o, e, rc = run_cmd(cmd, localised)
     if e:
         sys.exit('\nCommand:\n{}\n\nterminated with error:\n{}'.format(cmd, e.strip()))
     return o, e, rc
 
 
-def run_print_output_error(cmd):
-    o, e, rc = run_cmd(cmd)
+def run_print_output_error(cmd, localised=False):
+    o, e, rc = run_cmd(cmd, localised)
     if o or e:
         print '\ncommand: {}'.format(cmd)
     if o:
