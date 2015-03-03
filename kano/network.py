@@ -310,8 +310,8 @@ def is_ethernet_plugged(eth_device='eth0'):
 
 def is_connected(iface):
     '''
-    Returns data as returned by <iwconfig device>
-    or None if device is not present or non-operative
+    Returns details on which wireless network we are currently associated.
+    The linked variable tells us if Internet is reachable.
     '''
     essid = mode = ap = None
     linked = False
@@ -330,10 +330,9 @@ def is_connected(iface):
     else:
         mode = out
 
-    # ifplugstatus will tell us if we are associated
-    # and authenticated to the AP with return code 2
-    _, _, rc = run_cmd("/usr/sbin/ifplugstatus %s" % iface)
-    linked = (rc == 2)
+    # Association status can be queried via ifplugstatus,
+    # but we are returning linked=True if Internet is actually up.
+    linked = is_internet()
 
     return (essid, mode, ap, linked)
 
