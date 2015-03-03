@@ -332,8 +332,7 @@ def is_connected(iface):
 
     # Association status can be queried via ifplugstatus,
     # but we are returning linked=True if Internet is actually up.
-    _, _, rc = run_cmd("/usr/bin/is_internet")
-    linked = (rc == 0)
+    linked = is_internet()
 
     return (essid, mode, ap, linked)
 
