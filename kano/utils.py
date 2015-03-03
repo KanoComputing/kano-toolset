@@ -24,7 +24,7 @@ def run_cmd(cmd, localised=False):
     if not localised:
         env['LC_ALL'] = 'C'
 
-    process = subprocess.Popen(cmd, shell=True, env,
+    process = subprocess.Popen(cmd, shell=True, env=env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                preexec_fn=restore_signals)
 
