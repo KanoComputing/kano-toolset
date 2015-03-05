@@ -61,3 +61,11 @@ The script is a handy set of steps to compute your SD Card Input/Output throughp
 
 Script to shutdown the system after a confirmation message on the graphic frontend.
 The user needs sudo NOPASSWD: privileges for /sbin/poweroff.
+
+## webapp
+
+A webkit based browser is provided under `kano/wepapp`. This component is used from
+all Kano Blocks apps, mainly Make Pong and Make Minecraft to provide the user interaction panel.
+
+The Javascript module `js/backend-api.js` is used as a hack in wepapp to provide for
+download callbacks necessary to download content from Kano World.
