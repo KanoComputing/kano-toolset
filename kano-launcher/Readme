@@ -1,0 +1,29 @@
+kano-launcher implements a poor man's container system on kernels where control groups
+are not present, but namespaces are.
+
+Usage: kano-launcher <command> <preset>
+
+kano-launcher is basically intended to run <command> (using system(2)).
+
+If present, config files in /usr/share/kano-toolset/kano-launcher/conf/
+modify its behavior.
+
+The optional argument <preset> helps identify a config file.
+
+If the name of the config file exactly matches <preset> it is chosen.
+Otherwise, any config file matching a substring of <command>  may match.
+
+The following lines in the config file are allowed:
+
+no_kill
+extra_cmd: <cmd>
+match_only_preset
+
+ * match_only_preset causes a config file to match only if its filename matches the preset, not
+   in the command.
+ 
+If a matching config file is found, the command is 'containerised'. This means it, and
+all processes it launches, are subject to being killed when a new kano-launch instance is run.
+'no_kill' prevents a launched app from killing *other* launched apps (but not from itself being killed).
+
+if 'extra_cmd' is present, an additional command is run, as specified.

@@ -1,0 +1,4 @@
+no_kill
+match_only_preset
+extra_cmd: if [ -e /usr/bin/kano-profile-cli ]; then kano-profile-cli increment_app_state_variable pcmanfm starts 1 ; fi
+
