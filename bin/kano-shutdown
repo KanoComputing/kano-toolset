@@ -6,6 +6,7 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # Script to shutdown the system after a confirmation message
+# The user executing this code needs sudo NOPASSWD: privileges for /sbin/poweroff.
 #
 
 # Report shutdown event to Kano Tracker
