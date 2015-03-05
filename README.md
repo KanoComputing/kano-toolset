@@ -19,7 +19,7 @@ But you can still use many of them to your own needs. Below is a summary of the 
 ## Kano keys pressed
 
 A tool that returns an indication on wether the Ctrl-Alt key combination is currently pressed.
-This tool is used to regain control on unsupported screens, a.k.a. safe mode.
+This tool is used to regain control on RaspberryPI unsupported screens, and switch to a *safe mode*.
 
 ## Kano Splash
 
@@ -50,8 +50,8 @@ and model name to Kano for usage statistics.
 
 ## uinput
 
-This tool allows for detecting and identifying keyboard scancodes across different keyboards.
-It is currently not needed on the OS but used during our development and integration lifecycle.
+This tool allows for sending keyboard events into the system, as if they were pressed by the user.
+It is currently not stable and is not used or packaged into KanoOS.
 
 ## iospeed
 
