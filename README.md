@@ -48,10 +48,9 @@ It also provides a hook script which is called when DHCP events occur, for examp
 obtaining a lease: `bin/kano-network-hook`. This hook script is used to send the CPU ID 
 and model name to Kano for usage statistics.
 
-## uinput (internal)
+## uinput
 
 This tool allows for sending keyboard events into the system, as if they were pressed by the user.
-It is currently not stable and is not used or packaged into KanoOS.
 
 ## iospeed (internal)
 
