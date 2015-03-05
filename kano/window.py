@@ -5,8 +5,10 @@
 # Copyright (C) 2014 Kano Computing Ltd.
 # License: GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
 #
-# Base common code for Kano apps and projects
-#
+
+'''
+Base common code for Kano apps and projects
+'''
 
 from gtk import gdk
 import time
@@ -132,8 +134,12 @@ def _get_window_by_id(wid):
     return gdk.window_foreign_new(int(wid))
 
 
-# Find the gdk window to be manipulated. Gives up after 30 seconds.
 def find_window(title=None, pid=None, wid=None):
+    '''
+    Finds the gdk window identified by title, pid or wid (X window ID)
+    to be manipulated. It gives up if it does not appear in 30 seconds.
+    '''
+
     if (title is None) and (pid is None) and (wid is None):
         raise ValueError("At least one identificator needed.")
 
@@ -154,6 +160,9 @@ def find_window(title=None, pid=None, wid=None):
 
 def gdk_window_settings(win, x=None, y=None, width=None, height=None,
                         decoration=None, maximized=False, centered=False):
+    '''
+    Applies appeareance and position modifications to the Window identified by win    
+    '''
     # Screen dimensions
     scr_width = gdk.screen_width()
     scr_height = gdk.screen_height() - BOTTOM_BAR_HEIGHT
@@ -236,5 +245,3 @@ def gdk_window_settings(win, x=None, y=None, width=None, height=None,
     win.move_resize(int(new_x), int(new_y), int(new_width), int(new_height))
     gdk.window_process_all_updates()
     gdk.flush()
-
-

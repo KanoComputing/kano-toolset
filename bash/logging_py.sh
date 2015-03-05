@@ -3,7 +3,8 @@
 # Copyright (C) 2014, 2015 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# bash wrapper for kano.logging
+# Bash wrapper for kano.logging, so you can easily log events from your Bash scripts.
+#
 # Usage:
 #
 # . /usr/share/kano-toolset/logging_py.sh
@@ -11,6 +12,7 @@
 # set_app_name "make-minecraft"
 #
 # logger_write "Error! Error!"
+#
 
 APP_NAME="$0"
 

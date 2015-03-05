@@ -6,6 +6,10 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
+'''
+Discovers and exposes the absolute pathnames for common_css_dir and common_images_dir
+'''
+
 import os
 
 # setting up directories

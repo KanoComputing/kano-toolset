@@ -8,6 +8,7 @@
 
 import os
 import sys
+
 if __name__ == '__main__' and __package__ is None:
     dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if dir_path != '/usr':
@@ -55,12 +56,15 @@ def parse_string(string):
     # First part of the string
     pos1 = string.index("{{")
     first_part = string[:pos1]
+
     # Last part of the string
     pos2 = string.index("}}")
     last_part = string[pos2 + 2:]
+
     # Preset id
     preset_id = string[pos1 + 2]
     preset = get_preset_from_id(preset_id)
+
     # Colour part of the string
     colour_part = string[pos1 + 3:pos2]
     colour_part = colours.decorate_with_preset(colour_part, preset)
@@ -68,7 +72,8 @@ def parse_string(string):
 
 
 output = sys.argv[1]
-# If format found > parse the string "my {{1example}}"
+
+# If format found then parse the string "my {{1example}}"
 while output.find("{{") != -1:
     output = parse_string(output)
 

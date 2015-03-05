@@ -5,9 +5,8 @@
 # Copyright (C) 2015 Kano Computing Ltd.
 # License: http://opensource.org/licenses/MIT
 #
-# 
 # Terminate  a splash window when the app has finished loading.
-
+#
 
 if test -n "$SPLASH_PID" ; then 
    if test -n "$SPLASH_START_TIME" ; then

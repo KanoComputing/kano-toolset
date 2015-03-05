@@ -4,6 +4,10 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
+'''
+This module provides the core Kano Logging functionality
+'''
+
 import os
 import sys
 import re
@@ -51,12 +55,13 @@ LEVELS = {
 
 
 def normalise_level(level):
-    """Normalise the input string, i.e.
+    '''
+    Normalise the input string, i.e.
     convert it into lowercase and see if it matches with
     the specified levels held in the dict LEVELS.
     It will try to match the input to the first n chars
     of the dict. ex 'd', 'de' is turned into debug.
-    """
+    '''
 
     if level is None:
         return "none"
