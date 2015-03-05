@@ -3,9 +3,12 @@
 # Copyright (C) 2015 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# Module to enable profiling timepoints. This module is loaded
-# only if the configuration file exists, see profiling.py for more information
+#
 
+'''
+Module to enable profiling timepoints. This module is loaded
+only if the configuration file exists, see profiling.py for more information
+'''
 
 import os
 import sys

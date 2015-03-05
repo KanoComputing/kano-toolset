@@ -6,6 +6,9 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
+'''
+'''
+
 import os
 import re
 import subprocess
@@ -20,6 +23,10 @@ import json
 
 
 def run_cmd(cmd, localised=False):
+    '''
+    Executes cmd, returning stdout, stderr, return code
+    If localised is True, LC_ALL will be set to "C"
+    '''
     env = os.environ.copy()
     if not localised:
         env['LC_ALL'] = 'C'
@@ -34,6 +41,10 @@ def run_cmd(cmd, localised=False):
 
 
 def run_cmd_log(cmd, localised=False):
+    '''
+    Wrapper against run_cmd but Kano Logging executuion and return code
+    '''
+
     from kano.logging import logger
 
     out, err, rv = run_cmd(cmd, localised)
@@ -51,6 +62,9 @@ def run_cmd_log(cmd, localised=False):
 
 
 def run_bg(cmd, localised=False):
+    '''
+    Starts cmd program in the background
+    '''
     env = os.environ.copy()
     if not localised:
         env['LC_ALL'] = 'C'
@@ -173,6 +187,9 @@ def get_home_by_username(username):
 
 
 def get_cpu_id():
+    '''
+    Returns the RaspberryPI Serial number from /proc/cpuinfo
+    '''
     cpuinfo_file = '/proc/cpuinfo'
     lines = read_file_contents_as_lines(cpuinfo_file)
     if not lines:
@@ -256,6 +273,9 @@ def requests_get_json(url, params=None):
 
 
 def is_installed(program):
+    '''
+    Returns True if "program" is recognized as an executable command in PATH
+    '''
     _, _, rc = run_cmd('which {}'.format(program))
     return rc == 0
 
@@ -323,6 +343,7 @@ def detect_kano_keyboard():
 
     # Get information of all devices
     o, _, _ = run_cmd('lsusb -v')
+
     # Kano keyboard has the following information:
     # Vendor id:  0x1997
     # Product id: 0x2433
@@ -407,8 +428,10 @@ def is_model_2_b(revision=None):
 
 def get_rpi_model(revision=None):
     '''
-    Source for RaspberrPI model numbers
-    documented at: http://elinux.org/RPi_HardwareHistory
+    Returns a string identifying the RaspberryPI model (RPI A/B/B+/2B)
+
+    Source for RaspberrPI model numbers documented at:
+    http://elinux.org/RPi_HardwareHistory
     '''
     try:
         model_name=overclocked=''

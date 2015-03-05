@@ -6,6 +6,8 @@
 # License: GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
 #
 # A tool used to manipulate window properties
+# Call kano-window-tool --help for detailed options
+#
 
 import sys
 import re

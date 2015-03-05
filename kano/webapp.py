@@ -6,6 +6,10 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
+'''
+Provides a class wrapper on top of a WebKit browser
+'''
+
 import gtk
 import gobject
 import webkit

@@ -7,6 +7,7 @@
 #
 # A simple script to launch Kano projects
 # Usage: kano-launcher cmd [preset]
+#
 
 # Make sure there are no other projects running at the same time
 killall_projects () {

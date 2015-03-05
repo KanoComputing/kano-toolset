@@ -7,6 +7,10 @@
 #
 # Sends a signal to a Kano app (save, load, share, make)
 #
+# This script is invoked by the Kano Keyboard hotkeys (xbindkeys in Kano Desktop).
+# If you call it from a shell or command line, make sure you export DISPLAY
+# to point to your desktop.
+#
 
 # pipe name to send javascript code
 pipe_name=/tmp/webapp.pipe

@@ -3,6 +3,11 @@
 // Copyright (C) 2014 Kano Computing Ltd.
 // License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 //
+// This Javascript module is used to provide callbacks from the webapp Webkit based browser.
+//
+// In conjunction with Kano Blocks it allows for receiving special events such as capture
+// Download links triggered by the user.
+//
 
 window.backend = {
     callbacks: [],

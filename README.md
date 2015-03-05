@@ -14,7 +14,7 @@ But you can still use many of them to your own needs. Below is a summary of the 
 `kan-shutdown` shuts down the system after a confirmation message on the graphic frontend.
 `kano-signal` allows to send save, load, share, and make signals to Kano apps
 `rpi-info` will give you core information from you RPI unit such as CPU speed, temperature, etc.
-
+`bash` this directory contains code wrappers to make it easy to log events from Bash shell scripts.
 
 ## Kano keys pressed
 
@@ -48,12 +48,12 @@ It also provides a hook script which is called when DHCP events occur, for examp
 obtaining a lease: `bin/kano-network-hook`. This hook script is used to send the CPU ID 
 and model name to Kano for usage statistics.
 
-## uinput
+## uinput (internal)
 
 This tool allows for sending keyboard events into the system, as if they were pressed by the user.
 It is currently not stable and is not used or packaged into KanoOS.
 
-## iospeed
+## iospeed (internal)
 
 The script is a handy set of steps to compute your SD Card Input/Output throughput.
 

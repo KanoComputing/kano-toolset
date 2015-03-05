@@ -13,6 +13,10 @@
 # Common module for wireless support functions
 #
 
+'''
+Common functions used by kano-wifi and kano-connect to get wireless networking up
+'''
+
 import os
 import sys
 import time
