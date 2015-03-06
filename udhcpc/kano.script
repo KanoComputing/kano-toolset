@@ -20,6 +20,10 @@ RESOLV_CONF="/etc/resolv.conf"
 # Hook script to be called when network DHCP events occur
 network_hook="/usr/bin/kano-network-hook"
 
+# Config files in kano-settings
+SETTINGS_CONFIG='/usr/share/kano-settings/config/settings'
+SERVER_CONFIG='/usr/share/kano-settings/config/sentry'
+
 function call_hook {
 
     # The network hook script is called when UDHCP events arrive.
@@ -60,7 +64,22 @@ case $1 in
 "
         done
 
-        if [ -x /sbin/resolvconf ]; then
+        # Look at the setting to find the parental level
+        ultimate_parental=false
+
+        # Check if the parental control is at the highest level 3.0
+        while read line
+        do
+            if [[ $line == '"Parental-level": 3.0' ]]; then
+                ultimate_parental=true
+            fi
+        done < $SETTINGS_CONFIG
+
+        # If the parental is at the highest level, start the sentry server
+        if [ $ultimate_parental = true ]; then
+            sentry -c $SERVER_CONFIG
+
+        elif [ -x /sbin/resolvconf ]; then
             echo -n "$R" | resolvconf -a "${interface}.udhcpc"
         else
             echo -n "$R" > "$RESOLV_CONF"
