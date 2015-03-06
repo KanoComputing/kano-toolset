@@ -75,7 +75,10 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
     
   while(!feof(conf_file)){
     if(!fgets(line,STRING_SIZE,conf_file)){      
-      if(ferror(conf_file)) return 1;
+      if(ferror(conf_file)) {
+	fclose(conf_file);
+	return 1;
+      }
       break;
     }	 
 
