@@ -95,6 +95,7 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
     }
     
   }
+  fclose(conf_file);
   if(c.match_only_preset && matching_cmd)
     return 0; // don't write back match
   
@@ -109,7 +110,7 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
  */
 bool is_pi2(void)
 {
-  FILE *cpu=fopen("/proc/cpuinfo","r@");
+  FILE *cpu=fopen("/proc/cpuinfo","r");
   char line[STRING_SIZE];
   bool pi2=false;
   unsigned long long rev;
