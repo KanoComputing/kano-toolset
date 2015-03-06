@@ -33,7 +33,8 @@ int main(int argc,char *argv[])
     
   }
   int err;
-  
+
+  // now send signal to each pid
   for(i=3;i<argc;i++) {
 
     char path[PATH_LEN];
@@ -42,6 +43,8 @@ int main(int argc,char *argv[])
       kano_log_warning("kano-kill-ns: invalid pid %s, skipping\n",argv[i]);
       continue;
     }
+    // examine /proc/<pid>/ns/uts to see if it is the same as the inode we have
+    // been given
     count=snprintf(path,PATH_LEN,"/proc/%d/ns/uts",pid);
     if(count=0 || count==PATH_LEN){
       kano_log_warning("kano-kill-ns: path too long for %s, skipping\n",argv[i]);
@@ -62,5 +65,5 @@ int main(int argc,char *argv[])
     }
   }
   return 0;
-
 }
+

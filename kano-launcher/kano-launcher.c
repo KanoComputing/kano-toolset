@@ -32,8 +32,10 @@
 
 #define STACK_SIZE 4096
 
+// uid and gid saved here to allow dropping root privilege
 int gid;
 int uid;
+// The path of the container directory
 char contdir[256];
 bool contdir_set=0;
 
@@ -66,17 +68,16 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
     .match_only_preset=false,
     .extra_cmd=""
   };
+  
   FILE *conf_file=fopen(config_filename,"r");
   char line[256];
   if(!conf_file) return 1;
-  
-  
+    
   while(!feof(conf_file)){
     if(!fgets(line,256,conf_file)){      
       if(ferror(conf_file)) return 1;
       break;
-    }
-	 
+    }	 
 
     if(strncmp(line,"no_kill",7)==0){
       kano_log_debug("kano-launcher: config %s no_kill\n",config_filename);
@@ -101,6 +102,7 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
   *conf=c;
   return 0;
 }
+
 /**
  * @name is_pi2 - Return true if running on a pi2, false otherwise
  * @return bool
@@ -134,8 +136,6 @@ bool is_pi2(void)
  * @param conf -  Config to write
  * @return int  - zero on success
  */
-
-
 int get_config(char *preset, char *command,bool *match,config *conf){
   
   int err=0;
@@ -168,6 +168,7 @@ int get_config(char *preset, char *command,bool *match,config *conf){
     
   return 0;
 }
+
 /**
  * @name fatal - We have a fatal error, so log it and quit
  * @param msg - message
@@ -178,17 +179,28 @@ void fatal(char *msg){
   exit(1);
 }
 
+/**
+ * @name run_in_container - Function called by clone(2) to start inside a container.
+ * @param cmd - Command to run
+ * @return int - return value from system(2)
+ *
+ * This function is run inside the container. It binds the file
+ * /proc/<pid>/ns/uts to a file under ~/.kano-app-containers so
+ * we can find it later.
+ * 
+ * Even if we fail to do this, we still try to run the app.
+ * Before doing so, we drop root privilege
+ */
 int run_in_container(void *cmd){
-  // This function is run inside the container. It binds the file
-  // /proc/<pid>/ns/uts to a file under ~/.kano-app-containers so
-  // we can find it later.
-  // Even if we fail to do this, we still try to run the app.
   
   int  err;
   pid_t pid=getpid();
   char piddir[256];
   int  made_contfile=0;
   char my_contfile[256];    
+
+  // Choose a name for the contaimer file
+  // and make an empty file to bind on top of.
   do {
     int count=snprintf(piddir,256,"/proc/%d/ns/uts",pid);
     if(count==0 || count==256) {
@@ -208,8 +220,7 @@ int run_in_container(void *cmd){
 	close(cf);
 	break;
       }
-    }
-   
+    }   
 
     if(!made_contfile){
       kano_log_error("kano-launcher: failed to make container file for [%s]\n",cmd);
@@ -217,6 +228,7 @@ int run_in_container(void *cmd){
     }
   }while(0);
 
+  // Now bind the UTS namespace file on top of our empty file
   kano_log_debug("kano-launcher: binding [%s] in to %s \n",piddir,my_contfile);
   err = mount(piddir,my_contfile,NULL, MS_BIND, NULL);
   if(err){
@@ -228,6 +240,8 @@ int run_in_container(void *cmd){
     fatal("setgid: Unable to drop group privileges");
   if (setuid(uid) != 0)
     fatal("setuid: Unable to drop user privileges:");
+
+  // Run the actual command
   kano_log_info("kano-launcher: starting [%s]\n",cmd);
   err=system(cmd);
   if(err){
@@ -236,6 +250,11 @@ int run_in_container(void *cmd){
   
 
 }
+/**
+ * @name run_system - drop root priviledge and run a command 
+ * @param cmd - Command to run
+ * @return int  - return value from system(2)
+ */
 int run_system(void *cmd){
   // this function is used when we need to run a command which should not be containerised,
   // but  we still need to drop suid root.
@@ -254,7 +273,13 @@ int run_system(void *cmd){
 
 }
 
-int run_container(int in_container,char *cmd){
+/**
+ * @name run_container - run a command
+ * @param in_container - if true, run in a container
+ * @param cmd - command to run
+ * @return int - return value from clone
+ */
+int run_container(bool in_container,char *cmd){
   // Run a command, either in a container or not.
   int flags=CLONE_PARENT;
   int (*fn)(void *);
@@ -369,7 +394,7 @@ int main(int argc, char *argv[]){
   if(homedir){
 
     int count=snprintf(contdir, 256,"%s/.kano-app-containers",homedir);
-    if(count!=0 && count !=256){
+    if(count!=0 && count != 256){
 
       int err=mkdir(contdir, S_IWUSR | S_IRUSR | S_IXUSR);
 
