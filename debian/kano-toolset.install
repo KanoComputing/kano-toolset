@@ -20,4 +20,7 @@ kano-keys-pressed/kano-keys-pressed /usr/bin
 kano-splash/kano-splash /usr/bin
 kano-splash/kano-get-start-time /usr/bin
 
-share/kano-launcher-no-kill-list usr/share/kano-toolset/
+share/kano-launcher/conf usr/share/kano-toolset/kano-launcher/
+kano-launcher/kano-launcher usr/bin/
+kano-launcher/kano-kill-ns usr/bin/
+

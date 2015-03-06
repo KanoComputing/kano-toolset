@@ -176,6 +176,8 @@ class Logger:
                         log["message"]
                     )
                     sys.stderr.write(output_line)
+    def sync(self):
+        self._log_file.flush()
 
     def error(self, msg, **kwargs):
         kwargs["level"] = "error"
