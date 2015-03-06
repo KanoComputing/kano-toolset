@@ -37,7 +37,7 @@ int gid;
 int uid;
 // The path of the container directory
 char contdir[256];
-bool contdir_set=0;
+bool contdir_set=false; // true when we have set contdir
 
 // Configuration file format
 // The presence of a configuration file indicates that the app should be containerised.
@@ -244,11 +244,10 @@ int run_in_container(void *cmd){
   // Run the actual command
   kano_log_info("kano-launcher: starting [%s]\n",cmd);
   err=system(cmd);
-  if(err){
+  if(err==-1){
     kano_log_error("kano-launcher: unable to start [%s] in container\n",cmd);
-  }    
-  
-
+  }
+  return err;
 }
 /**
  * @name run_system - drop root priviledge and run a command 
@@ -267,10 +266,10 @@ int run_system(void *cmd){
 
   kano_log_info("kano-launcher: starting [%s]\n",cmd);
   err=system(cmd);
-  if(err){
+  if(err==-1){
     kano_log_error("kano-launcher: unable to start [%s]\n",cmd);
   }    
-
+  return err;
 }
 
 /**

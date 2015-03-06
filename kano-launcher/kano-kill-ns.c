@@ -23,14 +23,18 @@
 int main(int argc,char *argv[]) 
 {
   int i;
-  if(argc<3)
-    exit(1); // FIXME more error msg
+  if(argc<3){
+    kano_log_error("kano-kill-ns: too few arguments\n");
+    exit(1);
+  }
+  // parse first two arguments
   int signum=atoi(argv[1]);
   int count;
   char *end;
   ino_t tokill=strtoull(argv[2],&end,10);
   if(*end!=0) {
-    
+    kano_log_error("kano-kill-ns: ns inode not a number\n");
+    exit(1);
   }
   int err;
 
@@ -56,9 +60,8 @@ int main(int argc,char *argv[])
        kano_log_warning("kano-kill-ns failed to stat %s\n",path);
        continue;
     }
-
-    
-    if(!err && statbuf.st_ino==tokill){
+    // if matched, send the signal
+    if(statbuf.st_ino==tokill){
       kano_log_info("kano-kill-ns: killing %d\n",pid);
       int err= kill(pid, signum);      
       if(err) kano_log_warning("kano-kill-ns failed to kill %d\n",pid);
