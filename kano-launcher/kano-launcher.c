@@ -29,14 +29,14 @@
 
 #define CONF_DIR "/usr/share/kano-toolset/kano-launcher/conf"
 
-
+#define STRING_SIZE 256
 #define STACK_SIZE 4096
 
 // uid and gid saved here to allow dropping root privilege
 int gid;
 int uid;
 // The path of the container directory
-char contdir[256];
+char contdir[STRING_SIZE];
 bool contdir_set=false; // true when we have set contdir
 
 // Configuration file format
@@ -47,7 +47,7 @@ typedef struct {
   bool no_kill;           ///< If true, don't kill other apps when launching this one.
                           ///< Default false
   bool match_only_preset; ///< Don't match in the command string
-  char extra_cmd[256];    ///< extra command to run when launching this app
+  char extra_cmd[STRING_SIZE];    ///< extra command to run when launching this app
   
 
 }config;
@@ -70,11 +70,11 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
   };
   
   FILE *conf_file=fopen(config_filename,"r");
-  char line[256];
+  char line[STRING_SIZE];
   if(!conf_file) return 1;
     
   while(!feof(conf_file)){
-    if(!fgets(line,256,conf_file)){      
+    if(!fgets(line,STRING_SIZE,conf_file)){      
       if(ferror(conf_file)) return 1;
       break;
     }	 
@@ -91,7 +91,7 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
 
     if(strncmp(line,"extra_cmd:",10)==0){
       kano_log_debug("kano-launcher: config %s extra cmd %s\n",config_filename,&line[10]);
-      strncpy(c.extra_cmd,&line[10],256);
+      strncpy(c.extra_cmd,&line[10],STRING_SIZE);
     }
     
   }
@@ -110,11 +110,11 @@ int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf
 bool is_pi2(void)
 {
   FILE *cpu=fopen("/proc/cpuinfo","r@");
-  char line[256];
+  char line[STRING_SIZE];
   bool pi2=false;
   unsigned long long rev;
   while(!feof(cpu)){
-    if(!fgets(line,256,cpu)) break;
+    if(!fgets(line,STRING_SIZE,cpu)) break;
     if(strncmp("Revision",line,8)==0){
       int count=sscanf(line,"Revision : %llx",&rev);
       if(count==1){
@@ -139,10 +139,10 @@ bool is_pi2(void)
 int get_config(char *preset, char *command,bool *match,config *conf){
   
   int err=0;
-  char conf_filename[256];
+  char conf_filename[STRING_SIZE];
   *match=0;
   if(preset){
-    snprintf(conf_filename,256,"%s/%s",CONF_DIR,preset);
+    snprintf(conf_filename,STRING_SIZE,"%s/%s",CONF_DIR,preset);
   
     err=read_config(conf_filename,false,match,conf);
     if(!err) return 0;
@@ -158,7 +158,7 @@ int get_config(char *preset, char *command,bool *match,config *conf){
     kano_log_debug("kano-launcher: config %s\n",d->d_name);
     if(d->d_type==DT_REG && strstr(command,d->d_name)){
       kano_log_debug("kano-launcher: config %s matched\n",d->d_name);
-      snprintf(conf_filename,256,"%s/%s",CONF_DIR,d->d_name);
+      snprintf(conf_filename,STRING_SIZE,"%s/%s",CONF_DIR,d->d_name);
       read_config(conf_filename,true,match,conf);
       if(match) break;
     }
@@ -195,23 +195,23 @@ int run_in_container(void *cmd){
   
   int  err;
   pid_t pid=getpid();
-  char piddir[256];
+  char piddir[STRING_SIZE];
   int  made_contfile=0;
-  char my_contfile[256];    
+  char my_contfile[STRING_SIZE];    
 
   // Choose a name for the contaimer file
   // and make an empty file to bind on top of.
   do {
-    int count=snprintf(piddir,256,"/proc/%d/ns/uts",pid);
-    if(count==0 || count==256) {
+    int count=snprintf(piddir,STRING_SIZE,"/proc/%d/ns/uts",pid);
+    if(count==0 || count==STRING_SIZE) {
       kano_log_error("kano-launcher: string too long \n");
       break;
     }
   
     for(int i=0;i<10;i++){
-      int count=snprintf(my_contfile, 256,"%s/%d.%d",contdir,pid,i);
+      int count=snprintf(my_contfile, STRING_SIZE,"%s/%d.%d",contdir,pid,i);
       int cf;
-      if(count==0 || count==256) {
+      if(count==0 || count==STRING_SIZE) {
 	kano_log_error("kano-launcher: string too long making container file [%s]\n",contdir);
       }
       cf=open(my_contfile,S_IWUSR | S_IRUSR | S_IXUSR);
@@ -303,10 +303,10 @@ int run_container(bool in_container,char *cmd){
 }
 
 int kill_container(char *cont){
-  char my_contfile[256];
-  char my_uts[256];
-  char path[256];
-  char kill_cmd[256];
+  char my_contfile[STRING_SIZE];
+  char my_uts[STRING_SIZE];
+  char path[STRING_SIZE];
+  char kill_cmd[STRING_SIZE];
   int count;
   int err;
   do {
@@ -316,15 +316,15 @@ int kill_container(char *cont){
       break;
     }
       
-    snprintf(my_contfile, 256,"%s/%s",contdir,cont);
-    if(count==0 || count==256) {
+    snprintf(my_contfile, STRING_SIZE,"%s/%s",contdir,cont);
+    if(count==0 || count==STRING_SIZE) {
       kano_log_error("kano-launcher: error composing contdir string: too long\n");
       break;
     }
 
     do {
-      snprintf(my_uts, 256,"%s/%s",contdir,cont);
-      if(count==0 || count==256) {
+      snprintf(my_uts, STRING_SIZE,"%s/%s",contdir,cont);
+      if(count==0 || count==STRING_SIZE) {
 	kano_log_error("kano-launcher: error composing uts string: too long\n");
 	break;
       }
@@ -336,8 +336,8 @@ int kill_container(char *cont){
 	break;
       }
 
-      count=snprintf(kill_cmd, 256, "pgrep -u %s | xargs kano-kill-ns 15 %lld ", user_name, statbuf.st_ino);
-      if(count==0 || count==256) {
+      count=snprintf(kill_cmd, STRING_SIZE, "pgrep -u %s | xargs kano-kill-ns 15 %lld ", user_name, statbuf.st_ino);
+      if(count==0 || count==STRING_SIZE) {
 	kano_log_error("kano-launcher: error composing kill command string: too long\n");	
 	break;
       }
@@ -392,8 +392,8 @@ int main(int argc, char *argv[]){
   char *homedir=getenv("HOME");
   if(homedir){
 
-    int count=snprintf(contdir, 256,"%s/.kano-app-containers",homedir);
-    if(count!=0 && count != 256){
+    int count=snprintf(contdir, STRING_SIZE,"%s/.kano-app-containers",homedir);
+    if(count!=0 && count != STRING_SIZE){
 
       int err=mkdir(contdir, S_IWUSR | S_IRUSR | S_IXUSR);
 
