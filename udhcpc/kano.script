@@ -21,8 +21,7 @@ RESOLV_CONF="/etc/resolv.conf"
 network_hook="/usr/bin/kano-network-hook"
 
 # Config files in kano-settings
-SETTINGS_CONFIG='/usr/share/kano-settings/config/settings'
-SERVER_CONFIG='/usr/share/kano-settings/config/sentry'
+SERVER_CONFIG='/usr/bin/start-sentry-server'
 
 function call_hook {
 
@@ -64,28 +63,22 @@ case $1 in
 "
         done
 
-        # Look at the setting to find the parental level
-        ultimate_parental=false
+        # Check parental control
+        # Run the script that switches on the parental control if the config is set
+        # Will return 1 if it doesn't launch the server
+        $SERVER_CONFIG
+        parental_control_on=$?
 
-        # Check if the parental control is at the highest level 3.0
-        while read line
-        do
-            if [[ $line == '"Parental-level": 3.0' ]]; then
-                ultimate_parental=true
+        # If the parental control was not switched on, go through the other options
+        if [ $parental_control_on -eq 1 ]; then
+            if [ -x /sbin/resolvconf ]; then
+                echo -n "$R" | resolvconf -a "${interface}.udhcpc"
+            else
+                echo -n "$R" > "$RESOLV_CONF"
+
+                # Add a fallback DNS server to the end of the list, including a new line
+                echo "nameserver 8.8.8.8" >> "$RESOLV_CONF"
             fi
-        done < $SETTINGS_CONFIG
-
-        # If the parental is at the highest level, start the sentry server
-        if [ $ultimate_parental = true ]; then
-            sentry -c $SERVER_CONFIG
-
-        elif [ -x /sbin/resolvconf ]; then
-            echo -n "$R" | resolvconf -a "${interface}.udhcpc"
-        else
-            echo -n "$R" > "$RESOLV_CONF"
-
-            # Add a fallback DNS server to the end of the list, including a new line
-            echo "nameserver 8.8.8.8" >> "$RESOLV_CONF"
         fi
 
         # find the local timezone based on the IP address, then set local system
