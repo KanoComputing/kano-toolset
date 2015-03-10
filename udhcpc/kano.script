@@ -20,6 +20,9 @@ RESOLV_CONF="/etc/resolv.conf"
 # Hook script to be called when network DHCP events occur
 network_hook="/usr/bin/kano-network-hook"
 
+# Config files in kano-settings
+SERVER_CONFIG='/usr/bin/start-sentry-server'
+
 function call_hook {
 
     # The network hook script is called when UDHCP events arrive.
@@ -60,13 +63,22 @@ case $1 in
 "
         done
 
-        if [ -x /sbin/resolvconf ]; then
-            echo -n "$R" | resolvconf -a "${interface}.udhcpc"
-        else
-            echo -n "$R" > "$RESOLV_CONF"
+        # Check parental control
+        # Run the script that switches on the parental control if the config is set
+        # Will return 1 if it doesn't launch the server
+        $SERVER_CONFIG
+        parental_control_on=$?
 
-            # Add a fallback DNS server to the end of the list, including a new line
-            echo "nameserver 8.8.8.8" >> "$RESOLV_CONF"
+        # If the parental control was not switched on, go through the other options
+        if [ $parental_control_on -eq 1 ]; then
+            if [ -x /sbin/resolvconf ]; then
+                echo -n "$R" | resolvconf -a "${interface}.udhcpc"
+            else
+                echo -n "$R" > "$RESOLV_CONF"
+
+                # Add a fallback DNS server to the end of the list, including a new line
+                echo "nameserver 8.8.8.8" >> "$RESOLV_CONF"
+            fi
         fi
 
         # find the local timezone based on the IP address, then set local system
