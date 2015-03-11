@@ -25,14 +25,13 @@
 //
 //-------------------------------------------------------------------------
 
-#include <assert.h>
 #include <stdbool.h>
 
 #include "backgroundLayer.h"
 
 //-------------------------------------------------------------------------
 
-void
+bool
 initBackgroundLayer(
     BACKGROUND_LAYER_T *bg,
     uint16_t colour,
@@ -43,7 +42,8 @@ initBackgroundLayer(
     uint32_t vc_image_ptr;
 
     bg->resource = vc_dispmanx_resource_create(type, 1, 1, &vc_image_ptr);
-    assert(bg->resource != 0);
+    if(!bg->resource)
+      return false;
 
     //---------------------------------------------------------------------
 
@@ -57,12 +57,17 @@ initBackgroundLayer(
                                              sizeof(colour),
                                              &colour,
                                              &dst_rect);
-    assert(result == 0);
+    if(result){
+      result = vc_dispmanx_resource_delete(bg->resource);
+      return false;
+    }
+      
+    return true;
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 addElementBackgroundLayer(
     BACKGROUND_LAYER_T *bg,
     DISPMANX_DISPLAY_HANDLE_T display,
@@ -94,27 +99,36 @@ addElementBackgroundLayer(
                                 &alpha,
                                 NULL,
                                 DISPMANX_NO_ROTATE);
-    assert(bg->element != 0);
+    return bg->element;
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 destroyBackgroundLayer(
     BACKGROUND_LAYER_T *bg)
 {
     int result = 0;
+    bool res = true;
 
-    DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
-    assert(update != 0);
+    if(bg->element) {
+      DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+      if(update) {
 
-    result = vc_dispmanx_element_remove(update, bg->element);
-    assert(result == 0);
-
-    result = vc_dispmanx_update_submit_sync(update);
-    assert(result == 0);
+	result = vc_dispmanx_element_remove(update, bg->element);
+	if(result) res = false;
+	
+	result = vc_dispmanx_update_submit_sync(update);
+	if(result) res = false;
+	
+      }else{
+	res = false;
+      }
+    }
 
     result = vc_dispmanx_resource_delete(bg->resource);
-    assert(result == 0);
+    if(result) res = false;
+
+    return res;
 }
 
