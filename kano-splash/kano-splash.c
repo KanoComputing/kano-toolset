@@ -39,6 +39,7 @@
 #include "imageLayer.h"
 #include "loadpng.h"
 #include "get-start-time.h"
+#include "kano-log.h"
 
 #include "bcm_host.h"
 
@@ -187,8 +188,9 @@ int main(int argc, char *argv[])
 
     DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
     if(!display){
-      error=1;
-      goto end;
+        error=1;
+        kano_log_error("kano-splash: failed to open display\n");
+        goto end;
     }
 
     //---------------------------------------------------------------------
@@ -197,6 +199,7 @@ int main(int argc, char *argv[])
     int result = vc_dispmanx_display_get_info(display, &info);
     if(result){
 	error = 1;
+	kano_log_error("kano-splash: failed to get display info\n");
 	goto close_display;
     }
 
@@ -205,6 +208,7 @@ int main(int argc, char *argv[])
     BACKGROUND_LAYER_T backgroundLayer;
     bool okay = initBackgroundLayer(&backgroundLayer, background, 0);
     if(!okay){
+         kano_log_error("kano-splash: failed to init background layer\n");
 	 error=1;
 	 goto close_display;
     }
@@ -212,7 +216,7 @@ int main(int argc, char *argv[])
     IMAGE_LAYER_T imageLayer;
     if (loadPng(&(imageLayer.image), file) == false)
     {
-        fprintf(stderr, "unable to load %s\n", file);
+        kano_log_error("kano-splash: unable to load %s\n",file);
 	error=1;
 	goto close_background;
 
@@ -220,6 +224,7 @@ int main(int argc, char *argv[])
     okay = createResourceImageLayer(&imageLayer, 1);
     if(!okay){
 	 
+        kano_log_error("kano-splash: unable to create resource \n");
         error=1;
 	goto close_background;
     }
@@ -271,6 +276,7 @@ int main(int argc, char *argv[])
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
     if(!update) {
+         kano_log_error("kano-splash: unable to start update\n");
 	 error = 1;
 	 goto close_imagelayer;
     }
@@ -278,18 +284,21 @@ int main(int argc, char *argv[])
 
     bool res=addElementBackgroundLayer(&backgroundLayer, display, update);
     if(!res) {
+         kano_log_error("kano-splash: unable to add background element\n");
 	 error=1;
 	 goto close_imagelayer;
     }
 
     res=addElementImageLayerCentered(&imageLayer, &info, display, update);
     if(!res) {
+         kano_log_error("kano-splash: unable to add foreground element\n");
 	 error=1;
 	 goto close_imagelayer;
     }
 
     result = vc_dispmanx_update_submit_sync(update);
     if(result) {
+         kano_log_error("kano-splash: unable to submit update\n");
 	 error = 1;
 	 goto close_imagelayer;
     }
