@@ -168,14 +168,14 @@ class Logger:
 
             lines = str(msg).strip().split("\n")
 
+            log = {}
+            log["pid"] = self._pid
+            log.update(kwargs)
+            log["level"] = lname
 
             for line in lines:
-                log = {}
                 log["time"] = time.time()
-                log["pid"] = self._pid
-                log.update(kwargs)
                 log["message"] = line
-                log["level"] = lname
 
                 if level <= sys_log_level:
                     if self._log_file is None:
