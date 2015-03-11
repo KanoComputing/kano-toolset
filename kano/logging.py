@@ -21,6 +21,7 @@ from kano.utils import get_home_by_username
 
 LOG_ENV = "LOG_LEVEL"
 OUTPUT_ENV = "OUTPUT_LEVEL"
+FORCE_FLUSH_ENV = "KLOG_FORCE_FLUSH"
 SYSTEM_LOGS_DIR = "/var/log/kano/"
 
 # The length to which will the log files be cut to when cleaned up
@@ -78,6 +79,7 @@ class Logger:
     def __init__(self):
         self._log_file = None
         self._app_name = None
+        self._force_flush = False
         self._pid = os.getpid()
 
         log = os.getenv(LOG_ENV)
@@ -89,6 +91,10 @@ class Logger:
         if output is not None:
             output = normalise_level(output)
         self._cached_output_level = output
+
+        force_flush = os.getenv(FORCE_FLUSH_ENV)
+        if force_flush is not None:
+            self._force_flush = True
 
     def _load_conf(self):
         conf = None
@@ -141,7 +147,13 @@ class Logger:
             self._log_file.close()
             self._log_file = None
 
-    def write(self, msg, **kwargs):
+    def set_force_flush(self):
+        self._force_flush = True
+
+    def unset_force_flush(self):
+        self._force_flush = False
+
+    def write(self, msg, force_flush=False, **kwargs):
         lname = "info"
         if "level" in kwargs:
             lname = normalise_level(kwargs["level"])
@@ -155,6 +167,8 @@ class Logger:
                 self.set_app_name(sys.argv[0])
 
             lines = str(msg).strip().split("\n")
+
+
             for line in lines:
                 log = {}
                 log["time"] = time.time()
@@ -168,6 +182,9 @@ class Logger:
                         self._init_log_file()
                     self._log_file.write("{}\n".format(json.dumps(log)))
 
+                    if self._force_flush or force_flush:
+                        self.sync()
+
                 if level <= sys_output_level:
                     output_line = "{}[{}] {} {}\n".format(
                         self._app_name,
@@ -176,6 +193,7 @@ class Logger:
                         log["message"]
                     )
                     sys.stderr.write(output_line)
+
     def sync(self):
         self._log_file.flush()
 
