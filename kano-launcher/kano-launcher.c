@@ -295,14 +295,14 @@ int run_container(bool in_container,char *cmd){
     fn=run_system;
   }
   
-  void * stack = mmap(NULL, STACK_SIZE , \
+  char * stack = (char *)mmap(NULL, STACK_SIZE , \
 		      PROT_READ | PROT_WRITE, MAP_PRIVATE | \
 		      MAP_ANON | MAP_GROWSDOWN, -1, 0);
 
-  if(!stack) fatal("unable to obtain stack\n");
+  if(stack==MAP_FAILED) fatal("unable to obtain stack\n");
 
   pid_t cpid;
-  long ret=clone(fn,stack,flags,cmd,NULL,NULL,NULL);
+  long ret=clone(fn,(void *)(stack+STACK_SIZE),flags,cmd,NULL,NULL,NULL);
   return ret;
 }
 
