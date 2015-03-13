@@ -214,7 +214,8 @@ class Logger:
         self.write(msg, **kwargs)
 
     def flush(self):
-        self._log_file.close()
+        if self._log_file:
+            self._log_file.close()
         sys.stderr.flush()
 
     def _init_log_file(self):
