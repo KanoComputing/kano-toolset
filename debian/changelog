@@ -3,6 +3,7 @@ kano-toolset (1.3-12) unstable; urgency=low
   * Control omxplayer's volume from kano-volume with DBus
 
  -- Team Kano <dev@kano.me>  Tue, 10 Mar 2015 13:36:00 +0000
+
 kano-toolset (1.3-11) unstable; urgency=low
 
   * replace kano-launcher with C version.
