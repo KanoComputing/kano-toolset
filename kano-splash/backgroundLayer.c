@@ -57,7 +57,7 @@ initBackgroundLayer(
                                              sizeof(colour),
                                              &colour,
                                              &dst_rect);
-    if(result){
+    if(result != DISPMANX_SUCCESS){
       result = vc_dispmanx_resource_delete(bg->resource);
       return false;
     }
@@ -116,10 +116,10 @@ destroyBackgroundLayer(
       if(update) {
 
 	result = vc_dispmanx_element_remove(update, bg->element);
-	if(result) res = false;
+	if(result != DISPMANX_SUCCESS) res = false;
 	
 	result = vc_dispmanx_update_submit_sync(update);
-	if(result) res = false;
+	if(result != DISPMANX_SUCCESS) res = false;
 	
       }else{
 	res = false;
@@ -127,7 +127,7 @@ destroyBackgroundLayer(
     }
 
     result = vc_dispmanx_resource_delete(bg->resource);
-    if(result) res = false;
+    if(result != DISPMANX_SUCCESS) res = false;
 
     return res;
 }

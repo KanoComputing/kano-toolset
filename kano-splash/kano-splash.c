@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 
     DISPMANX_MODEINFO_T info;
     int result = vc_dispmanx_display_get_info(display, &info);
-    if(result){
+    if(result != DISPMANX_SUCCESS){
 	error = 1;
 	kano_log_error("kano-splash: failed to get display info\n");
 	goto close_display;
@@ -297,7 +297,7 @@ int main(int argc, char *argv[])
     }
 
     result = vc_dispmanx_update_submit_sync(update);
-    if(result) {
+    if(result != DISPMANX_SUCCESS) {
          kano_log_error("kano-splash: unable to submit update\n");
 	 error = 1;
 	 goto close_imagelayer;

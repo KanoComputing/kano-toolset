@@ -77,7 +77,7 @@ createResourceImageLayer(
                                              il->image.pitch,
                                              il->image.buffer,
                                              &(il->dstRect));
-    if(result){ 
+    if(result != DISPMANX_SUCCESS){ 
         result = vc_dispmanx_resource_delete(il->resource);
         return false;
     }
@@ -192,12 +192,12 @@ changeSourceImageLayer(
                                                  il->image.pitch,
                                                  il->image.buffer,
                                                  &(il->dstRect));
-    if(result) return false;
+    if(result != DISPMANX_SUCCESS) return false;
 
     result = vc_dispmanx_element_change_source(update,
                                                il->element,
                                                il->resource);
-    if(result) return false;
+    if(result != DISPMANX_SUCCESS) return false;
     return true;
 }
 
@@ -213,18 +213,18 @@ changeSourceAndUpdateImageLayer(
                                                  il->image.pitch,
                                                  il->image.buffer,
                                                  &(il->dstRect));
-    if(result) return false;
+    if(result != DISPMANX_SUCCESS) return false;
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
 
     result = vc_dispmanx_element_change_source(update,
                                                il->element,
                                                il->resource);
-    if(result) res = false;
+    if(result != DISPMANX_SUCCESS) res = false;
 
     // started so we'll finish, despite errors
     result = vc_dispmanx_update_submit_sync(update);
-    if(result) res = false;
+    if(result != DISPMANX_SUCCESS) res = false;
     
     return res;
 
@@ -243,18 +243,18 @@ destroyImageLayer(
     
     
       result = vc_dispmanx_element_remove(update, il->element);
-      if(result) res = false;
+      if(result != DISPMANX_SUCCESS) res = false;
 
       // we are probably in deep trouble if element_remove failed, but finish the update anyway
       result = vc_dispmanx_update_submit_sync(update);
-      if(result) res = false;
+      if(result != DISPMANX_SUCCESS) res = false;
     }
 
     //---------------------------------------------------------------------
 
     if(il->resource){
       result = vc_dispmanx_resource_delete(il->resource);
-      if(result) res = false;
+      if(result != DISPMANX_SUCCESS) res = false;
     }
 
     //---------------------------------------------------------------------
