@@ -18,6 +18,11 @@
     font: Bariol Bold 13px;
 }
 
+.small_orange_button GtkLabel:insensitive {
+    color: @kano_grey;
+    background: transparent;
+}
+
 .small_orange_button:hover {
     background: transparent;
 }
