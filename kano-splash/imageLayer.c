@@ -25,7 +25,6 @@
 //
 //-------------------------------------------------------------------------
 
-#include <assert.h>
 #include <stdbool.h>
 
 #include "element_change.h"
@@ -34,23 +33,24 @@
 
 //-------------------------------------------------------------------------
 
-void
+bool
 initImageLayer(
     IMAGE_LAYER_T *il,
     int32_t width,
     int32_t height,
     VC_IMAGE_TYPE_T type)
 {
-    initImage(&(il->image), type, width, height, false);
+    return initImage(&(il->image), type, width, height, false);
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 createResourceImageLayer(
     IMAGE_LAYER_T *il,
     int32_t layer)
 {
+  // we return false on error, and either the resource has not been obtained or it is deallocated.
     uint32_t vc_image_ptr;
     int result = 0;
 
@@ -62,7 +62,7 @@ createResourceImageLayer(
             il->image.width | (il->image.pitch << 16),
             il->image.height | (il->image.alignedHeight << 16),
             &vc_image_ptr);
-    assert(il->resource != 0);
+    if(il->resource == 0) return false;
 
     //---------------------------------------------------------------------
 
@@ -77,12 +77,16 @@ createResourceImageLayer(
                                              il->image.pitch,
                                              il->image.buffer,
                                              &(il->dstRect));
-    assert(result == 0);
+    if(result != DISPMANX_SUCCESS){ 
+        result = vc_dispmanx_resource_delete(il->resource);
+        return false;
+    }
+    return true;
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 addElementImageLayerOffset(
     IMAGE_LAYER_T *il,
     int32_t xOffset,
@@ -102,12 +106,12 @@ addElementImageLayerOffset(
                          il->image.width,
                          il->image.height);
 
-    addElementImageLayer(il, display, update);
+    return addElementImageLayer(il, display, update);
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 addElementImageLayerCentered(
     IMAGE_LAYER_T *il,
     DISPMANX_MODEINFO_T *info,
@@ -126,18 +130,20 @@ addElementImageLayerCentered(
                          il->image.width,
                          il->image.height);
 
-    addElementImageLayer(il, display, update);
+    bool result= addElementImageLayer(il, display, update);
+    if(!result) return false;
 
     vc_dispmanx_rect_set(&(il->dstRect),
                          0,
                          0,
                          il->image.width,
                          il->image.height);
+    return true;
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 addElementImageLayer(
     IMAGE_LAYER_T *il,
     DISPMANX_DISPLAY_HANDLE_T display,
@@ -163,18 +169,20 @@ addElementImageLayer(
                                 &alpha,
                                 NULL, // clamp
                                 DISPMANX_NO_ROTATE);
-    assert(il->element != 0);
+    if(!il->element)
+      return false;
 
     vc_dispmanx_rect_set(&(il->dstRect),
                          0,
                          0,
                          il->image.width,
                          il->image.height);
+    return true;
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 changeSourceImageLayer(
     IMAGE_LAYER_T *il,
     DISPMANX_UPDATE_HANDLE_T update)
@@ -184,63 +192,74 @@ changeSourceImageLayer(
                                                  il->image.pitch,
                                                  il->image.buffer,
                                                  &(il->dstRect));
-    assert(result == 0);
+    if(result != DISPMANX_SUCCESS) return false;
 
     result = vc_dispmanx_element_change_source(update,
                                                il->element,
                                                il->resource);
-    assert(result == 0);
-
+    if(result != DISPMANX_SUCCESS) return false;
+    return true;
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool 
 changeSourceAndUpdateImageLayer(
     IMAGE_LAYER_T *il)
 {
+    bool res = true;
     int result = vc_dispmanx_resource_write_data(il->resource,
                                                  il->image.type,
                                                  il->image.pitch,
                                                  il->image.buffer,
                                                  &(il->dstRect));
-    assert(result == 0);
+    if(result != DISPMANX_SUCCESS) return false;
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
-    assert(update != 0);
 
     result = vc_dispmanx_element_change_source(update,
                                                il->element,
                                                il->resource);
-    assert(result == 0);
+    if(result != DISPMANX_SUCCESS) res = false;
 
+    // started so we'll finish, despite errors
     result = vc_dispmanx_update_submit_sync(update);
-    assert(result == 0);
+    if(result != DISPMANX_SUCCESS) res = false;
+    
+    return res;
 
 }
 
 //-------------------------------------------------------------------------
 
-void
+bool
 destroyImageLayer(
     IMAGE_LAYER_T *il)
 {
     int result = 0;
+    bool res = true;
+    if(il->element){
+      DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+    
+    
+      result = vc_dispmanx_element_remove(update, il->element);
+      if(result != DISPMANX_SUCCESS) res = false;
 
-    DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
-    assert(update != 0);
-    result = vc_dispmanx_element_remove(update, il->element);
-    assert(result == 0);
-    result = vc_dispmanx_update_submit_sync(update);
-    assert(result == 0);
+      // we are probably in deep trouble if element_remove failed, but finish the update anyway
+      result = vc_dispmanx_update_submit_sync(update);
+      if(result != DISPMANX_SUCCESS) res = false;
+    }
 
     //---------------------------------------------------------------------
 
-    result = vc_dispmanx_resource_delete(il->resource);
-    assert(result == 0);
+    if(il->resource){
+      result = vc_dispmanx_resource_delete(il->resource);
+      if(result != DISPMANX_SUCCESS) res = false;
+    }
 
     //---------------------------------------------------------------------
 
     destroyImage(&(il->image));
+    return res;
 }
 

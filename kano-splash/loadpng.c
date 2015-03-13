@@ -45,6 +45,7 @@ loadPng(
     IMAGE_T* image,
     const char *file)
 {
+    bool res=true;
     FILE* fpin = fopen(file, "rb");
 
     if (fpin == NULL)
@@ -62,21 +63,22 @@ loadPng(
 
     if (png_ptr == NULL)
     {
-        return false;
+        res = false;
+	goto close_fpin;
     }
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
 
     if (info_ptr == NULL)
     {
-        png_destroy_read_struct(&png_ptr, 0, 0);
-        return false;
+        res = false;
+	goto close_png_read_struct;
     }
 
     if (setjmp(png_jmpbuf(png_ptr)))
     {
-        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-        return false;
+        res = false;
+	goto close_png_read_struct;
     }
 
     //---------------------------------------------------------------------
@@ -97,11 +99,16 @@ loadPng(
         type = VC_IMAGE_RGBA32;
     }
 
-    initImage(image,
+    bool okay=initImage(image,
               type,
               png_get_image_width(png_ptr, info_ptr),
               png_get_image_height(png_ptr, info_ptr),
               false);
+    if(!okay) {
+      res = false;
+      goto close_png_read_struct;
+    }
+      
 
     //---------------------------------------------------------------------
 
@@ -151,6 +158,10 @@ loadPng(
     //---------------------------------------------------------------------
 
     png_bytepp row_pointers = malloc(image->height * sizeof(png_bytep));
+    if(!row_pointers) {
+      res = false;
+      goto close_png_read_struct;
+    }
 
     png_uint_32 j = 0;
     for (j = 0 ; j < image->height ; ++j)
@@ -164,12 +175,15 @@ loadPng(
 
     //---------------------------------------------------------------------
 
-    fclose(fpin);
 
     free(row_pointers);
 
+close_png_read_struct:
     png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 
-    return true;
+close_fpin:    
+    fclose(fpin);
+
+    return res;
 }
 

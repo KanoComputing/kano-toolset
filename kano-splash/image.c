@@ -161,7 +161,7 @@ bool initImage(
     if (image->buffer == NULL)
     {
         fprintf(stderr, "image: memory exhausted\n");
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     return true;

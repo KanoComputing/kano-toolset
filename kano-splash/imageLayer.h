@@ -46,19 +46,19 @@ typedef struct
 
 //-------------------------------------------------------------------------
 
-void
+bool
 initImageLayer(
     IMAGE_LAYER_T *il,
     int32_t width,
     int32_t height,
     VC_IMAGE_TYPE_T type);
 
-void
+bool
 createResourceImageLayer(
     IMAGE_LAYER_T *il,
     int32_t layer);
 
-void
+bool
 addElementImageLayerOffset(
     IMAGE_LAYER_T *il,
     int32_t xOffset,
@@ -66,29 +66,29 @@ addElementImageLayerOffset(
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void
+bool
 addElementImageLayerCentered(
     IMAGE_LAYER_T *il,
     DISPMANX_MODEINFO_T *info,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void
+bool
 addElementImageLayer(
     IMAGE_LAYER_T *il,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void
+bool
 changeSourceImageLayer(
     IMAGE_LAYER_T *il,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void
+bool
 changeSourceAndUpdateImageLayer(
     IMAGE_LAYER_T *il);
 
-void destroyImageLayer(IMAGE_LAYER_T *il);
+bool destroyImageLayer(IMAGE_LAYER_T *il);
 
 //-------------------------------------------------------------------------
 

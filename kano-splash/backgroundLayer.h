@@ -43,19 +43,19 @@ typedef struct
 
 //-------------------------------------------------------------------------
 
-void
+bool
 initBackgroundLayer(
     BACKGROUND_LAYER_T *bg,
     uint16_t colour,
     int32_t layer);
 
-void
+bool
 addElementBackgroundLayer(
     BACKGROUND_LAYER_T *bg,
     DISPMANX_DISPLAY_HANDLE_T display,
     DISPMANX_UPDATE_HANDLE_T update);
 
-void destroyBackgroundLayer(BACKGROUND_LAYER_T *bg);
+bool destroyBackgroundLayer(BACKGROUND_LAYER_T *bg);
 
 
 //-------------------------------------------------------------------------

@@ -28,7 +28,6 @@
 
 #define _GNU_SOURCE
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +39,7 @@
 #include "imageLayer.h"
 #include "loadpng.h"
 #include "get-start-time.h"
+#include "kano-log.h"
 
 #include "bcm_host.h"
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     char *file;
     char *binary;
     int is_interp;
-    
+    int error=0;
 
     binary=basename(argv[0]);
     is_interp=strcmp(binary,"kano-splash")==0;
@@ -187,25 +187,49 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
-    assert(display != 0);
+    if(!display){
+        error=1;
+        kano_log_error("kano-splash: failed to open display\n");
+        goto end;
+    }
 
     //---------------------------------------------------------------------
 
     DISPMANX_MODEINFO_T info;
     int result = vc_dispmanx_display_get_info(display, &info);
-    assert(result == 0);
+    if(result != DISPMANX_SUCCESS){
+	error = 1;
+	kano_log_error("kano-splash: failed to get display info\n");
+	goto close_display;
+    }
 
     //---------------------------------------------------------------------
 
     BACKGROUND_LAYER_T backgroundLayer;
-    initBackgroundLayer(&backgroundLayer, background, 0);
+    bool okay = initBackgroundLayer(&backgroundLayer, background, 0);
+    if(!okay){
+         kano_log_error("kano-splash: failed to init background layer\n");
+	 error=1;
+	 goto close_display;
+    }
 
     IMAGE_LAYER_T imageLayer;
     if (loadPng(&(imageLayer.image), file) == false)
     {
-        fprintf(stderr, "unable to load %s\n", file);
+        kano_log_error("kano-splash: unable to load %s\n",file);
+	error=1;
+	goto close_background;
+
     }
-    createResourceImageLayer(&imageLayer, 1);
+    okay = createResourceImageLayer(&imageLayer, 1);
+    if(!okay){
+	 
+        kano_log_error("kano-splash: unable to create resource \n");
+        error=1;
+	goto close_background;
+    }
+	 
+	 
 
     //---------------------------------------------------------------------
 
@@ -251,14 +275,33 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------------
 
     DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
-    assert(update != 0);
+    if(!update) {
+         kano_log_error("kano-splash: unable to start update\n");
+	 error = 1;
+	 goto close_imagelayer;
+    }
+	 
 
-    addElementBackgroundLayer(&backgroundLayer, display, update);
-    addElementImageLayerCentered(&imageLayer, &info, display, update);
+    bool res=addElementBackgroundLayer(&backgroundLayer, display, update);
+    if(!res) {
+         kano_log_error("kano-splash: unable to add background element\n");
+	 error=1;
+	 goto close_imagelayer;
+    }
+
+    res=addElementImageLayerCentered(&imageLayer, &info, display, update);
+    if(!res) {
+         kano_log_error("kano-splash: unable to add foreground element\n");
+	 error=1;
+	 goto close_imagelayer;
+    }
 
     result = vc_dispmanx_update_submit_sync(update);
-    assert(result == 0);
-
+    if(result != DISPMANX_SUCCESS) {
+         kano_log_error("kano-splash: unable to submit update\n");
+	 error = 1;
+	 goto close_imagelayer;
+    }
     //---------------------------------------------------------------------
     // wait to be signalled with SIGARLM or timeout
     struct timespec ts;
@@ -271,16 +314,22 @@ int main(int argc, char *argv[])
 
     //---------------------------------------------------------------------
 
-    destroyBackgroundLayer(&backgroundLayer);
+close_imagelayer:
+
     destroyImageLayer(&imageLayer);
 
-    //---------------------------------------------------------------------
+close_background:
+    
+    destroyBackgroundLayer(&backgroundLayer);
 
+    //---------------------------------------------------------------------
+close_display:
+    
     result = vc_dispmanx_display_close(display);
-    assert(result == 0);
+
 
     //---------------------------------------------------------------------
-
-    return 0;
+end:
+    return error;
 }
 
