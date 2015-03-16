@@ -22,7 +22,7 @@ APP_NAME="`basename $0`"
 function set_log_envs
 {
     local kano_conf_file="/etc/kano-logs.conf"
-    eval `awk '{print "export "toupper(substr($1, 0, length($1)))"=" "\""$2"\""}' "$kano_conf_file"`
+    eval `awk '{print toupper(substr($1, 0, length($1)))"=" "\""$2"\""}' "$kano_conf_file"`
 }
 
 
