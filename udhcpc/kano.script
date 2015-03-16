@@ -63,11 +63,20 @@ case $1 in
 "
         done
 
-        # Check parental control
-        # Run the script that switches on the parental control if the config is set
-        # Will return 1 if it doesn't launch the server
-        $SERVER_CONFIG
-        parental_control_on=$?
+        # Check whether the ultimate parental control should be switched on
+        # TODO: move this to kano-settings
+
+        # First check that server config file exists.
+        if [ -f $SERVER_CONFIG ]; then
+
+            # Run the script that switches on the parental control if the config is set
+            # Will return 1 if it doesn't launch the server
+            $SERVER_CONFIG
+            parental_control_on=$?
+        else
+            # The ultimate parental control was not turned on
+            parental_control_on=1
+        fi
 
         # If the parental control was not switched on, go through the other options
         if [ $parental_control_on -eq 1 ]; then
