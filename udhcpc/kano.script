@@ -67,7 +67,7 @@ case $1 in
         # TODO: move this to kano-settings
 
         # First check that server config file exists.
-        if [ -f $SERVER_CONFIG ]; then
+        if [ -x $SERVER_CONFIG ]; then
 
             # Run the script that switches on the parental control if the config is set
             # Will return 1 if it doesn't launch the server
