@@ -12,6 +12,7 @@
 
 import os
 import sys
+import time
 
 from kano.logging import logger
 from kano.utils import get_cpu_id, get_rpi_model, run_cmd
@@ -27,10 +28,11 @@ def send_cpu_id():
     else:
         try:
             # Save a trace of the CPUID so we dont send it over again
-            # The file's timestamp will tell us when this happened
+            # The UTC timestamp is embedded inside the cpuid file as well
+            utc_time=time.asctime(time.gmtime(time.time()))
             with open(cpuid_filename, 'a') as f:
                 os.utime(cpuid_filename, None)
-                f.write('RaspberryPI model: {}\n'.format(get_rpi_model()))
+                f.write('RaspberryPI model: {}\n{}\n'.format(get_rpi_model(), utc_time))
 
             # Send this file over the network
             cmdline='curl --retry 5 --retry-delay 3 -T "{}" ' \
