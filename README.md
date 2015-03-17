@@ -11,7 +11,7 @@ But you can still use many of them to your own needs. Below is a summary of the 
 `kano-dialog` and `kano-progress` is used to display popup messages with a Kano look & feel
 `kano-led` will blink your RaspberryPI board LED repeatedly for a few seconds.
 `kano-logs` allows to inspect the system logs used by all KanoOS applications
-`kan-shutdown` shuts down the system after a confirmation message on the graphic frontend.
+`kano-shutdown` shuts down the system after a confirmation message on the graphic frontend.
 `kano-signal` allows to send save, load, share, and make signals to Kano apps
 `rpi-info` will give you core information from you RPI unit such as CPU speed, temperature, etc.
 `bash` this directory contains code wrappers to make it easy to log events from Bash shell scripts.
