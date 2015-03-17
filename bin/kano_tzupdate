@@ -31,7 +31,7 @@ Set the system timezone based on IP geolocation.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # This script has been adapted on KanoOS to provide for custom authentication
-# against geonames, and getting current gelocation from the free webservice ipinfo.io
+# against geonames, and getting current geolocation from the free webservice ipinfo.io
 #
 
 import argparse
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        coords = get_gelocation(ip=args.ip)
+        coords = get_geolocation(ip=args.ip)
     except LookupError as e:
         print "IPInfoDB returned an error: " + str(e)
         sys.exit(3)
