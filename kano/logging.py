@@ -82,15 +82,17 @@ class Logger:
         self._force_flush = False
         self._pid = os.getpid()
 
+        self._cached_log_level = None
+        self._cached_output_level = None
+        self._load_conf()
+
         log = os.getenv(LOG_ENV)
         if log is not None:
-            log = normalise_level(log)
-        self._cached_log_level = log
+            self._cached_log_level = normalise_level(log)
 
         output = os.getenv(OUTPUT_ENV)
         if output is not None:
-            output = normalise_level(output)
-        self._cached_output_level = output
+            self._cached_output_level = normalise_level(output)
 
         force_flush = os.getenv(FORCE_FLUSH_ENV)
         if force_flush is not None:
