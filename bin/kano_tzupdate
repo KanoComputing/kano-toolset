@@ -1,0 +1,156 @@
+#!/usr/bin/env python
+
+"""
+Set the system timezone based on IP geolocation.
+"""
+
+#
+# (c) 2013 Christopher Down
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of 
+# this software and associated documentation files (the "Software"), to deal in 
+# the Software without restriction, including without limitation the rights to 
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+# of the Software, and to permit persons to whom the Software is furnished to do 
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all 
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+# SOFTWARE. 
+#
+#
+#
+# Copyright (C) 2015 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This script has been adapted on KanoOS to provide for custom authentication
+# against geonames, and getting current geolocation from the free webservice ipinfo.io
+#
+
+import argparse
+import errno
+import json
+import os
+import sys
+
+
+# Accomodate a library to speak to the web services
+try:
+    from urllib.request import urlopen
+    from urllib.parse import urlencode
+except ImportError:  # Python 2 fallback
+    from urllib import urlopen, urlencode
+
+
+# Authentication information required by the web services
+AUTH = {
+    "geonames": {
+        "username": "kanosystem",
+    },
+}
+
+PATH = {
+    "zoneinfo": "/usr/share/zoneinfo",
+    "localtime": "/etc/localtime",
+}
+
+
+def get_geolocation(ip=None):
+    '''
+    This is a simplified version to obtain your current location
+    by using the free web service ipinfo.io API
+    '''
+    lat=lng=None
+
+    if ip:
+        url='http://ipinfo.io/{}/geo'.format(ip)
+    else:
+        url="http://ipinfo.io/geo"
+
+    try:
+        result = urlopen(url)
+        res_data = json.loads(result.read())
+        lat,lng=res_data['loc'].split(',')
+        return lat,lng
+    except:
+        raise
+
+
+def timezone_from_location(coords):
+    """
+    Return the timezone for a set of coordinates using the GeoNames API.
+
+    :param coords: latitude and longitude
+    :returns: timezone, or None if none is available
+    """
+
+    url = "http://api.geonames.org/timezoneJSON?"
+
+    latitude, longitude = coords
+    url_params = {
+        "username": AUTH["geonames"]["username"],
+        "lat": latitude,
+        "lng": longitude,
+    }
+
+    res_handle = urlopen(url + urlencode(url_params))
+
+    try:
+        res_encoding = res_handle.headers.get_content_charset()
+    except AttributeError:  # Python 2 fallback
+        res_encoding = res_handle.headers.getparam("charset")
+
+    res_data = json.loads(res_handle.read().decode(res_encoding))
+
+    timezone = res_data.get("timezoneId")
+
+    return timezone
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "-p", "--print-only",
+        action="store_true",
+        help="print the timezone, but don't update " + PATH["localtime"]
+    )
+    parser.add_argument(
+        "-a", "--ip",
+        help="use this IP instead of automatically detecting it"
+    )
+    args = parser.parse_args()
+
+    try:
+        coords = get_geolocation(ip=args.ip)
+    except LookupError as e:
+        print "IPInfoDB returned an error: " + str(e)
+        sys.exit(3)
+
+    timezone = timezone_from_location(coords)
+
+    if timezone is None:
+        print "No timezone available for this IP."
+        sys.exit(2)
+
+    if not args.print_only:
+        timezone_path = os.path.join(PATH["zoneinfo"], timezone)
+        if not os.path.isfile(timezone_path):
+            print "Unknown timezone: " + timezone_path
+            sys.exit(1)
+
+        try:
+            os.unlink(PATH["localtime"])
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
+        os.symlink(timezone_path, PATH["localtime"])
+
+    print(timezone)

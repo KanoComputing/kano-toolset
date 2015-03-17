@@ -92,7 +92,7 @@ case $1 in
 
         # find the local timezone based on the IP address, then set local system
         if [ ! -L /etc/localtime ]; then
-            tzupdated=`/usr/local/bin/tzupdate 2>&1`
+            tzupdated=`/usr/bin/kano-tzupdate 2>&1`
             if [ "$?" -eq 0 ]; then
                 logger_info "tzupdate SUCCESS: $tzupdated"
                 logger_info "tzupdate result: $(file /etc/localtime)"
