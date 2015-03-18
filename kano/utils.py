@@ -69,7 +69,8 @@ def run_bg(cmd, localised=False):
     if not localised:
         env['LC_ALL'] = 'C'
 
-    subprocess.Popen(cmd, shell=True, env=env)
+    s=subprocess.Popen(cmd, shell=True, env=env)
+    return s
 
 
 def run_term_on_error(cmd, localised=False):
