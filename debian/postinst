@@ -12,7 +12,8 @@ case "$1" in
     configure)
 
         # Create custom sudoers file
-        echo "%sudo   ALL=(root) NOPASSWD: /usr/bin/kano-launcher" > $TMP_FILE
+	echo "Defaults env_keep += KLOG_FORCE_FLUSH" > $TMP_FILE
+        echo "%sudo   ALL=(root) NOPASSWD: /usr/bin/kano-launcher" >> $TMP_FILE
         echo "%sudo   ALL=(root) NOPASSWD: /usr/bin/is_internet" >> $TMP_FILE
         echo "%sudo   ALL=(root) NOPASSWD: /usr/sbin/ifplugstatus" >> $TMP_FILE
 
