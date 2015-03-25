@@ -25,7 +25,7 @@ import json
 def run_cmd(cmd, localised=False):
     '''
     Executes cmd, returning stdout, stderr, return code
-    If localised is True, LC_ALL will be set to "C"
+    if localised is False, LC_ALL will be set to "C"
     '''
     env = os.environ.copy()
     if not localised:
