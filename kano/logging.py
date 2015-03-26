@@ -322,3 +322,26 @@ def __tail_log_file(file_path, length):
 
     with open(file_path, "w") as f:
         f.write("".join(data[(len(data) - length):]))
+
+
+# set exception hook to log exceptions
+
+def log_excepthook(exc_class, exc_value, tb):
+    import traceback
+
+    tb_txt = ''.join(traceback.format_tb(tb))
+    try:
+        (filename, number, function, line_text) = traceback.extract_tb(tb)[-1]
+        exc_txt = "{} line {} function {} [{}]".format(
+            filename, number, function, line_text)
+    except:
+        exc_txt = ""
+
+    logger.error("Unhandled exception '{}' at {} (see logfile for full trace)"
+                 .format(exc_value, exc_txt),
+                 traceback=tb_txt,
+                 exc_class=str(exc_class),
+                 exc_value=str(exc_value))
+    sys.__excepthook__(exc_class, exc_value, tb)
+
+sys.excepthook = log_excepthook
