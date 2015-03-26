@@ -168,7 +168,11 @@ class Logger:
             if self._app_name is None:
                 self.set_app_name(sys.argv[0])
 
-            lines = str(msg).strip().split("\n")
+            try:
+                lines = msg.strip().split('\n')
+            except AttributeError:
+                # msg.strip() failes if it isn't an ascii or unicode string
+                lines = str(msg).split('\n')
 
             log = {}
             log["pid"] = self._pid
@@ -188,13 +192,13 @@ class Logger:
                         self.sync()
 
                 if level <= sys_output_level:
-                    output_line = "{}[{}] {} {}\n".format(
+                    output_line = u"{}[{}] {} {}\n".format(
                         self._app_name,
                         decorate_string_only_terminal(self._pid, "yellow"),
                         decorate_with_preset(log["level"], log["level"], True),
                         log["message"]
                     )
-                    sys.stderr.write(output_line)
+                    sys.stderr.write(output_line.encode('utf-8'))
 
     def sync(self):
         self._log_file.flush()
