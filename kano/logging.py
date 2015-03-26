@@ -171,7 +171,7 @@ class Logger:
             try:
                 lines = msg.strip().split('\n')
             except AttributeError:
-                # msg.strip() failes if it isn't an ascii or unicode string
+                # msg.strip() fails if it isn't an ascii or unicode string
                 lines = str(msg).split('\n')
 
             log = {}
