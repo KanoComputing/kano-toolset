@@ -64,11 +64,11 @@ typedef struct {
 int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf){
   // default config
   config c={
-    .no_kill=false,
+    .no_kill=true,
     .match_only_preset=false,
-    .extra_cmd=""
+    .extra_cmd={0}
   };
-  
+
   FILE *conf_file=fopen(config_filename,"r");
   char line[STRING_SIZE];
   if(!conf_file) return 1;
@@ -424,7 +424,7 @@ int main(int argc, char *argv[]){
   gid=getgid();
 
   
-  config conf;
+  config conf={ true, true, "" };
   bool pi2=is_pi2();
   bool conf_matched=0;
 
@@ -440,9 +440,9 @@ int main(int argc, char *argv[]){
     kill_containers();
   }
   run_container(do_container,command);
-  if(conf.extra_cmd[0])
-    run_container(do_container,conf.extra_cmd);
-  
+  if(conf.extra_cmd[0]) {
+      run_container(do_container,conf.extra_cmd);
+  }
   
   return 0;
 }
