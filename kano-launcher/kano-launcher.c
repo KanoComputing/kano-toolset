@@ -64,7 +64,7 @@ typedef struct {
 int read_config(char *config_filename,bool matching_cmd,bool *match,config *conf){
   // default config
   config c={
-    .no_kill=true,
+    .no_kill=false,
     .match_only_preset=false,
     .extra_cmd={0}
   };
