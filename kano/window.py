@@ -14,6 +14,7 @@ from gtk import gdk
 import time
 
 from kano.utils import run_cmd
+import kano.xwindow
 
 BOTTOM_BAR_HEIGHT = 44
 
@@ -134,6 +135,19 @@ def _get_window_by_id(wid):
     return gdk.window_foreign_new(int(wid))
 
 
+def retry_for(fn, secs, *args, **kwargs):
+    '''
+    Retry a function for some time if it returns None
+    '''
+    res = None
+    for i in range(1, secs * 10):
+        res = fn(*args, **kwargs)
+        if res is not None:
+            return res
+        time.sleep(0.1)
+    return res
+
+
 def find_window(title=None, pid=None, wid=None):
     '''
     Finds the gdk window identified by title, pid or wid (X window ID)
@@ -143,19 +157,32 @@ def find_window(title=None, pid=None, wid=None):
     if (title is None) and (pid is None) and (wid is None):
         raise ValueError("At least one identificator needed.")
 
-    win = None
-    for i in range(1, 300):
-        if title is not None:
-            win = _get_window_by_title(title)
-        elif pid is not None:
-            win = _get_window_by_pid(pid)
-        else:
-            win = _get_window_by_id(wid)
-
-        if win is not None:
-            break
-        time.sleep(0.1)
+    win = retry_for(_find_window_any, 30, title=title, pid=pid, wid=wid)
     return win
+
+
+def _find_window_any(title=None, pid=None, wid=None):
+    '''
+    Find the gdk window identified by title, pid or wid (X window ID)
+    '''
+    win = None
+    if title is not None:
+        win = _get_window_by_title(title)
+    elif pid is not None:
+        win = _get_window_by_pid(pid)
+    else:
+        win = _get_window_by_id(wid)
+    return win
+
+
+def get_child_windows(win):
+    ''' Get child windows
+        assumes that there is at least one, so waits for up to
+        30 seconds for it to appear.
+    '''
+    child_xids = retry_for(
+        kano.xwindow.get_child_windows_from_xid, 30, win.xid)
+    return map(_get_window_by_id, child_xids)
 
 
 def gdk_window_settings(win, x=None, y=None, width=None, height=None,

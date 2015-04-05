@@ -1,3 +1,9 @@
+kano-toolset (1.3-14) unstable; urgency=low
+
+  * Extra X functions for minecraft.
+
+ -- Team Kano <dev@kano.me>  Tue, 7 Apr 2015 13:51:00 +0100
+
 kano-toolset (1.3-13) unstable; urgency=low
 
   * Added new script kano-tzupdate to use ipinfo.io and custom Kano auth credentials
