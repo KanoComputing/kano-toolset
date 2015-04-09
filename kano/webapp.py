@@ -11,6 +11,7 @@ Provides a class wrapper on top of a WebKit browser
 '''
 
 import gtk
+from gtk import gdk
 import gobject
 import webkit
 import sys
@@ -77,7 +78,8 @@ class WebApp(object):
     _app_icon = None
     _inspector = False
 
-
+    _disable_minimize = False
+    
     _pipe = True
 
     def run(self):
@@ -133,6 +135,9 @@ class WebApp(object):
                             self._width, self._height, self._decoration,
                             self._maximized, self._centered)
 
+        if self._disable_minimize:
+            win.connect("window-state-event", self._unminimise_if_minimised)
+
         view.open(self._index)
 
         # Start a thread that injects Javascript code coming from a filesystem pipe.
@@ -142,6 +147,12 @@ class WebApp(object):
 
         gtk.main()
 
+    def _unminimise_if_minimised(self, window, event):
+        # Check if we are attempting to minimise the window
+        # if so, try to unminimise it
+        if event.changed_mask & gdk.WINDOW_STATE_ICONIFIED:
+            window.deiconify()
+            
     def _activate_inspector(self, inspector, target_view, splitter):
         inspector_view = webkit.WebView()
         splitter.add2(inspector_view)
