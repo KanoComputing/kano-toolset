@@ -140,11 +140,13 @@ def retry_for(fn, secs, *args, **kwargs):
     Retry a function for some time if it returns None
     '''
     res = None
-    for i in range(1, secs * 10):
+    tries_per_sec = 10
+    sleep_time = 1.0 / tries_per_sec
+    for i in range(1, secs * tries_per_sec):
         res = fn(*args, **kwargs)
         if res is not None:
             return res
-        time.sleep(0.1)
+        time.sleep(sleep_time)
     return res
 
 
