@@ -25,8 +25,7 @@ SERVER_CONFIG='/usr/bin/start-sentry-server'
 
 function call_hook {
 
-    # The network hook script is called when UDHCP events arrive.
-    # The first parameter can be one of: bound, renew, deconfig, leasefail, nak.
+    # The network hook script is called when UDHCP events "bound" and "renew" arrive.
     # If bound or renew, the IP address of the lease will be given through the second parameter
     # The script will run as the superuser and started in the background, the return code is meaningless.
 
@@ -132,23 +131,18 @@ case $1 in
             resolvconf -d "${interface}.udhcpc"
         fi
         /sbin/ifconfig $interface 0.0.0.0
-
-        call_hook $1
         ;;
 
     leasefail)
         echo "$0: Lease failed: $message"
-        call_hook $1
         ;;
 
     nak)
         echo "$0: Received a NAK: $message"
-        call_hook $1
         ;;
 
     *)
         echo "$0: Unknown udhcpc command: $1";
-        call_hook $1
         exit 1;
         ;;
 esac
