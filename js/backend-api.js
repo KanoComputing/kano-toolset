@@ -11,6 +11,7 @@
 
 window.backend = {
     callbacks: [],
+    seq: 0,
 
     call: function() {
         if (arguments.length >= 1) {
@@ -43,7 +44,9 @@ window.backend = {
 
         var args_string = args.join('/');
 
-        window.location.hash = 'api:' + func + '/' + args_string;
+        this.seq++; // add a sequence number to ensure string is different from last one
+
+        window.location.hash = 'api:' + func + '/' + this.seq + '/' + args_string;
     },
 
     trigger_cb: function(cb_name, timestamp, result) {
@@ -57,9 +60,10 @@ window.backend = {
                 callback.timestamp === timestamp) {
                 callback.callback(result);
                 backend.callbacks.splice(i, 1);
-                break;
+                return;
             }
         }
+	console.log("callback not found!");
 
     }
 };

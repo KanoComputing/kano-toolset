@@ -222,7 +222,7 @@ class WebApp(object):
         sys.exit(0)
 
     def _parse_api_call(self, call_str):
-        call_re = r"#api:(\w+)(\[\d+\])?(/[^/]*)*$"
+        call_re = r"#api:(\w+)(\[\d+\])?(/[^/]*)+$"
         call_match = re.search(call_re, call_str)
 
         name = call_match.group(1)
@@ -238,7 +238,8 @@ class WebApp(object):
         if len(args) > 0:
             if args[-1] == "/":
                 args = args[:-1]
-            call += map(urllib.unquote, args.split("/"))
+            arglist = map(urllib.unquote, args.split("/"))
+            call += arglist[1:]  # remove seq
 
         return call
 
