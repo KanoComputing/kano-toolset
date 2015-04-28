@@ -14,62 +14,67 @@
 
 # pipe name to send javascript code
 pipe_name=/tmp/webapp.pipe
-app="none"
-signal="none"
+app=""
+
+signal=$1
+
 
 # syntax sanity check
-if [ "$1" == "" ]; then
-    echo "Usage: make-signal < save | load | share | make >"
-    exit 1
-else
-    signal=$1
-fi
+case $signal in
+    save)
+        key_propagation="ctrl+s"
+        jscmd="Signal.save()"
+        ;;
+    load)
+        key_propagation="ctrl+o"
+        jscmd="Signal.load()"
+        ;;
+    share)
+        key_propagation="ctrl+u"
+        jscmd="Signal.share()"
+        ;;
+    make)
+        key_propagation="ctrl+r"
+        jscmd="Signal.make()"
+        ;;
+    *)
+        echo "Usage: make-signal < save | load | share | make >"
+        exit 1
+        ;;
+esac
 
-# if there is no pipe, webkit is not running
-if [ ! -p $pipe_name ]; then
-    # nor Pong nor Minecraft are running, byebye
-    exit 1
-else
-    # which one is running?
-    xwininfo -tree -root|grep -i pong > /dev/null 2>&1
+
+function is_running {
+    xwininfo -tree -root | grep -i $1 > /dev/null 2>&1
+}
+
+
+for APP in pong minecraft music; do
+    is_running $APP
     if [ $? == 0 ]; then
-	app="pong"
-    else
-	xwininfo -tree -root|grep -i minecraft > /dev/null 2>&1
-	if [ $? == 0 ]; then
-	    app="minecraft"
-	fi
+        app=$APP
+        break
     fi
+done
 
-    if [ $app == "" ]; then
-	exit 1
-    fi
+if [ $app == "" ]; then
+    # No valid app is running
+    exit 1
 fi
 
-# Signals
-function save {
-    jscmd="Signal.save();"
-    echo $jscmd > $pipe_name
-}
-
-function load {
-    jscmd="Signal.load();"
-    echo $jscmd > $pipe_name
-}
-
-function share {
-    jscmd="Signal.share();"
-    echo $jscmd > $pipe_name
-}
-
-function make {
-    jscmd="Signal.make();"
-    echo $jscmd > $pipe_name
-}
 
 if [ "$2" == "debug" ]; then
     echo "Dispatching signal: $signal"
 fi
 
-eval $signal
+
+# if there is no pipe, webkit is not running
+if [ -p $pipe_name ]; then
+    # webkit is running
+    echo $jscmd > $pipe_name
+else
+    # just propagate keys
+    xdotool key "$key_propagation"
+fi
+
 exit $?
