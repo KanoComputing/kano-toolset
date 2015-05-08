@@ -29,6 +29,8 @@ from kano.colours import decorate_string_only_terminal, decorate_with_preset
 from kano.utils import enforce_root
 import pyinotify
 
+# Used for looking at logs off the pi. See -d option
+force_log_dirs = None
 
 def get_logfiles(app=None):
     log_dirs = [logging.SYSTEM_LOGS_DIR]
@@ -39,6 +41,9 @@ def get_logfiles(app=None):
             user_log_dir = '/home/{}/.kano-logs'.format(f)
             if os.path.isdir(user_log_dir):
                 log_dirs.append(user_log_dir)
+
+    if force_log_dirs is not None:
+        log_dirs = force_log_dirs
 
     logfiles = []
     for d in log_dirs:
@@ -181,6 +186,12 @@ def watch_logs(app=None):
 
 def process_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-d", "--log-dir",
+        help="extract from a different dir (for off-pi analysis)",
+        type=str
+    )
+
     subparsers = parser.add_subparsers(
         title="Subcommands",
         description="These are the commands you can use with kano-logs",
@@ -240,7 +251,12 @@ def process_args():
 
 
 def main():
+    global force_log_dirs
+
     args = process_args()
+
+    if 'log_dir' in args:
+        force_log_dirs = [args['log_dir']]
 
     if args["which"] == "show":
         if args["watch"]:
