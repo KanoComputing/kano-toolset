@@ -602,7 +602,11 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
 
 
 def disconnect(iface):
+    # Stop the Kano reconnecting to the internet
     run_cmd('wpa_cli terminate')
+    k = KwifiCache()
+    k.empty()
+
     run_cmd('iwconfig "%s" essid off' % iface)
     run_cmd('iwconfig "%s" mode managed' % iface)
     time.sleep(3)
