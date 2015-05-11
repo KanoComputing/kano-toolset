@@ -407,7 +407,7 @@ def wpa_conf(essid, psk, confile, wep=False):
                %s\n
             ''' % (essid, psk[3:], wpa_epilog)
         else:
-            # In plain text form, the wpa_passphrase tool will give us 
+            # In plain text form, the wpa_passphrase tool will give us
             # the passphrase and essid encoded correctly
             # and it carefully takes care of escaping single/double quotes for us
             try:
@@ -602,6 +602,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
 
 
 def disconnect(iface):
+    run_cmd('wpa_cli terminate')
     run_cmd('iwconfig "%s" essid off' % iface)
     run_cmd('iwconfig "%s" mode managed' % iface)
     time.sleep(3)
