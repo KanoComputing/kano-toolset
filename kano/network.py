@@ -678,24 +678,32 @@ def launch_chromium(*args):
 def network_info():
     out, _, _ = run_cmd('ip route show')
     network_dict = dict()
+
     for line in out.splitlines():
         if line.startswith('default'):
             continue
+
         interface = line.split('dev ')[1].split()[0]
 
         data = dict()
 
         if interface.startswith('wlan'):
-            command_network = "/sbin/iwconfig wlan0 | grep 'ESSID:' | awk '{print $4}' | sed 's/ESSID://g' | sed 's/\"//g'"
+            command_network = "/sbin/iwconfig wlan0"
             out, _, _ = run_cmd(command_network)
-            data['ESSID'] = out.strip()
-            data['nice_name'] = 'Wireless: {}'.format(out.strip())
+
+            essid_match = re.match(r'.*ESSID:"(.*)"\ *$', out, re.MULTILINE)
+            essid = essid_match.groups()[0] \
+                if essid_match else 'Wireless Network'
+
+            data['ESSID'] = essid
+            data['nice_name'] = 'Wireless: {}'.format(essid)
         else:
             data['nice_name'] = 'Ethernet'
 
         data['address'] = line.split('src ')[1].split()[0]
 
         network_dict[interface] = data
+
     return network_dict
 
 
