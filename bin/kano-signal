@@ -22,19 +22,15 @@ signal=$1
 # syntax sanity check
 case $signal in
     save)
-        key_propagation="ctrl+s"
         jscmd="Signal.save()"
         ;;
     load)
-        key_propagation="ctrl+o"
         jscmd="Signal.load()"
         ;;
     share)
-        key_propagation="ctrl+u"
         jscmd="Signal.share()"
         ;;
     make)
-        key_propagation="ctrl+r"
         jscmd="Signal.make()"
         ;;
     *)
@@ -53,11 +49,17 @@ for APP in pong minecraft music; do
     is_running $APP
     if [ $? == 0 ]; then
         app=$APP
+
+        if [ $app == "music" ]; then
+            # Make Music is registered as "sonicpi" in dbus
+            app="sonicpi"
+        fi
+
         break
     fi
 done
 
-if [ $app == "" ]; then
+if [ -z $app ]; then
     # No valid app is running
     exit 1
 fi
@@ -73,8 +75,9 @@ if [ -p $pipe_name ]; then
     # webkit is running
     echo $jscmd > $pipe_name
 else
-    # just propagate keys
-    xdotool key "$key_propagation"
+    # Pass on event to dbus
+    dbus-send --session --dest="me.kano.$app" --print-reply \
+              "/me/kano/$app" "me.kano.$app.Actions.$signal" 2>/dev/null
 fi
 
 exit $?
