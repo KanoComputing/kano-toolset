@@ -1,3 +1,9 @@
+kano-toolset (2.0-1) unstable; urgency=low
+
+  * Adding the get_free_space() function to utils
+
+ -- Team Kano <dev@kano.me>  Wed, 13 May 2015 17:10:00 +0100
+
 kano-toolset (1.3-14) unstable; urgency=low
 
   * Extra X functions for minecraft.

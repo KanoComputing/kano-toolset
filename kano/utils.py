@@ -546,3 +546,21 @@ def sed(pattern, replacement, file_path, use_regexp=True):
                 changed += 1
 
     return changed
+
+
+def get_free_space(path="/"):
+    """
+        Returns the amount of free space in certain location in MB
+
+        :param path: The location to measure the free space at.
+        :type path: str
+
+        :return: Number of free megabytes.
+        :rtype: int
+    """
+
+    out, err, rv = run_cmd("df {}".format(path))
+
+    device, size, used, free, percent, mp = out.split('\n')[1].split()
+
+    return int(free) / 1024
