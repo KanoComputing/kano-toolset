@@ -255,7 +255,7 @@ def main():
 
     args = process_args()
 
-    if 'log_dir' in args:
+    if 'log_dir' in args and args['log_dir']:
         force_log_dirs = [args['log_dir']]
 
     if args["which"] == "show":
