@@ -293,9 +293,23 @@ def chown_path(path, user=None, group=None):
         user = user_unsudoed
     if not group:
         group = user_unsudoed
-    uid = pwd.getpwnam(user).pw_uid
-    gid = grp.getgrnam(group).gr_gid
-    os.chown(path, uid, gid)
+    try:
+        uid = pwd.getpwnam(user).pw_uid
+        gid = grp.getgrnam(group).gr_gid
+        os.chown(path, uid, gid)
+    except KeyError as e:
+        from kano.logging import logger
+        logger.error(
+            'user {} or group {} do not match with existing'.format(user, group))
+        ret_val = False
+    except OSError as e:
+        from kano.logging import logger
+        logger.error(
+            'Error while trying to chown, root priviledges needed {}'.format(e))
+        ret_val = False
+    else:
+        ret_val = True
+    return ret_val
 
 
 def play_sound(audio_file, background=False):
