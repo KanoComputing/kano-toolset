@@ -12,6 +12,8 @@ uinput/scancodes.py usr/lib/python2.7/dist-packages/
 
 udhcpc/kano.script etc/udhcpc
 
+ifplugd/kano-ifplugd etc/ifplugd/action.d
+
 bash/logging.sh usr/share/kano-toolset/
 bash/logging_py.sh usr/share/kano-toolset/
 

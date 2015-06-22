@@ -17,6 +17,9 @@ import time
 from kano.logging import logger
 from kano.utils import get_cpu_id, get_rpi_model, run_cmd
 
+# file that external applications can monitor for internet availability triggers
+monitor_file="/var/opt/internet_monitor"
+
 def send_cpu_id():
     sent=False
 
@@ -48,7 +51,14 @@ def send_cpu_id():
 
 if __name__ == '__main__':
     rc = 1
+
+    # A DHCP BOUND event is an indication that the Internet should be reachable
     if len(sys.argv) > 1 and sys.argv[1] == 'bound':
+
+        # update internet availability info
+        with open(monitor_file, 'w') as f:
+            f.write('internet: up\n')
+
         if send_cpu_id() == True:
             logger.info('Kit serial number has been sent')
             rc=0
