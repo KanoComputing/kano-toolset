@@ -5,14 +5,14 @@
 # Copyright (C) 2015 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# This script is called when network DHCP events occur
-# It is called from /etc/udhcpc/kano.script (Kano Toolset packge)
-# and sends the RaspberryPI CPU Serial Number to Kano. It runs as the superuser.
+# This script is called by the ifplugd deamone when network interfaces
+# transition from UP and DOWN (connected to disconnected).
 #
-# Monitors the link status of the Internet through an external regular file
+# For ethernet devices it is detected when you plug / unplug the network cable.
+# On wireless devices the (de)association from the access point.
 #
-# Listens for DOWN events only, if the Internet is down, puts a mark in the external file.
-# UP events are recorded from the kano-network-hook, because they have a much higher latency.
+# The UP event is controlled by kano-network-hook script, because it is called
+# after the DHCP client has setup the correct configuration.
 #
 
 # file that external applications can monitor for internet availability triggers
