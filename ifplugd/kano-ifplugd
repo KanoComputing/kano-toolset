@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# kano-ifplugd
+#
+# Copyright (C) 2015 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This script is called by the ifplugd deamone when network interfaces
+# transition from UP and DOWN (connected to disconnected).
+#
+# For ethernet devices it is detected when you plug / unplug the network cable.
+# On wireless devices the (de)association from the access point.
+#
+# The UP event is controlled by kano-network-hook script, because it is called
+# after the DHCP client has setup the correct configuration.
+#
+
+# file that external applications can monitor for internet availability triggers
+monitor_file="/var/opt/internet_monitor"
+
+if [ "$2" == "down" ]; then
+
+    # We are testing internet connectivity now for if we are in multihomed mode (eth and wlan)
+    is_internet
+    if [ "$?" != "0" ]; then
+	echo -e "internet: down\n" > $monitor_file
+    fi
+fi
+
+exit 0
