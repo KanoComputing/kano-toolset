@@ -14,7 +14,6 @@ class LabelledEntries(Gtk.Alignment):
 
     def __init__(self, entries_info):
         Gtk.Alignment.__init__(self)
-        self.set_padding(0, 0, 0, 100)
 
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.entries = []
