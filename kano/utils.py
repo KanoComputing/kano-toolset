@@ -322,7 +322,7 @@ def play_sound(audio_file, background=False):
 
     _, extension = os.path.splitext(audio_file)
 
-    if extension in ['wav', 'voc', 'raw', 'au']:
+    if extension in ['.wav', '.voc', '.raw', '.au']:
         cmd = 'aplay -q {}'.format(audio_file)
     else:
         volume_percent, _ = get_volume()
