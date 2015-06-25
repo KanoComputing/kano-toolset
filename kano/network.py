@@ -677,9 +677,23 @@ class KwifiCache:
         return wdata
 
 
+def launch_browser(*args):
+    # TODO: Set the default system browser setting somewhere
+    # if you are not root, you will get a "su" prompt that would misteriously stall you
+    if not os.getuid() == 0:
+        return
+
+    launch_midori(args)
+
+
 def launch_chromium(*args):
     user_name = get_user_unsudoed()
-    run_bg('su - ' + user_name + ' -c chromium')
+    run_bg('su - ' + user_name + ' -c chromium {}'.format(''.join(*args)))
+
+
+def launch_midori(*args):
+    user_name = get_user_unsudoed()
+    run_bg('su - ' + user_name + ' -c midori {}'.format(''.join(*args)))
 
 
 def network_info():
