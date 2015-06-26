@@ -22,7 +22,7 @@ import grp
 import json
 
 
-def run_cmd(cmd, localised=False):
+def run_cmd(cmd, localised=False, unsudo=False):
     '''
     Executes cmd, returning stdout, stderr, return code
     if localised is False, LC_ALL will be set to "C"
@@ -30,6 +30,9 @@ def run_cmd(cmd, localised=False):
     env = os.environ.copy()
     if not localised:
         env['LC_ALL'] = 'C'
+
+    if unsudo and 'SUDO_USER' in os.environ and os.environ['SUDO_USER'] != 'root':
+        cmd = "sudo -u {} bash -c '{}' ".format(os.environ['SUDO_USER'], cmd)
 
     process = subprocess.Popen(cmd, shell=True, env=env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -40,14 +43,14 @@ def run_cmd(cmd, localised=False):
     return stdout, stderr, returncode
 
 
-def run_cmd_log(cmd, localised=False):
+def run_cmd_log(cmd, localised=False, unsudo=False):
     '''
     Wrapper against run_cmd but Kano Logging executuion and return code
     '''
 
     from kano.logging import logger
 
-    out, err, rv = run_cmd(cmd, localised)
+    out, err, rv = run_cmd(cmd, localised, unsudo)
     logger.info("Command: {}".format(cmd))
 
     if len(out.strip()) > 0:
@@ -61,13 +64,16 @@ def run_cmd_log(cmd, localised=False):
     return out, err, rv
 
 
-def run_bg(cmd, localised=False):
+def run_bg(cmd, localised=False, unsudo=False):
     '''
     Starts cmd program in the background
     '''
     env = os.environ.copy()
     if not localised:
         env['LC_ALL'] = 'C'
+
+    if unsudo and 'SUDO_USER' in os.environ and os.environ['SUDO_USER'] != 'root':
+        cmd = "sudo -u {} bash -c '{}' ".format(os.environ['SUDO_USER'], cmd)
 
     s=subprocess.Popen(cmd, shell=True, env=env)
     return s
