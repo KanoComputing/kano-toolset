@@ -197,7 +197,7 @@ class Logger:
                     sys.stderr.write(output_line)
 
     def sync(self):
-        self._log_file.flush()
+        self.flush()
 
     def error(self, msg, **kwargs):
         kwargs["level"] = "error"
@@ -216,8 +216,9 @@ class Logger:
         self.write(msg, **kwargs)
 
     def flush(self):
-        if self._log_file:
-            self._log_file.close()
+        if self._log_file and not self._log_file.closed:
+            self._log_file.flush()
+
         sys.stderr.flush()
 
     def _init_log_file(self):
