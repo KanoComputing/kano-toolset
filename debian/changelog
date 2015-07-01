@@ -1,8 +1,15 @@
+kano-toolset (2.1-1) unstable; urgency=low
+
+  * Adding the kano.timeout module
+
+ -- Team Kano <dev@kano.me>  Wed, 1 Jul 2015 16:26:00 +0100
+
 kano-toolset (2.0-2) unstable; urgency=low
 
   * Add 'unsudo' option to run_cmd, run_cmd_bg, run_cmd_log
 
  -- Team Kano <dev@kano.me>  Tue, 15 May 2015 18:59:00 +0100
+
 kano-toolset (2.0-1) unstable; urgency=low
 
   * Adding the get_free_space() function to utils
