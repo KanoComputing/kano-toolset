@@ -688,12 +688,14 @@ def launch_browser(*args):
 
 def launch_chromium(*args):
     user_name = get_user_unsudoed()
-    run_bg('su - ' + user_name + ' -c chromium {}'.format(''.join(*args)))
+    arguments=''.join(*args)
+    run_bg('su - ' + user_name + ' -c "chromium {}"'.format(arguments))
 
 
 def launch_midori(*args):
     user_name = get_user_unsudoed()
-    run_bg('su - ' + user_name + ' -c midori {}'.format(''.join(*args)))
+    arguments=''.join(*args)
+    run_bg('su - ' + user_name + ' -c "midori {}"'.format(arguments))
 
 
 def network_info():
