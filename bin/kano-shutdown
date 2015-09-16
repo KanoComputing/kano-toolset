@@ -9,6 +9,15 @@
 # The user executing this code needs sudo NOPASSWD: privileges for /sbin/poweroff.
 #
 
+# Check if the updater scheduled the install at shutdown
+STATUS_FILE="/var/cache/kano-updater/status.json"
+scheduled=`grep -Po '"is_scheduled":.[0|1]' $STATUS_FILE | awk '{ print $2 }'`
+
+if [ $scheduled -eq 1 ]
+then
+    sudo kano-updater install --gui
+fi
+
 # Report shutdown event to Kano Tracker
 kano-tracker-ctl +1 shutdown
 
