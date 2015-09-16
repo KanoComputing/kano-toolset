@@ -13,8 +13,7 @@
 STATUS_FILE="/var/cache/kano-updater/status.json"
 scheduled=`grep -Po '"is_scheduled":.[0|1]' $STATUS_FILE | awk '{ print $2 }'`
 
-if [ $scheduled -eq 1 ]
-then
+if [ $scheduled -eq 1 ]; then
     sudo kano-updater install --gui
 fi
 
