@@ -39,7 +39,7 @@ class KanoDialog():
     # It can either be a dictionary for backwards compatibility, or a list
     def __init__(self, title_text="", description_text="", button_dict=None, widget=None,
                  has_entry=False, has_list=False, scrolled_text="", global_style="", parent_window=None,
-                 orange_info=None):
+                 orange_info=None, hide_from_taskbar=False):
 
         self.title_text = title_text
         self.description_text = description_text
@@ -57,6 +57,7 @@ class KanoDialog():
         self.dialog.set_decorated(False)
         self.dialog.set_resizable(False)
         self.dialog.set_keep_above(True)
+        self.dialog.set_skip_taskbar_hint(hide_from_taskbar)
         self.dialog.set_border_width(5)
 
         apply_styling_to_widget(self.dialog, self.CSS_PATH)
@@ -269,6 +270,7 @@ def parse_items(args):
     has_list = False
     buttons = {}
     global_style = False
+    hide_from_taskbar = False
 
     for arg in args:
         split = arg.split('=')
@@ -324,7 +326,10 @@ def parse_items(args):
         if split[0] == "global_style":
             global_style = True
 
-    return title, description, buttons, widget, has_entry, has_list, scrolled_text, global_style
+        if split[0] == "no-taskbar":
+            hide_from_taskbar = True
+
+    return title, description, buttons, widget, has_entry, has_list, scrolled_text, global_style, hide_from_taskbar
 
 
 def on_button_toggled(button):

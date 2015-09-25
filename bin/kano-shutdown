@@ -9,6 +9,10 @@
 # The user executing this code needs sudo NOPASSWD: privileges for /sbin/poweroff.
 #
 
+
+# run the updater to install urgent or prompt for updating now
+sudo kano-updater ui shutdown-window
+
 # Report shutdown event to Kano Tracker
 kano-tracker-ctl +1 shutdown
 
