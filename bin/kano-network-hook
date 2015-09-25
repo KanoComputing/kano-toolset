@@ -30,6 +30,14 @@ def send_cpu_id():
         pass
     else:
         try:
+            # This is a loose dependency as we can't make kano-toolset
+            # depend on profile.
+            from kano_profile.tracker_events import generate_event
+            generate_event('ping')
+
+            # The code below is the legacy way of tracking cpuids
+            # TODO: To be removed when the new way is known to be reliable
+
             # Save a trace of the CPUID so we dont send it over again
             # The UTC timestamp is embedded inside the cpuid file as well
             utc_time=time.asctime(time.gmtime(time.time()))
