@@ -349,9 +349,48 @@ def play_sound(audio_file, background=False):
 
 
 def is_running(program):
-    cmd = "pgrep -f '{}' -l | grep -v pgrep | wc -l".format(program)
-    o, _, _ = run_cmd(cmd)
-    return int(o)
+    '''
+    Returns True if at least one instance of program name is running.
+    program will search through the command line, so asking for
+    "connect" will return True for the process
+    "wpa_supplicant -c/etc/connect.conf"
+    '''
+    # Search using a regex, to exclude itself (pgrep) from the list
+    cmd = "pgrep -fc '[{}]{}'".format(program[0], program[1:])
+    running=0
+    try:
+        result=os.popen(cmd)
+        running=int(result.read().strip())
+    except:
+        pass
+    return (running > 0)
+
+
+def is_jessie():
+    '''
+    Returns True if /etc/debian_version tells us 
+    we are running in a Debian Jessie OS.
+    '''
+    jessie_found=False
+    try:
+        osversion=open('/etc/debian_version').read().strip()
+        major, minor = osversion.split('.')
+        if major == '8':
+            jessie_found=True
+    except:
+        pass
+
+    return jessie_found
+
+
+def is_systemd():
+    '''
+    returns True if we are in a systemd environment - Debian Jessie
+    '''
+    try:
+        return os.readlink('/sbin/init') == '/lib/systemd/systemd'
+    except:
+        return False
 
 
 def enforce_root(msg):
