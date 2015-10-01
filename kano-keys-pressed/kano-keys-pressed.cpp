@@ -12,6 +12,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <iostream>
+#include <unistd.h>
 
 #include "hid.h"
 
