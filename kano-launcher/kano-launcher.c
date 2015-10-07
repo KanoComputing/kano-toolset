@@ -30,7 +30,8 @@
 #define CONF_DIR "/usr/share/kano-toolset/kano-launcher/conf"
 
 #define STRING_SIZE 256
-#define STACK_SIZE 4096
+#define PAGE_SIZE  4096
+#define STACK_SIZE PAGE_SIZE*4
 
 // uid and gid saved here to allow dropping root privilege
 int gid;
