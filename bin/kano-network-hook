@@ -32,8 +32,11 @@ def send_cpu_id():
         try:
             # This is a loose dependency as we can't make kano-toolset
             # depend on profile.
-            from kano_profile.tracker_events import generate_event
-            generate_event('ping')
+            try:
+                from kano_profile.tracker_events import generate_event
+                generate_event('ping')
+            except Exception as e:
+                logger.error("Error sending the ping event ({})".format(e))
 
             # The code below is the legacy way of tracking cpuids
             # TODO: To be removed when the new way is known to be reliable
