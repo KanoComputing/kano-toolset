@@ -35,6 +35,15 @@ EOF
 	# kano-launcher is setuid root to allow use of CLONE_NEWUTS
 	chmod u+s /usr/bin/kano-launcher
 
+        # On jessie, Chromium is started as "chromium-browser" binary.
+        which chromium > /dev/null
+        if [ "$?" != "0" ]; then
+            # Chromium binary is not in the path, create a symlink.
+            # If is not yet installed, the symlink will
+            # be resolved automatically when it does.
+            ln -s /usr/bin/chromium /usr/bin/chromium-browser
+        fi
+
         ;;
 esac
 
