@@ -56,7 +56,9 @@ class KanoDialog():
         self.dialog = Gtk.Dialog()
         self.dialog.set_decorated(False)
         self.dialog.set_resizable(False)
-        self.dialog.set_keep_above(True)
+
+        # TODO: review this - should this always be set?
+        # self.dialog.set_keep_above(True)
         self.dialog.set_skip_taskbar_hint(hide_from_taskbar)
         self.dialog.set_border_width(5)
 
@@ -178,7 +180,7 @@ class KanoDialog():
             for argument, value in button_defaults.iteritems():
 
                 # Use default info if not provided
-                if not argument in button:
+                if argument not in button:
                     button[argument] = value
 
                     # Create default return values for OK and CANCEL buttons
@@ -231,6 +233,10 @@ class KanoDialog():
         return True
 
     def run(self):
+        if self.parent_window is not None:
+            # Make the dialog always above the parent window
+            self.dialog.set_transient_for(self.parent_window)
+
         if self.parent_window is not None and \
            hasattr(self.parent_window, 'blur') and \
            callable(self.parent_window.blur):
