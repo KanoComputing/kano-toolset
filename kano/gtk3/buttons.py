@@ -130,7 +130,7 @@ class KanoButton(GenericButton):
         self.show_all()
         self.spinner.start()
 
-     # Replace content of button with original content and stop spinner spinning
+    # Replace content of button with original content and stop spinner spinning
     def stop_spinner(self):
         self.spinner.stop()
         self.remove(self.spinner)
