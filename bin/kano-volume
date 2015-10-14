@@ -27,21 +27,15 @@ fi
 # First parameter is either "up" or "down"
 updown=$1
 
-# percentage to increase / decrease the volume
-up_factor=8
-down_factor=7
-
 case $updown in
     "up")
         amixer set Master 1+ > /dev/null 2>&1
-        amixer set PCM -- $[$(amixer get PCM|grep -o [0-9]*%|sed 's/%//')+$up_factor]% > /dev/null 2>&1
         if [ "$omx_running" -eq 0 ]; then
             dbus-send --print-reply=literal --session --dest=org.mpris.MediaPlayer2.omxplayer /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Action int32:18 >/dev/null
         fi
         ;;
     "down")
         amixer set Master 1- > /dev/null 2>&1
-        amixer set PCM -- $[$(amixer get PCM|grep -o [0-9]*%|sed 's/%//')-$down_factor]% > /dev/null 2>&1
         if [ "$omx_running" -eq 0 ]; then
             dbus-send --print-reply=literal --session --dest=org.mpris.MediaPlayer2.omxplayer /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Action int32:17 >/dev/null
         fi
