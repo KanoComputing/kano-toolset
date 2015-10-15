@@ -72,8 +72,13 @@ class KanoComboBox(Gtk.Button):
 
         # creating the scroll up and down buttons for the dropdown menu
         self.scroll_up_button = self.ScrollMenuItem(self.SCROLL_ARROW_UP)
-        self.scroll_down_button = self.ScrollMenuItem(self.SCROLL_ARROW_DOWN)
+        self.scroll_up_button.get_style_context().add_class("KanoComboBox")
+        self.scroll_up_button.get_style_context().add_class("up_button")
         self.scroll_up_button.connect("enter-notify-event", self.on_scroll_button)
+
+        self.scroll_down_button = self.ScrollMenuItem(self.SCROLL_ARROW_DOWN)
+        self.scroll_down_button.get_style_context().add_class("KanoComboBox")
+        self.scroll_down_button.get_style_context().add_class("down_button")
         self.scroll_down_button.connect("enter-notify-event", self.on_scroll_button)
 
         # creating the popup dropdown menu

@@ -1,15 +1,29 @@
-
-GtkMenu.KanoComboBox {
+GtkMenuItem.KanoComboBox, GtkMenuItem.KanoComboBox.up_button, GtkMenuItem.KanoComboBox.down_button {
     border-width: 2px;
     border-color: @active_border;
-    border-style: solid;
-    box-shadow: none;
+    border-right-style: solid;
+    border-left-style: solid;
 }
+
 
 GtkMenuItem.KanoComboBox {
     background: #ffffff;
     padding-top: 5px;
     padding-bottom: 5px;
+    border-top-style: none;
+    border-bottom-style: none;
+}
+
+GtkMenuItem.KanoComboBox.up_button {
+    background: #dddddd;
+    border-top-style: solid;
+    border-bottom-style: none;
+}
+
+GtkMenuItem.KanoComboBox.down_button {
+    background: #dddddd;
+    border-top-style: none;
+    border-bottom-style: solid;
 }
 
 GtkMenuItem.KanoComboBox GtkLabel {
