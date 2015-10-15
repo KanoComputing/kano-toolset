@@ -1,4 +1,5 @@
 GtkMenuItem.KanoComboBox, GtkMenuItem.KanoComboBox.up_button, GtkMenuItem.KanoComboBox.down_button {
+    background: #ffffff;
     border-width: 2px;
     border-color: @active_border;
     border-right-style: solid;
@@ -7,7 +8,6 @@ GtkMenuItem.KanoComboBox, GtkMenuItem.KanoComboBox.up_button, GtkMenuItem.KanoCo
 
 
 GtkMenuItem.KanoComboBox {
-    background: #ffffff;
     padding-top: 5px;
     padding-bottom: 5px;
     border-top-style: none;
@@ -15,13 +15,11 @@ GtkMenuItem.KanoComboBox {
 }
 
 GtkMenuItem.KanoComboBox.up_button {
-    background: #dddddd;
     border-top-style: solid;
     border-bottom-style: none;
 }
 
 GtkMenuItem.KanoComboBox.down_button {
-    background: #dddddd;
     border-top-style: none;
     border-bottom-style: solid;
 }
