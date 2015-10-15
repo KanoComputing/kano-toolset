@@ -683,7 +683,7 @@ def launch_browser(*args):
     if not os.getuid() == 0:
         return
 
-    launch_midori(args)
+    launch_chromium(args)
 
 
 def launch_chromium(*args):
