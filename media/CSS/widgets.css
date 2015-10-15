@@ -69,13 +69,16 @@ GtkEntry {
     border-radius:3px;
     padding: 10px;
     font: Bariol 13;
+    background: #ffffff;
 }
+
 GtkEntry:insensitive {
     border-color: @inactive_border;
     color: @inactive_writing;
     border-style: solid;
     border-width: 2px;
     border-radius:3px;
+    background: #eeeeee;
 }
 
 /**
