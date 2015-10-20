@@ -1,20 +1,153 @@
-#!/bin/sh
+#!/usr/bin/python
 
 # kano-shutdown
 #
-# Copyright (C) 2014 Kano Computing Ltd.
+# Copyright (C) 2014, 2015 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# Script to shutdown the system after a confirmation message
-# The user executing this code needs sudo NOPASSWD: privileges for /sbin/poweroff.
+# Python script to display a Desktop shutdown dialog to turn off, reboot or logoff.
+# The user executing this code needs sudo NOPASSWD: privileges for
+# /sbin/poweroff, reboot, and loginctl.
 #
 
+from gi.repository import Gtk
 
-# run the updater to install urgent or prompt for updating now
-sudo kano-updater ui shutdown-window
+from kano.gtk3.heading import Heading
+from kano.gtk3.buttons import KanoButton, KanoButtonBox
+from kano.gtk3.application_window import ApplicationWindow
+from kano.utils import run_cmd, run_bg
 
-# Report shutdown event to Kano Tracker
-kano-tracker-ctl +1 shutdown
+from kano.paths import common_css_dir
 
-kano-sync --backup -s &
-lxsession-logout -p "Logout from this session?" -b /usr/share/kano-desktop/images/kano-logout-face.png -s top
+import os
+
+
+class ShutdownOptions(ApplicationWindow):
+    '''
+    Displays a dialog with logout, poweroff and reboot buttons
+    '''
+    def __init__(self, title='', width=300, height=550):
+
+        self.top_image_file='/usr/share/kano-desktop/images/kano-logout-face.png'
+
+	# Load and apply styles
+        cssProvider = Gtk.CssProvider()
+        cssProvider.load_from_path(common_css_dir + "/shutdown.css")
+        styleContext = Gtk.StyleContext()
+        styleContext.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        # Setup the window
+        ApplicationWindow.__init__(self, title, width, height)
+        self.set_default_size(width, height)
+        self.set_decorated(False)
+
+        # The ESC key will terminate the app
+        self.connect('key-press-event', self.on_key_function)
+        
+        # Create ad eventbox that has all the action buttons and image
+        background = Gtk.EventBox()
+
+        # Top image widget, separator and title
+        self.top_image=Gtk.Image.new_from_file(self.top_image_file)
+
+        # FIXME: Increase the separator width
+        self.separator=Gtk.HSeparator()
+
+        # FIXME: The label becomes invisible, even if the CSS forces the color
+        self.actions_title=Gtk.Label('Do you want to Logout?')
+        self.actions_style = self.actions_title.get_style_context()
+        self.actions_style.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        self.actions_style.add_class('.shutdown_title')
+
+        # All the action buttons
+        # FIXME: Styles are not working, need larger font
+        self.btn_shutdown=KanoButton('Shutdown')
+        self.btn_style = self.btn_shutdown.get_style_context()
+        self.btn_style.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        self.btn_style.add_class('.shutdown_button')
+        self.btn_shutdown.connect('button-press-event', self.button_click)
+
+        self.btn_reboot=KanoButton('Reboot')
+        self.btn_reboot.connect('button-press-event', self.button_click)
+
+        self.btn_logout=KanoButton('Logout')
+        self.btn_logout.connect('button-press-event', self.button_click)
+
+        self.btn_cancel=KanoButton('Cancel')
+        self.btn_cancel.connect('button-press-event', self.button_click)
+
+        # A vertical box where all widgets will sit
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox.set_margin_top(30)
+        vbox.set_margin_left(20)
+        vbox.set_margin_right(20)
+        vbox.set_margin_bottom(30)
+        vbox.set_spacing(30)
+        vbox.expand=True
+
+        # insert information widgets
+        vbox.pack_start(self.top_image, False, False, 0)
+        vbox.pack_start(self.separator, False, False, 0)
+        vbox.pack_start(self.actions_title, False, False, 0)
+
+        # insert buttons from bottom to top to align correctly
+        vbox.pack_end(self.btn_cancel, False, False, 1)
+        vbox.pack_end(self.btn_logout, False, False, 1)
+        vbox.pack_end(self.btn_reboot, False, False, 1)
+        vbox.pack_end(self.btn_shutdown, False, False, 1)
+
+        # put it all together inside the window
+        vbox.get_style_context()
+        background.add(vbox)
+        self.set_main_widget(background)
+        self.show_all()
+
+    def shutdown(self):
+        run_bg('sudo /sbin/poweroff')
+
+    def reboot(self):
+        run_bg('sudo /sbin/reboot')
+
+    def logout(self):
+        # FIXME: There has to be a better way to logoff without sudo (dbus?)
+        run_bg('sudo loginctl terminate-seat seat0')
+
+    def button_click(self, button, event):
+        '''
+        Called when any of the buttons is clicked
+        '''
+        if button==self.btn_shutdown:
+            self.shutdown()
+        elif button==self.btn_reboot:
+            self.reboot()
+        elif button==self.btn_logout:
+            self.logout()
+
+        # If Cancel button or otherwise, terminate the app
+        Gtk.main_quit()
+
+    def on_key_function(self, widget, event):
+        '''
+        The ESC key will also dismiss any action and return to Desktop
+        '''
+        esc_key=65307
+        if event.keyval == esc_key:
+            Gtk.main_quit()
+            
+
+
+
+if __name__ == '__main__':
+
+   # run the updater to install urgent or prompt for updating now
+   run_cmd('sudo kano-updater ui shutdown-window')
+
+   # Report to Kano Tracker, and kano-sync
+   # asynchronously for faster UI response time
+   run_bg('kano-tracker-ctl +1 shutdown')
+   run_bg('kano-sync --backup -s &')
+
+   # Show up to the dialog
+   win=ShutdownOptions()
+   win.show_all()
+   Gtk.main()
