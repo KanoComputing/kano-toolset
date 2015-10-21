@@ -103,7 +103,7 @@ class ShutdownOptions(ApplicationWindow):
 
     def logout(self):
         # Kill the user desktop session manager and everything below it
-        run_bg('pkill -9 lxsession')
+        run_bg('pkill lxsession')
 
     def button_click(self, button, event):
         '''
