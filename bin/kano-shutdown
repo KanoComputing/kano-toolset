@@ -10,6 +10,11 @@
 # /sbin/poweroff, reboot, and loginctl.
 #
 
+# The steps needed before showing the dialog are a bit time consuming
+# so we raise the hourglass as soon as possible
+from kdesk.hourglass import hourglass_start, hourglass_end
+hourglass_start('kano-shutdown')
+
 from gi.repository import Gtk
 
 from kano.gtk3.heading import Heading
@@ -139,15 +144,25 @@ class ShutdownOptions(ApplicationWindow):
 
 if __name__ == '__main__':
 
-   # run the updater to install urgent or prompt for updating now
-   run_cmd('sudo kano-updater ui shutdown-window')
+    try:
+        # run the updater to install urgent or prompt for updating now
+        run_cmd('sudo kano-updater ui shutdown-window')
 
-   # Report to Kano Tracker, and kano-sync
-   # asynchronously for faster UI response time
-   run_bg('kano-tracker-ctl +1 shutdown')
-   run_bg('kano-sync --backup -s &')
+        # Report to Kano Tracker, and kano-sync
+        # asynchronously for faster UI response time
+        run_bg('kano-tracker-ctl +1 shutdown')
+        run_bg('kano-sync --backup -s &')
+        
+        # Show up to the dialog
+        win=ShutdownOptions()
+        win.show_all()
 
-   # Show up to the dialog
-   win=ShutdownOptions()
-   win.show_all()
-   Gtk.main()
+        # Stop the hourglass right before showing the dialog
+        hourglass_end()
+
+        Gtk.main()
+
+    except:
+        # something went wrong, stop the hourglass and raise exception
+        hourglass_end()
+        raise
