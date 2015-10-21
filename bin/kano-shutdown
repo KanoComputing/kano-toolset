@@ -50,20 +50,14 @@ class ShutdownOptions(ApplicationWindow):
         # Create ad eventbox that has all the action buttons and image
         background = Gtk.EventBox()
 
-        # Top image widget, separator and title
+        # Top image widget, a separator and a title
         self.top_image=Gtk.Image.new_from_file(self.top_image_file)
-
-        # FIXME: Increase the separator width
         self.separator=Gtk.HSeparator()
-
-        # FIXME: The label becomes invisible, even if the CSS forces the color
         self.actions_title=Gtk.Label('Do you want to Logout?')
         self.actions_title.get_style_context().add_class('shutdown_title')
 
         # All the action buttons
-        # FIXME: Styles are not working, need larger font
         self.btn_shutdown=KanoButton('Shutdown')
-        self.btn_shutdown.get_style_context().add_class('shutdown_button')
         self.btn_shutdown.connect('button-press-event', self.button_click)
 
         self.btn_reboot=KanoButton('Reboot')
@@ -108,8 +102,8 @@ class ShutdownOptions(ApplicationWindow):
         run_bg('sudo /sbin/reboot')
 
     def logout(self):
-        # FIXME: There has to be a better way to logoff without sudo (dbus?)
-        run_bg('sudo loginctl terminate-seat seat0')
+        # Kill the user desktop session manager and everything below it
+        run_bg('pkill -9 lxsession')
 
     def button_click(self, button, event):
         '''

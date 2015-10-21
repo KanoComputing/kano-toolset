@@ -8,11 +8,7 @@
 */
 
 .shutdown_title {
-    color: #6e6e6e;
-    font: Bariol Bold 13;
-}
-
-.shutdown_button {
-    color: #6e6e6e;
-    font: Bariol Bold 13;
+    color: #222222;
+    font: Bariol Bold 16;
+    padding-top: 10px;
 }

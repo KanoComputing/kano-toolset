@@ -17,9 +17,6 @@ case "$1" in
         echo "%sudo   ALL=(root) NOPASSWD: /usr/bin/is_internet" >> $TMP_FILE
         echo "%sudo   ALL=(root) NOPASSWD: /usr/sbin/ifplugstatus" >> $TMP_FILE
 
-        # FIXME: Needed by new shutdown dialog, will eventually fix to non-sudo alternative
-        echo "%sudo   ALL=(root) NOPASSWD: /bin/loginctl" >> $TMP_FILE
-
         # The owner and group for the sudoers file must both be 0
         chown root:root $TMP_FILE
         # The file permissions must be set to 0440
