@@ -15,11 +15,12 @@
 from kdesk.hourglass import hourglass_start, hourglass_end
 hourglass_start('kano-shutdown')
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 from kano.gtk3.heading import Heading
 from kano.gtk3.buttons import KanoButton, KanoButtonBox
 from kano.gtk3.application_window import ApplicationWindow
+from kano.gtk3.apply_styles import apply_styling_to_screen
 from kano.utils import run_cmd, run_bg
 
 from kano.paths import common_css_dir
@@ -35,11 +36,8 @@ class ShutdownOptions(ApplicationWindow):
 
         self.top_image_file='/usr/share/kano-desktop/images/kano-logout-face.png'
 
-	# Load and apply styles
-        cssProvider = Gtk.CssProvider()
-        cssProvider.load_from_path(common_css_dir + "/shutdown.css")
-        styleContext = Gtk.StyleContext()
-        styleContext.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        # Load and apply styles
+        apply_styling_to_screen(common_css_dir + "/shutdown.css")
 
         # Setup the window
         ApplicationWindow.__init__(self, title, width, height)
@@ -48,7 +46,7 @@ class ShutdownOptions(ApplicationWindow):
 
         # The ESC key will terminate the app
         self.connect('key-press-event', self.on_key_function)
-        
+
         # Create ad eventbox that has all the action buttons and image
         background = Gtk.EventBox()
 
@@ -60,16 +58,12 @@ class ShutdownOptions(ApplicationWindow):
 
         # FIXME: The label becomes invisible, even if the CSS forces the color
         self.actions_title=Gtk.Label('Do you want to Logout?')
-        self.actions_style = self.actions_title.get_style_context()
-        self.actions_style.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        self.actions_style.add_class('.shutdown_title')
+        self.actions_title.get_style_context().add_class('shutdown_title')
 
         # All the action buttons
         # FIXME: Styles are not working, need larger font
         self.btn_shutdown=KanoButton('Shutdown')
-        self.btn_style = self.btn_shutdown.get_style_context()
-        self.btn_style.add_provider(cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-        self.btn_style.add_class('.shutdown_button')
+        self.btn_shutdown.get_style_context().add_class('shutdown_button')
         self.btn_shutdown.connect('button-press-event', self.button_click)
 
         self.btn_reboot=KanoButton('Reboot')
@@ -131,14 +125,13 @@ class ShutdownOptions(ApplicationWindow):
         # If Cancel button or otherwise, terminate the app
         Gtk.main_quit()
 
-    def on_key_function(self, widget, event):
+    def on_key_function(self, window=None, event=None):
         '''
         The ESC key will also dismiss any action and return to Desktop
         '''
-        esc_key=65307
-        if event.keyval == esc_key:
+        if event and event.get_keyval()[1] == Gdk.KEY_Escape:
             Gtk.main_quit()
-            
+
 
 
 
@@ -152,7 +145,7 @@ if __name__ == '__main__':
         # asynchronously for faster UI response time
         run_bg('kano-tracker-ctl +1 shutdown')
         run_bg('kano-sync --backup -s &')
-        
+
         # Show up to the dialog
         win=ShutdownOptions()
         win.show_all()
