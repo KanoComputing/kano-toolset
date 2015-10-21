@@ -9,7 +9,7 @@
 # It's main advantage over the default is it's ability to set
 # the number of items to display when the dropdown is poped up.
 
-
+import time
 import os
 import sys
 import types
@@ -73,8 +73,8 @@ class KanoComboBox(Gtk.Button):
         # creating the scroll up and down buttons for the dropdown menu
         self.scroll_up_button = self.ScrollMenuItem(self.SCROLL_ARROW_UP)
         self.scroll_down_button = self.ScrollMenuItem(self.SCROLL_ARROW_DOWN)
-        self.scroll_up_button.connect("button-press-event", self.on_scroll_button)
-        self.scroll_down_button.connect("button-press-event", self.on_scroll_button)
+        self.scroll_up_button.connect("enter-notify-event", self.on_scroll_button)
+        self.scroll_down_button.connect("enter-notify-event", self.on_scroll_button)
 
         # creating the popup dropdown menu
         self.dropdown = Gtk.Menu()
@@ -125,6 +125,8 @@ class KanoComboBox(Gtk.Button):
             self.on_scroll_up()
         elif event.direction == Gdk.ScrollDirection.DOWN:
             self.on_scroll_down()
+
+        time.sleep(0.05)
 
     def on_scroll_button(self, button, event):
         # triggered when a scroll button has just been pressed (not released)
