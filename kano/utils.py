@@ -584,3 +584,13 @@ def get_free_space(path="/"):
     device, size, used, free, percent, mp = out.split('\n')[1].split()
 
     return int(free) / 1024
+
+
+class open_locked(file):
+    """ A version of open with an exclusive lock to be used within
+        controlled execution statements.
+    """
+    def __init__(self, *args, **kwargs):
+        super(open_locked, self).__init__(*args, **kwargs)
+        fcntl.flock(self, fcntl.LOCK_EX)
+

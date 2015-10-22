@@ -1,3 +1,9 @@
+kano-toolset (2.2.0-1) unstable; urgency=low
+
+  * Adding open_locked API.
+
+ -- Team Kano <dev@kano.me>  Mon, 14 Sep 2015 14:10:00 +0100
+
 kano-toolset (2.1-2) unstable; urgency=low
 
   * Adding scheduling functionality for Kano Updater
