@@ -20,7 +20,7 @@ import getpass
 import pwd
 import grp
 import json
-
+import fcntl
 
 def run_cmd(cmd, localised=False, unsudo=False):
     '''
@@ -584,3 +584,23 @@ def get_free_space(path="/"):
     device, size, used, free, percent, mp = out.split('\n')[1].split()
 
     return int(free) / 1024
+
+
+class open_locked(file):
+    """ A version of open with an exclusive lock to be used within
+        controlled execution statements.
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        pass optional nonblock=True for nonblocking behavior
+        """
+
+        # we need to process 'nonblock' before calling
+        # super().__init__ because that does not know about 'nonblock'
+        mode = fcntl.LOCK_EX
+        if kwargs.get('nonblock') is not None:
+            mode = mode | fcntl.LOCK_NB
+            del kwargs['nonblock']
+
+        super(open_locked, self).__init__(*args, **kwargs)
+        fcntl.flock(self, mode)
