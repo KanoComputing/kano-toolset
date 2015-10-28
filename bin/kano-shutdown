@@ -96,10 +96,10 @@ class ShutdownOptions(ApplicationWindow):
         self.show_all()
 
     def shutdown(self):
-        run_bg('sudo /sbin/poweroff')
+        run_bg('sudo systemctl poweroff')
 
     def reboot(self):
-        run_bg('sudo /sbin/reboot')
+        run_bg('sudo systemctl reboot')
 
     def logout(self):
         # Kill the user desktop session manager and everything below it
