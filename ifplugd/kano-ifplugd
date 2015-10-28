@@ -17,6 +17,7 @@
 
 # file that external applications can monitor for internet availability triggers
 monitor_file="/var/opt/internet_monitor"
+interface="$1"
 
 if [ "$2" == "down" ]; then
 
@@ -25,6 +26,9 @@ if [ "$2" == "down" ]; then
     if [ "$?" != "0" ]; then
 	echo -e "internet: down\n" > $monitor_file
     fi
+
+    # Clear associated IP addresses
+    ip addr flush dev $interface
 fi
 
 exit 0
