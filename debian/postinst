@@ -35,6 +35,10 @@ EOF
 	# kano-launcher is setuid root to allow use of CLONE_NEWUTS
 	chmod u+s /usr/bin/kano-launcher
 
+	# FIXME there is a problem with the interaction of udev and ifplugd.
+	# for now, disable the udev action script
+	chmod 644 /lib/udev/ifplugd.agent
+
         ;;
 esac
 
