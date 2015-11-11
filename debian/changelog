@@ -1,3 +1,7 @@
+kano-toolset (2.2.0-2) unstable; urgency=low
+
+  * Adding get_partition_info API.
+
 kano-toolset (2.2.0-1) unstable; urgency=low
 
   * Adding open_locked API.

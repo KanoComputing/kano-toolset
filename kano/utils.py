@@ -219,6 +219,22 @@ def get_mac_address():
         return mac_addr_str
 
 
+def get_partition_info():
+    device = '/dev/mmcblk0'
+    try:
+        cmd = 'lsblk -n -b {} -o SIZE'.format(device)
+        stdout, stderr, returncode = run_cmd(cmd)
+        if returncode != 0:
+            from kano.logging import logger
+            logger.warning("error running lsblk")
+            return []
+        lines = stdout.strip().split('\n')
+        sizes = map(int, lines)
+        return sizes
+    except:
+        return []
+
+
 def read_json(filepath, silent=True):
     try:
         return json.loads(read_file_contents(filepath))
