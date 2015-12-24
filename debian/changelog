@@ -1,3 +1,9 @@
+kano-toolset (2.2.0-3) unstable; urgency=low
+
+  * Add decorators module.
+
+ -- Team Kano <dev@kano.me>  Wed, 6 Jan 2016 16:17:00 +0100
+
 kano-toolset (2.2.0-2) unstable; urgency=low
 
   * Adding get_partition_info API.
