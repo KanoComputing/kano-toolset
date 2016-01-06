@@ -37,7 +37,7 @@ def require_root(exit_on_failure=False, verbose=False):
                 logger.error(msg)
 
                 if verbose:
-                    print msg
+                    sys.stdout.write('{}\n'.format(msg))
 
                 if exit_on_failure:
                     sys.exit(ERR_ROOT_PERMISSIONS_REQ)
