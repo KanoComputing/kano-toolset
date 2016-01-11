@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from kano.utils.processes import restore_signals
+from kano.utils.shell import restore_signals
 
 
 def is_gui():
