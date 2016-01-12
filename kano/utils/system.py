@@ -1,3 +1,5 @@
+import os
+
 def is_jessie():
     '''
     Returns True if /etc/debian_version tells us
