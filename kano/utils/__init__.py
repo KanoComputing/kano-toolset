@@ -23,11 +23,12 @@ from kano.utils.hardware import \
     detect_kano_keyboard, is_model_a, is_model_b, is_model_b_plus, \
     is_model_2_b, get_rpi_model, is_monitor, get_mac_address, get_cpu_id
 from kano.utils.processes import \
-    kill_child_processes, is_running, get_program_name, pkill, restore_signals
+    kill_child_processes, is_running, get_program_name, pkill
 from kano.utils.gui import \
     is_gui, zenity_show_progress
 from kano.utils.shell import \
-    run_cmd, run_cmd_log, run_bg, run_term_on_error, run_print_output_error
+    run_cmd, run_cmd_log, run_bg, run_term_on_error, run_print_output_error, \
+    restore_signals
 from kano.utils.http_requests import \
     proxies, download_url, requests_get_json, debug_requests
 from kano.utils.disk import \

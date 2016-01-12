@@ -46,10 +46,3 @@ def pkill(clues):
             if clue in line:
                 pid = line.split()[0]
                 run_cmd("kill {}".format(pid))
-
-
-def restore_signals():
-    signals = ('SIGPIPE', 'SIGXFZ', 'SIGXFSZ')
-    for sig in signals:
-        if hasattr(signal, sig):
-            signal.signal(getattr(signal, sig), signal.SIG_DFL)
