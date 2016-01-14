@@ -1,3 +1,9 @@
+kano-toolset (2.3.0-3) unstable; urgency=low
+
+  * Audio volume parsing fix.
+
+ -- Team Kano <dev@kano.me>  Thu, 14 Jan 2016 11:11:00 +0100
+
 kano-toolset (2.3.0-2) unstable; urgency=low
 
   * Separate utils module into submodule.

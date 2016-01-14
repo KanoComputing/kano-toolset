@@ -1,6 +1,15 @@
+# misc.py
+#
+# Copyright (C) 2014-2016 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
+#
+# Miscellaneous utilities
+
+
 import datetime
 
 from kano.utils.shell import run_cmd
+
 
 def get_date_now():
     return datetime.datetime.utcnow().isoformat()

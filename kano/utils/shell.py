@@ -1,7 +1,16 @@
+# shell.py
+#
+# Copyright (C) 2014-2016 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
+#
+# Utilities related to shell and running commands
+
+
 import os
 import sys
 import signal
 import subprocess
+
 
 def restore_signals():
     signals = ('SIGPIPE', 'SIGXFZ', 'SIGXFSZ')

@@ -1,3 +1,11 @@
+# audio.py
+#
+# Copyright (C) 2014-2016 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
+#
+# Utilities relating to audio
+
+
 import os
 
 from kano.utils.shell import run_cmd, run_bg, run_cmd_log
@@ -62,26 +70,15 @@ def get_volume():
     from kano.logging import logger
 
     percent = 100
-    millibel = 400
 
-    cmd = "amixer | grep %"
-    o, _, _ = run_cmd(cmd)
-    o = o.strip().split(' ')
+    cmd = "amixer | head -n 6 | grep -Po '(\d{1,3})(?=%)'"
+    output, _, _ = run_cmd(cmd)
 
     try:
-        millibel = int(o[2])
+        percent = int(output.strip())
     except Exception:
-        msg = 'asmixer format bad for millibel, o: {}'.format(o)
+        msg = 'amixer format bad for percent, output: {}'.format(output)
         logger.error(msg)
         pass
 
-    try:
-        percent = int(o[3].translate(None, '[]%'))
-    except Exception:
-        msg = 'asmixer format bad for percent, o: {}'.format(o)
-        logger.error(msg)
-        pass
-
-    # logger.debug('percent: {}, millibel: {}'.format(percent, millibel))
-
-    return percent, millibel
+    return percent
