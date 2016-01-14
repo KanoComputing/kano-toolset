@@ -1,3 +1,10 @@
+# file_operations.py
+#
+# Copyright (C) 2014-2016 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
+#
+
+
 import os
 import re
 import pwd
@@ -8,6 +15,7 @@ import fcntl
 
 from kano.utils.user import get_user_unsudoed
 from kano.utils.shell import run_cmd
+
 
 def read_file_contents(path):
     if os.path.exists(path):
