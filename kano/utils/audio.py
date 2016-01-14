@@ -74,7 +74,7 @@ def get_volume():
     output, _, _ = run_cmd(cmd)
 
     try:
-        percent = int(output)
+        percent = int(output.strip())
     except Exception:
         msg = 'amixer format bad for percent, output: {}'.format(output)
         logger.error(msg)
