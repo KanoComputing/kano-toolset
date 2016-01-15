@@ -13,6 +13,8 @@ import grp
 import shutil
 import json
 import fcntl
+import errno
+import time
 
 from kano.utils.user import get_user_unsudoed
 from kano.utils.shell import run_cmd
@@ -138,7 +140,6 @@ class open_locked(file):
             try:
                 fcntl.flock(self, mode)
             except IOError as e:
-                import errno
                 if e.errno == errno.EAGAIN:
                     return "wait"
                 raise e
@@ -146,7 +147,6 @@ class open_locked(file):
 
         if timeout:
             # Lock, or retry until timeout is exhausted
-            import time
             now = time.clock()
             res = False
             while (time.clock() - now) < timeout:
