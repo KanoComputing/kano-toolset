@@ -1,3 +1,9 @@
+kano-toolset (2.3.0-4) unstable; urgency=low
+
+  * Add 'timeout' keyword arg to open_locked
+
+ -- Team Kano <dev@kano.me>  Wed, 6 Jan 2016 17:15:00 +0100
+
 kano-toolset (2.3.0-3) unstable; urgency=low
 
   * Audio volume parsing fix.

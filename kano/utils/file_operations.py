@@ -13,9 +13,15 @@ import grp
 import shutil
 import json
 import fcntl
+import errno
+import time
 
 from kano.utils.user import get_user_unsudoed
 from kano.utils.shell import run_cmd
+
+
+class TimeoutException(Exception):
+    pass
 
 
 def read_file_contents(path):
@@ -109,6 +115,8 @@ class open_locked(file):
     def __init__(self, *args, **kwargs):
         """
         pass optional nonblock=True for nonblocking behavior
+        pass optional timeout=seconds for timeout blocking.
+         If timeout is exhausted, we raise an exception
         """
 
         # we need to process 'nonblock' before calling
@@ -118,8 +126,37 @@ class open_locked(file):
             mode = mode | fcntl.LOCK_NB
             del kwargs['nonblock']
 
+        timeout = kwargs.get('timeout')
+        if timeout is not None:
+            mode = mode | fcntl.LOCK_NB
+            del kwargs['timeout']
+
         super(open_locked, self).__init__(*args, **kwargs)
-        fcntl.flock(self, mode)
+
+        def flock_try(self, mode):
+            # Try locking a file
+            # return True on success, "wait" if it is locked
+
+            try:
+                fcntl.flock(self, mode)
+            except IOError as e:
+                if e.errno == errno.EAGAIN:
+                    return "wait"
+                raise e
+            return True
+
+        if timeout:
+            # Lock, or retry until timeout is exhausted
+            now = time.clock()
+            res = False
+            while (time.clock() - now) < timeout:
+                res = flock_try(self, mode)
+                if res is True:
+                    break
+            if res is not True:
+                raise TimeoutException()
+        else:
+            fcntl.flock(self, mode)
 
 
 def sed(pattern, replacement, file_path, use_regexp=True):
