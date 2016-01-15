@@ -24,7 +24,7 @@ def play_sound(audio_file, background=False):
     if extension in ['.wav', '.voc', '.raw', '.au']:
         cmd = 'aplay -q {}'.format(audio_file)
     else:
-        volume_percent, _ = get_volume()
+        volume_percent = get_volume()
         volume_str = '--vol {}'.format(
             percent_to_millibel(volume_percent, raspberry_mod=True))
         cmd = 'omxplayer -o both {volume} {link}'.format(
