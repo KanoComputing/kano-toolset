@@ -116,6 +116,9 @@ class KanoButton(GenericButton):
         apply_styling_to_widget(self.spinner, self.SPINNER_CSS)
 
     def start_spinner(self):
+        if self.is_spinning:
+            return
+
         # Keep old dimensions with box
         allocation = self.get_allocation()
         self.remove(self.internal_box)
@@ -132,6 +135,9 @@ class KanoButton(GenericButton):
 
     # Replace content of button with original content and stop spinner spinning
     def stop_spinner(self):
+        if not self.is_spinning:
+            return
+
         self.spinner.stop()
         self.remove(self.spinner)
         self.add(self.internal_box)
