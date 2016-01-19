@@ -2,7 +2,7 @@ kano-toolset (2.3.0-5) unstable; urgency=low
 
   * Added option for kano-signal to open new projects (launch-share)
 
- -- Team Kano <dev@kano.me>  Thu, 15 Jan 2016 14:32:00 +0100
+ -- Team Kano <dev@kano.me>  Thu, 19 Jan 2016 15:11:00 +0100
 
 kano-toolset (2.3.0-4) unstable; urgency=low
 
