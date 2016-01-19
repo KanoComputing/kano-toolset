@@ -2,14 +2,21 @@
 
 # kano-signal
 #
-# Copyright (C) 2014 Kano Computing Ltd.
+# Copyright (C) 2014-2016 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# Sends a signal to a Kano app (save, load, share, make)
+# Sends a signal to a Kano app (save, load, share, make, launch-share)
 #
 # This script is invoked by the Kano Keyboard hotkeys (xbindkeys in Kano Desktop).
 # If you call it from a shell or command line, make sure you export DISPLAY
 # to point to your desktop.
+#
+# It is also invoked from Kano World when launching a Share.
+# The chromium hooks connect to kano-profile.apps module,
+# it calls this script with "launch-share <filename>,
+# which will open a share on the currently running app.
+#
+# Exit code 0 means the signal could be delivered, any other value means error.
 #
 
 # pipe name to send javascript code
@@ -17,6 +24,9 @@ pipe_name=/tmp/webapp.pipe
 app=""
 
 signal=$1
+
+# For launch-share signal
+xml_filename=$2
 
 
 # syntax sanity check
@@ -33,8 +43,20 @@ case $signal in
     make)
         jscmd="Signal.make()"
         ;;
+
+    launch-share)
+	# Make sure the share creation was downloaded
+	if [ ! -f "$xml_filename" ]; then
+	    echo "Please specify a valid xml file to 'launch-share' : $xml_filename"
+	    exit 1
+	fi
+
+	# Command to open a share on top of your current workspace
+        jscmd="Signal.launch_share(\"$xml_filename\")"	
+        ;;
+
     *)
-        echo "Usage: make-signal < save | load | share | make >"
+        echo "Usage: make-signal < save | load | share | make | launch-share <xml_filename> >"
         exit 1
         ;;
 esac
@@ -45,6 +67,7 @@ function is_running {
 }
 
 
+# TODO: We need to cover the rest of Kano apps (see kano-profile/rules)
 for APP in pong minecraft music; do
     is_running $APP
     if [ $? == 0 ]; then
@@ -64,20 +87,20 @@ if [ -z $app ]; then
     exit 1
 fi
 
-
-if [ "$2" == "debug" ]; then
-    echo "Dispatching signal: $signal"
-fi
-
-
 # if there is no pipe, webkit is not running
 if [ -p $pipe_name ]; then
     # webkit is running
     echo $jscmd > $pipe_name
 else
     # Pass on event to dbus
-    dbus-send --session --dest="me.kano.$app" --print-reply \
-              "/me/kano/$app" "me.kano.$app.Actions.$signal" 2>/dev/null
+    # In the case of launch-share, we send the xml file as an extra string parameter on the signal
+    if [ "$signal" == "launch-share" ]; then
+	dbus-send --session --dest="me.kano.$app" --print-reply \
+		  "/me/kano/$app" "me.kano.$app.Actions.$signal string:\"$xml_filename\"" 2>/dev/null
+    else
+	dbus-send --session --dest="me.kano.$app" --print-reply \
+		  "/me/kano/$app" "me.kano.$app.Actions.$signal" 2>/dev/null
+    fi
 fi
 
-exit $?
+exit 0
