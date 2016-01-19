@@ -12,22 +12,23 @@
 # to point to your desktop.
 #
 # It is also invoked from Kano World when launching a Share.
-# The chromium hooks connect to kano-profile.apps module,
-# it calls this script with "launch-share <filename>,
-# which will open a share on the currently running app.
+# The chromium hook connected to kano-profile.apps module,
+# calls this script with "launch-share <xml_filename>",
+# which will open a share on the currently running app by sending a signal.
 #
-# Exit code 0 means the signal could be delivered, any other value means error.
+# Exit code 0 means the signal could be delivered, any other value means error,
+# in which case you should launch the app.
 #
 
 # pipe name to send javascript code
 pipe_name=/tmp/webapp.pipe
 app=""
 
+# signal name
 signal=$1
 
-# For launch-share signal
+# "launch-share" signal name needs this extra parameter
 xml_filename=$2
-
 
 # syntax sanity check
 case $signal in
@@ -63,12 +64,13 @@ esac
 
 
 function is_running {
-    xwininfo -tree -root | grep -i $1 > /dev/null 2>&1
+    xwininfo -tree -root | grep -i "$1" > /dev/null 2>&1
+    xwininfo -tree -root | grep -i "$1" >> $logfile
 }
 
 
 # TODO: We need to cover the rest of Kano apps (see kano-profile/rules)
-for APP in pong minecraft music; do
+for APP in make-pong make-minecraft make-music; do
     is_running $APP
     if [ $? == 0 ]; then
         app=$APP
@@ -84,6 +86,7 @@ done
 
 if [ -z $app ]; then
     # No valid app is running
+    echo "no valid app is running, returning error"
     exit 1
 fi
 
