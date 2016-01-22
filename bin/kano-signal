@@ -2,22 +2,33 @@
 
 # kano-signal
 #
-# Copyright (C) 2014 Kano Computing Ltd.
+# Copyright (C) 2014-2016 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# Sends a signal to a Kano app (save, load, share, make)
+# Sends a signal to a Kano app (save, load, share, make, launch-share)
 #
 # This script is invoked by the Kano Keyboard hotkeys (xbindkeys in Kano Desktop).
 # If you call it from a shell or command line, make sure you export DISPLAY
 # to point to your desktop.
+#
+# It is also invoked from Kano World when launching a Share.
+# The chromium hook connected to kano-profile.apps module,
+# calls this script with "launch-share <xml_filename>",
+# which will open a share on the currently running app by sending a signal.
+#
+# Exit code 0 means the signal could be delivered, any other value means error,
+# in which case you should launch the app.
 #
 
 # pipe name to send javascript code
 pipe_name=/tmp/webapp.pipe
 app=""
 
+# signal name
 signal=$1
 
+# "launch-share" signal name needs this extra parameter
+xml_filename=$2
 
 # syntax sanity check
 case $signal in
@@ -33,19 +44,32 @@ case $signal in
     make)
         jscmd="Signal.make()"
         ;;
+
+    launch-share)
+	# Make sure the share creation was downloaded
+	if [ ! -f "$xml_filename" ]; then
+	    echo "Please specify a valid xml file to 'launch-share' : $xml_filename"
+	    exit 1
+	fi
+
+	# Command to open a share on top of your current workspace
+        jscmd="Signal.load(\"$xml_filename\")"
+        ;;
+
     *)
-        echo "Usage: make-signal < save | load | share | make >"
+        echo "Usage: make-signal < save | load | share | make | launch-share <xml_filename> >"
         exit 1
         ;;
 esac
 
 
 function is_running {
-    xwininfo -tree -root | grep -i $1 > /dev/null 2>&1
+    xwininfo -tree -root | grep -i "$1" > /dev/null 2>&1
 }
 
 
-for APP in pong minecraft music; do
+# TODO: We need to cover the rest of Kano apps (see kano-profile/rules)
+for APP in make-pong make-minecraft make-music; do
     is_running $APP
     if [ $? == 0 ]; then
         app=$APP
@@ -61,23 +85,36 @@ done
 
 if [ -z $app ]; then
     # No valid app is running
+    echo "no valid app is running, returning error"
     exit 1
 fi
 
-
-if [ "$2" == "debug" ]; then
-    echo "Dispatching signal: $signal"
-fi
-
-
 # if there is no pipe, webkit is not running
 if [ -p $pipe_name ]; then
-    # webkit is running
+    # Minecraft and Pong, because webkit is running.
     echo $jscmd > $pipe_name
+
+    # Since this is a signal from another app (most times Kano World),
+    # switch user focus back to the game app.
+    if [ "$app" == "make-minecraft" ]; then
+	wmctrl -a "Make Minecraft"
+    fi
+
+    if [ "$app" == "make-pong" ]; then
+	wmctrl -a "Make Pong"
+    fi
 else
     # Pass on event to dbus
-    dbus-send --session --dest="me.kano.$app" --print-reply \
-              "/me/kano/$app" "me.kano.$app.Actions.$signal" 2>/dev/null
+    # In the case of launch-share, we send the xml file as an extra string parameter on the signal
+    if [ "$signal" == "launch-share" ]; then
+	dbus-send --session --dest="me.kano.$app" --print-reply \
+		  "/me/kano/$app" "me.kano.$app.Actions.$signal string:\"$xml_filename\"" 2>/dev/null
+    else
+	dbus-send --session --dest="me.kano.$app" --print-reply \
+		  "/me/kano/$app" "me.kano.$app.Actions.$signal" 2>/dev/null
+    fi
+
+    # TODO: Apps should implement gaining focus when such signal is sent
 fi
 
-exit $?
+exit 0
