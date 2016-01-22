@@ -9,7 +9,7 @@ Package: kano-toolset
 Architecture: all
 Depends: ${misc:Depends}, python-gtk2, python-webkit,
          fping, python, zenity, bc, ifplugd, python-yaml, python-pyinotify,
-         resolvconf, libpng12-0, libraspberrypi-bin, procps, x11-utils, dbus
+         resolvconf, libpng12-0, libraspberrypi-bin, procps, x11-utils, dbus, wmctrl
 Replaces: kano-init (<< 1.0-46)
 Breaks: kano-init (<< 1.0-46)
 Description: Collection of tools for Kanux

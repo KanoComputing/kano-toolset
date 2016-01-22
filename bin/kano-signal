@@ -91,8 +91,18 @@ fi
 
 # if there is no pipe, webkit is not running
 if [ -p $pipe_name ]; then
-    # webkit is running
+    # Minecraft and Pong, because webkit is running.
     echo $jscmd > $pipe_name
+
+    # Since this is a signal from another app (most times Kano World),
+    # switch user focus back to the game app.
+    if [ "$app" == "make-minecraft" ]; then
+	wmctrl -a "Make Minecraft"
+    fi
+
+    if [ "$app" == "make-pong" ]; then
+	wmctrl -a "Make Pong"
+    fi
 else
     # Pass on event to dbus
     # In the case of launch-share, we send the xml file as an extra string parameter on the signal
@@ -103,6 +113,8 @@ else
 	dbus-send --session --dest="me.kano.$app" --print-reply \
 		  "/me/kano/$app" "me.kano.$app.Actions.$signal" 2>/dev/null
     fi
+
+    # TODO: Apps should implement gaining focus when such signal is sent
 fi
 
 exit 0
