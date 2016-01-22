@@ -714,7 +714,7 @@ def network_info():
             command_network = "/sbin/iwconfig wlan0"
             out, _, _ = run_cmd(command_network)
 
-            essid_match = re.match(r'.*ESSID:"(.*)"\ *$', out, re.MULTILINE)
+            essid_match = re.match(r'.*ESSID:"(.*)"\ .*', out, re.MULTILINE)
             essid = essid_match.groups()[0] \
                 if essid_match else 'Wireless Network'
 
