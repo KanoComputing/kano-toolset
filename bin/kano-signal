@@ -53,7 +53,7 @@ case $signal in
 	fi
 
 	# Command to open a share on top of your current workspace
-        jscmd="Signal.launch_share(\"$xml_filename\")"	
+        jscmd="Signal.load(\"$xml_filename\")"
         ;;
 
     *)
@@ -65,7 +65,6 @@ esac
 
 function is_running {
     xwininfo -tree -root | grep -i "$1" > /dev/null 2>&1
-    xwininfo -tree -root | grep -i "$1" >> $logfile
 }
 
 
