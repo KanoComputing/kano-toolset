@@ -104,25 +104,29 @@ if fifo_exists:
     # Since this is a signal from another app (most times Kano World),
     # switch user focus back to the game app.
     if app == "make-minecraft":
-        os.system('wmctrl -a "Make Minecraft"')
+        rc = os.system('wmctrl -a "Make Minecraft"')
 
     if app == "make-pong":
-        os.system('wmctrl -a "Make Pong"')
+        rc = os.system('wmctrl -a "Make Pong"')
 
 else:
     # Pass on event to dbus
     def do_send_dbus(app, signal, xml_filename=None):
-        cmd = 'dbus-send --session --dest="me.kano.{}" --print-reply '.format(app)
-        cmd = cmd + ' "/me/kano/{}" "me.kano.{}.Actions.{}"'.format(app, app, signal)
+        import dbus
+        session_bus = dbus.SessionBus()
+        proxy = session_bus.get_object("me.kano.{}".format(app), "/me/kano/{}".format(app))
+        sig = proxy.get_dbus_method(signal, dbus_interface="me.kano.{}.Actions".format(app))
         if xml_filename:
-            cmd = cmd + 'string:{}'.format(xml_filename)
-        os.system(cmd + ' 2>/dev/null')
+            sig(xml_filename)
+        else:
+            sig()
+
 
     # In the case of launch-share, we send the xml file as an extra string parameter on the signal
     if signal == "launch-share":
-        do_send_dbus(app, signal)
-    else:
         do_send_dbus(app, signal, xml_filename)
+    else:
+        do_send_dbus(app, signal)
 
     # TODO: Apps should implement gaining focus when such signal is sent
 
