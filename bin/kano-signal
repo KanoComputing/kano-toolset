@@ -105,11 +105,18 @@ if fifo_exists:
 
     # Since this is a signal from another app (most times Kano World),
     # switch user focus back to the game app.
-    if app == "make-minecraft":
-        rc = os.system('wmctrl -a "Make Minecraft"')
+    app_name_dict = {
+        'make-minecraft': 'Make Minecraft',
+        'make-pong': 'Make Pong'
+    }
 
-    if app == "make-pong":
-        rc = os.system('wmctrl -a "Make Pong"')
+    if app in app_name_dict:
+        cmd = 'wmctrl -a "{}"'.format(app_name_dict[app])
+        print cmd
+        rc = os.system(cmd)
+        if rc != 0:
+            from kano.logging import logger
+            logger.error("error raising window {}".format(app_name_dict[app]))
 
 else:
     # Pass on event to dbus
@@ -133,7 +140,7 @@ else:
     except:
         # make sure to return 1 on error
         import traceback
-        from kano.logger import logger
+        from kano.logging import logger
         logger.error('Unexpected error when sending dbus signal.\n{}'
                      .format(traceback.format_exc()))
         sys.exit(1)
