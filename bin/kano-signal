@@ -58,13 +58,13 @@ elif signal == "launch-share":
     # Make sure the share creation was downloaded
     if not os.path.exists(xml_filename):
         print "Please specify a valid xml file to 'launch-share' : {}".format(xml_filename)
-        exit(1)
+        sys.exit(1)
 
         # Command to open a share on top of your current workspace
     jscmd = "Signal.load(\"{}\")".format(xml_filename)
 else:
     print "Usage: make-signal < save | load | share | make | launch-share <xml_filename> >"
-    exit(1)
+    sys.exit(1)
 
 
 def is_running(cmd):
@@ -85,7 +85,7 @@ for APP in ["make-pong", "make-minecraft", "make-music"]:
 if app is None:
     # No valid app is running
     print "no valid app is running, returning error"
-    exit(1)
+    sys.exit(1)
 
 
 # if there is no pipe, webkit is not running
@@ -136,8 +136,8 @@ else:
         from kano.logger import logger
         logger.error('Unexpected error when sending dbus signal.\n{}'
                      .format(traceback.format_exc()))
-        exit(1)
+        sys.exit(1)
     # TODO: Apps should implement gaining focus when such signal is sent
 
 
-exit(0)
+sys.exit(0)
