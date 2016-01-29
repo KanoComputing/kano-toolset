@@ -54,7 +54,7 @@ elif signal == "make":
     jscmd = "Signal.make()"
 elif signal == "launch-share":
     # dbus doesn't like '-' so we use '_'
-    signal = "launch_share"
+    signal = "load_share"
     # Make sure the share creation was downloaded
     if not os.path.exists(xml_filename):
         print "Please specify a valid xml file to 'launch-share' : {}".format(xml_filename)
@@ -126,7 +126,7 @@ else:
 
     try:
         # In the case of launch-share, we send the xml file as an extra string parameter on the signal
-        if signal == "launch_share":
+        if signal == "load_share":
             do_send_dbus(app, signal, xml_filename)
         else:
             do_send_dbus(app, signal)
