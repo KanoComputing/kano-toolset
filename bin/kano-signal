@@ -124,12 +124,19 @@ else:
             sig()
 
 
-    # In the case of launch-share, we send the xml file as an extra string parameter on the signal
-    if signal == "launch_share":
-        do_send_dbus(app, signal, xml_filename)
-    else:
-        do_send_dbus(app, signal)
-
+    try:
+        # In the case of launch-share, we send the xml file as an extra string parameter on the signal
+        if signal == "launch_share":
+            do_send_dbus(app, signal, xml_filename)
+        else:
+            do_send_dbus(app, signal)
+    except:
+        # make sure to return 1 on error
+        import traceback
+        from kano.logger import logger
+        logger.error('Unexpected error when sending dbus signal.\n{}'
+                     .format(traceback.format_exc()))
+        exit(1)
     # TODO: Apps should implement gaining focus when such signal is sent
 
 
