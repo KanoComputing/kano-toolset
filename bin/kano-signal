@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env python
 
 # kano-signal
 #
@@ -18,103 +18,133 @@
 #
 # Exit code 0 means the signal could be delivered, any other value means error,
 # in which case you should launch the app.
+
+# NB this has been converted line by line from bash. Needs cleanup
 #
+import sys
+import os
+import stat
 
 # pipe name to send javascript code
-pipe_name=/tmp/webapp.pipe
-app=""
+pipe_name = "/tmp/webapp.pipe"
+app = None
 
+# CLEANUP: should make argument parsing nicer
 # signal name
-signal=$1
+try:
+    signal = sys.argv[1]
+except:
+    signal = ""
 
 # "launch-share" signal name needs this extra parameter
-xml_filename=$2
+try:
+    xml_filename = sys.argv[2]
+except:
+    xml_filename = ""
+
 
 # syntax sanity check
-case $signal in
-    save)
-        jscmd="Signal.save()"
-        ;;
-    load)
-        jscmd="Signal.load()"
-        ;;
-    share)
-        jscmd="Signal.share()"
-        ;;
-    make)
-        jscmd="Signal.make()"
-        ;;
+if signal == "save":
+    jscmd = "Signal.save()"
+elif signal == "load":
+    jscmd = "Signal.load()"
+elif signal == "share":
+    jscmd = "Signal.share()"
+elif signal == "make":
+    jscmd = "Signal.make()"
+elif signal == "launch-share":
+    # dbus doesn't like '-' so we use '_'
+    signal = "load_share"
+    # Make sure the share creation was downloaded
+    if not os.path.exists(xml_filename):
+        print "Please specify a valid xml file to 'launch-share' : {}".format(xml_filename)
+        sys.exit(1)
 
-    launch-share)
-	# Make sure the share creation was downloaded
-	if [ ! -f "$xml_filename" ]; then
-	    echo "Please specify a valid xml file to 'launch-share' : $xml_filename"
-	    exit 1
-	fi
-
-	# Command to open a share on top of your current workspace
-        jscmd="Signal.load(\"$xml_filename\")"
-        ;;
-
-    *)
-        echo "Usage: make-signal < save | load | share | make | launch-share <xml_filename> >"
-        exit 1
-        ;;
-esac
+        # Command to open a share on top of your current workspace
+    jscmd = "Signal.load(\"{}\")".format(xml_filename)
+else:
+    print "Usage: make-signal < save | load | share | make | launch-share <xml_filename> >"
+    sys.exit(1)
 
 
-function is_running {
-    xwininfo -tree -root | grep -i "$1" > /dev/null 2>&1
-}
+def is_running(cmd):
+    rc = os.system('xwininfo -tree -root | grep -i "{}" > /dev/null 2>&1'.format(cmd))
+    return rc == 0
 
 
 # TODO: We need to cover the rest of Kano apps (see kano-profile/rules)
-for APP in make-pong make-minecraft make-music; do
-    is_running $APP
-    if [ $? == 0 ]; then
-        app=$APP
-
-        if [ $app == "music" ]; then
+for APP in ["make-pong", "make-minecraft", "make-music"]:
+    if is_running(APP):
+        app = APP
+        if app == "make-music":
             # Make Music is registered as "sonicpi" in dbus
-            app="sonicpi"
-        fi
+            app = "sonicpi"
 
         break
-    fi
-done
 
-if [ -z $app ]; then
+if app is None:
     # No valid app is running
-    echo "no valid app is running, returning error"
-    exit 1
-fi
+    print "no valid app is running, returning error"
+    sys.exit(1)
+
 
 # if there is no pipe, webkit is not running
-if [ -p $pipe_name ]; then
+fifo_exists = False
+try:
+    if stat.S_ISFIFO(os.stat(pipe_name).st_mode):
+        fifo_exists = True
+except:
+    # ignore exception when fifo does not exist
+    pass
+
+if fifo_exists:
+    pipe = open(pipe_name, "w")
     # Minecraft and Pong, because webkit is running.
-    echo $jscmd > $pipe_name
+    print >> pipe, jscmd
+    pipe.close()
 
     # Since this is a signal from another app (most times Kano World),
     # switch user focus back to the game app.
-    if [ "$app" == "make-minecraft" ]; then
-	wmctrl -a "Make Minecraft"
-    fi
+    app_name_dict = {
+        'make-minecraft': 'Make Minecraft',
+        'make-pong': 'Make Pong'
+    }
 
-    if [ "$app" == "make-pong" ]; then
-	wmctrl -a "Make Pong"
-    fi
-else
+    if app in app_name_dict:
+        cmd = 'wmctrl -a "{}"'.format(app_name_dict[app])
+        print cmd
+        rc = os.system(cmd)
+        if rc != 0:
+            from kano.logging import logger
+            logger.error("error raising window {}".format(app_name_dict[app]))
+
+else:
     # Pass on event to dbus
-    # In the case of launch-share, we send the xml file as an extra string parameter on the signal
-    if [ "$signal" == "launch-share" ]; then
-	dbus-send --session --dest="me.kano.$app" --print-reply \
-		  "/me/kano/$app" "me.kano.$app.Actions.$signal string:\"$xml_filename\"" 2>/dev/null
-    else
-	dbus-send --session --dest="me.kano.$app" --print-reply \
-		  "/me/kano/$app" "me.kano.$app.Actions.$signal" 2>/dev/null
-    fi
+    def do_send_dbus(app, signal, xml_filename=None):
+        import dbus
+        session_bus = dbus.SessionBus()
+        proxy = session_bus.get_object("me.kano.{}".format(app), "/me/kano/{}".format(app))
+        sig = proxy.get_dbus_method(signal, dbus_interface="me.kano.{}.Actions".format(app))
+        if xml_filename:
+            sig(xml_filename)
+        else:
+            sig()
 
+
+    try:
+        # In the case of launch-share, we send the xml file as an extra string parameter on the signal
+        if signal == "load_share":
+            do_send_dbus(app, signal, xml_filename)
+        else:
+            do_send_dbus(app, signal)
+    except:
+        # make sure to return 1 on error
+        import traceback
+        from kano.logging import logger
+        logger.error('Unexpected error when sending dbus signal.\n{}'
+                     .format(traceback.format_exc()))
+        sys.exit(1)
     # TODO: Apps should implement gaining focus when such signal is sent
-fi
 
-exit 0
+
+sys.exit(0)
