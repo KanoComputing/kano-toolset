@@ -73,7 +73,7 @@ def is_running(cmd):
 
 
 # TODO: We need to cover the rest of Kano apps (see kano-profile/rules)
-for APP in ["make-pong", "make-minecraft", "make-music"]:
+for APP in ["make-pong", "make-minecraft", "make-music", "make-light"]:
     if is_running(APP):
         app = APP
         if app == "make-music":
@@ -122,6 +122,8 @@ else:
     # Pass on event to dbus
     def do_send_dbus(app, signal, xml_filename=None):
         import dbus
+
+        app = app.replace('-', '_')  # DBus doesn't behave well with '-'
         session_bus = dbus.SessionBus()
         proxy = session_bus.get_object("me.kano.{}".format(app), "/me/kano/{}".format(app))
         sig = proxy.get_dbus_method(signal, dbus_interface="me.kano.{}.Actions".format(app))
