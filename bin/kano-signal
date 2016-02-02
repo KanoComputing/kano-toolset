@@ -25,6 +25,9 @@ import sys
 import os
 import stat
 
+# verbose flag for debugging on the console
+verbose=False
+
 # pipe name to send javascript code
 pipe_name = "/tmp/webapp.pipe"
 app = None
@@ -41,6 +44,31 @@ try:
     xml_filename = sys.argv[2]
 except:
     xml_filename = ""
+
+
+def set_focus(app, verbose=False):
+    '''
+    Sets user input focus to the app name.
+    '''
+    app_titles_dict = {
+        'make-minecraft': 'Make Minecraft',
+        'make-pong': 'Make Pong',
+        'sonicpi': 'Sonic Pi',
+        'make-light': 'Make Light'
+    }
+
+    if app in app_titles_dict:
+        # switch user focus back to the game app.
+        cmd = 'wmctrl -a "{}"'.format(app_titles_dict[app])
+        if verbose: print cmd
+        rc = os.system(cmd)
+        if rc != 0:
+            from kano.logging import logger
+            logger.error("error raising window {}".format(app_titles_dict[app]))
+
+        return (rc==0)
+
+    return False
 
 
 # syntax sanity check
@@ -84,7 +112,7 @@ for APP in ["make-pong", "make-minecraft", "make-music", "make-light"]:
 
 if app is None:
     # No valid app is running
-    print "no valid app is running, returning error"
+    if verbose: print "no valid app is running, returning error"
     sys.exit(1)
 
 
@@ -97,26 +125,17 @@ except:
     # ignore exception when fifo does not exist
     pass
 
+# Set user input focus to the app receiving the share.
+# Needs to happen before sending the signal, because DBus is synchronous
+# - a confirmation message box will block kano-signal until the user confirms.
+set_focus(app)
+
 if fifo_exists:
+    # This means we are talking to Minecraft and Pong,
+    # because kano-blocks webkit talks receives signals through the pipe.
     pipe = open(pipe_name, "w")
-    # Minecraft and Pong, because webkit is running.
     print >> pipe, jscmd
     pipe.close()
-
-    # Since this is a signal from another app (most times Kano World),
-    # switch user focus back to the game app.
-    app_name_dict = {
-        'make-minecraft': 'Make Minecraft',
-        'make-pong': 'Make Pong'
-    }
-
-    if app in app_name_dict:
-        cmd = 'wmctrl -a "{}"'.format(app_name_dict[app])
-        print cmd
-        rc = os.system(cmd)
-        if rc != 0:
-            from kano.logging import logger
-            logger.error("error raising window {}".format(app_name_dict[app]))
 
 else:
     # Pass on event to dbus
@@ -132,7 +151,6 @@ else:
         else:
             sig()
 
-
     try:
         # In the case of launch-share, we send the xml file as an extra string parameter on the signal
         if signal == "load_share":
@@ -146,7 +164,5 @@ else:
         logger.error('Unexpected error when sending dbus signal.\n{}'
                      .format(traceback.format_exc()))
         sys.exit(1)
-    # TODO: Apps should implement gaining focus when such signal is sent
-
 
 sys.exit(0)
