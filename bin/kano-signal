@@ -125,10 +125,11 @@ except:
     # ignore exception when fifo does not exist
     pass
 
-# Set user input focus to the app receiving the share.
+# Set user input focus to the app receiving the load_share signal.
 # Needs to happen before sending the signal, because DBus is synchronous
 # - a confirmation message box will block kano-signal until the user confirms.
-set_focus(app)
+if signal == "launch-share":
+    set_focus(app)
 
 if fifo_exists:
     # This means we are talking to Minecraft and Pong,
