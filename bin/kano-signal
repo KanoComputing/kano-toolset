@@ -13,7 +13,7 @@
 #
 # It is also invoked from Kano World when launching a Share.
 # The chromium hook connected to kano-profile.apps module,
-# calls this script with "launch-share <xml_filename>",
+# calls this script with "launch-share <share_filename>",
 # which will open a share on the currently running app by sending a signal.
 #
 # Exit code 0 means the signal could be delivered, any other value means error,
@@ -24,26 +24,18 @@
 import sys
 import os
 import stat
+from optparse import OptionParser
 
 # verbose flag for debugging on the console
 verbose=False
 
 # pipe name to send javascript code
 pipe_name = "/tmp/webapp.pipe"
-app = None
 
-# CLEANUP: should make argument parsing nicer
-# signal name
-try:
-    signal = sys.argv[1]
-except:
-    signal = ""
 
-# "launch-share" signal name needs this extra parameter
-try:
-    xml_filename = sys.argv[2]
-except:
-    xml_filename = ""
+def is_running(cmd):
+    rc = os.system('xwininfo -tree -root | grep -i "{}" > /dev/null 2>&1'.format(cmd))
+    return rc == 0
 
 
 def set_focus(app, verbose=False):
@@ -57,113 +49,147 @@ def set_focus(app, verbose=False):
         'make-light': 'Make Light'
     }
 
-    if app in app_titles_dict:
+    if app in app_titles_dict.itervalues():
         # switch user focus back to the game app.
-        cmd = 'wmctrl -a "{}"'.format(app_titles_dict[app])
-        if verbose: print cmd
+        cmd = 'wmctrl -a "{}"'.format(app)
+        if verbose:
+            print cmd
+
         rc = os.system(cmd)
         if rc != 0:
+            # delay loading for performance reasons
             from kano.logging import logger
-            logger.error("error raising window {}".format(app_titles_dict[app]))
+            logger.error("error raising window {}".format(app))
 
         return (rc==0)
 
     return False
 
 
-# syntax sanity check
-if signal == "save":
-    jscmd = "Signal.save()"
-elif signal == "load":
-    jscmd = "Signal.load()"
-elif signal == "share":
-    jscmd = "Signal.share()"
-elif signal == "make":
-    jscmd = "Signal.make()"
-elif signal == "launch-share":
-    # dbus doesn't like '-' so we use '_'
-    signal = "load_share"
-    # Make sure the share creation was downloaded
-    if not os.path.exists(xml_filename):
-        print "Please specify a valid xml file to 'launch-share' : {}".format(xml_filename)
+if __name__ == '__main__':
+    app = None
+    share_filename=None
+
+    usage_help='Usage: kano-signal < save | load | share | make | ' \
+      'launch-share <share_filename> > [ --verbose ]'
+
+    # Collect arguments, first one is the signal name, optional "verbose"
+    parser = OptionParser()
+    parser.add_option('-v', '--verbose',
+                action='store_true', dest='verbose', default=False,
+                help='Be verbose', metavar="FILE")
+
+    (options, args) = parser.parse_args()
+    verbose=options.verbose
+
+    if not len(args):
+        print usage_help
         sys.exit(1)
+    else:
+        # sanity check
+        signal=args[0]
+        if signal == 'launch-share' and len(args) < 2:
+            print 'Please specify a Kano World share file to open'
+            sys.exit(1)
+        else:
+            share_filename=args[1]
+
+    # Prepare signal based on arguments received
+    if signal == "save":
+        jscmd = "Signal.save()"
+    elif signal == "load":
+        jscmd = "Signal.load()"
+    elif signal == "share":
+        jscmd = "Signal.share()"
+    elif signal == "make":
+        jscmd = "Signal.make()"
+    elif signal == "launch-share":
+        # dbus doesn't like '-' so we use '_'
+        signal = "load_share"
+
+        # Make sure the kano world share creation was downloaded
+        if not os.path.exists(share_filename):
+            print "Please specify a valid xml file to 'launch-share' : {}".format(share_filename)
+            sys.exit(1)
 
         # Command to open a share on top of your current workspace
-    jscmd = "Signal.load(\"{}\")".format(xml_filename)
-else:
-    print "Usage: make-signal < save | load | share | make | launch-share <xml_filename> >"
-    sys.exit(1)
-
-
-def is_running(cmd):
-    rc = os.system('xwininfo -tree -root | grep -i "{}" > /dev/null 2>&1'.format(cmd))
-    return rc == 0
-
-
-# TODO: We need to cover the rest of Kano apps (see kano-profile/rules)
-for APP in ["make-pong", "make-minecraft", "make-music", "make-light"]:
-    if is_running(APP):
-        app = APP
-        if app == "make-music":
-            # Make Music is registered as "sonicpi" in dbus
-            app = "sonicpi"
-
-        break
-
-if app is None:
-    # No valid app is running
-    if verbose: print "no valid app is running, returning error"
-    sys.exit(1)
-
-
-# if there is no pipe, webkit is not running
-fifo_exists = False
-try:
-    if stat.S_ISFIFO(os.stat(pipe_name).st_mode):
-        fifo_exists = True
-except:
-    # ignore exception when fifo does not exist
-    pass
-
-# Set user input focus to the app receiving the load_share signal.
-# Needs to happen before sending the signal, because DBus is synchronous
-# - a confirmation message box will block kano-signal until the user confirms.
-if signal == "launch-share":
-    set_focus(app)
-
-if fifo_exists:
-    # This means we are talking to Minecraft and Pong,
-    # because kano-blocks webkit talks receives signals through the pipe.
-    pipe = open(pipe_name, "w")
-    print >> pipe, jscmd
-    pipe.close()
-
-else:
-    # Pass on event to dbus
-    def do_send_dbus(app, signal, xml_filename=None):
-        import dbus
-
-        app = app.replace('-', '_')  # DBus doesn't behave well with '-'
-        session_bus = dbus.SessionBus()
-        proxy = session_bus.get_object("me.kano.{}".format(app), "/me/kano/{}".format(app))
-        sig = proxy.get_dbus_method(signal, dbus_interface="me.kano.{}.Actions".format(app))
-        if xml_filename:
-            sig(xml_filename)
-        else:
-            sig()
-
-    try:
-        # In the case of launch-share, we send the xml file as an extra string parameter on the signal
-        if signal == "load_share":
-            do_send_dbus(app, signal, xml_filename)
-        else:
-            do_send_dbus(app, signal)
-    except:
-        # make sure to return 1 on error
-        import traceback
-        from kano.logging import logger
-        logger.error('Unexpected error when sending dbus signal.\n{}'
-                     .format(traceback.format_exc()))
+        jscmd = "Signal.load(\"{}\")".format(share_filename)
+    else:
+        print usage_help
         sys.exit(1)
+
+    # TODO: We need to cover the rest of Kano apps (see kano-profile/rules)
+    for APP in ["make-pong", "make-minecraft", "make-music", "make-light"]:
+        if is_running(APP):
+            app = APP
+            if app == "make-music":
+                # Make Music is registered as "sonicpi" in dbus
+                app = "sonicpi"
+
+            break
+
+    if app is None:
+        if verbose:
+            print "no valid app is running, returning error"
+        sys.exit(1)
+
+    # if there is no pipe, webkit is not running
+    fifo_exists = False
+    try:
+        if stat.S_ISFIFO(os.stat(pipe_name).st_mode):
+            fifo_exists = True
+    except:
+        # ignore exception when fifo does not exist
+        pass
+
+    # Set user input focus to the app receiving the load_share signal.
+    # Needs to happen before sending the signal, because DBus is synchronous
+    # - a confirmation message box will block kano-signal until the user confirms.
+    if signal == 'load_share':
+        if verbose:
+            print 'setting focus to app', app
+        set_focus(app)
+
+    if fifo_exists:
+        # This means we are talking to Minecraft and Pong,
+        # because kano-blocks webkit talks receives signals through the pipe.
+        pipe = open(pipe_name, "w")
+
+        if verbose:
+            print 'Sending app {} a webkit signal "{}"'.format(app, jscmd)
+
+        print >> pipe, jscmd
+        pipe.close()
+
+    else:
+        # Pass on event to dbus
+        def do_send_dbus(app, signal, share_filename=None):
+            import dbus
+
+            app = app.replace('-', '_')  # DBus doesn't behave well with '-'
+            session_bus = dbus.SessionBus()
+            proxy = session_bus.get_object("me.kano.{}".format(app), "/me/kano/{}".format(app))
+            sig_pfn = proxy.get_dbus_method(signal, dbus_interface="me.kano.{}.Actions".format(app))
+            if share_filename:
+                sig_pfn(share_filename)
+            else:
+                sig_pfn()
+
+        if verbose:
+            print 'Sending dbus signal {} to app {}, filename {}'.format(signal, app, share_filename)
+
+        try:
+            # In the case of launch-share, we send the share file as an extra string parameter on the signal
+            if signal == "load_share":
+                do_send_dbus(app, signal, share_filename)
+            else:
+                do_send_dbus(app, signal)
+        except:
+            # make sure to return 1 on error
+            import traceback
+            from kano.logging import logger
+            logger.error('Unexpected error when sending dbus signal.\n{}'
+                        .format(traceback.format_exc()))
+            sys.exit(1)
 
 sys.exit(0)
