@@ -51,7 +51,7 @@ def set_focus(app, verbose=False):
 
     if app in app_titles_dict:
         # switch user focus back to the game app.
-        cmd = 'wmctrl -a "{}"'.format(app)
+        cmd = 'wmctrl -a "{}"'.format(app_titles_dict[app])
         if verbose:
             print cmd
 
@@ -59,7 +59,7 @@ def set_focus(app, verbose=False):
         if rc != 0:
             # delay loading for performance reasons
             from kano.logging import logger
-            logger.error("error raising window {}".format(app))
+            logger.error("error raising window {}".format(app_titles_dict[app]))
 
         return (rc==0)
 
