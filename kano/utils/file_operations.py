@@ -9,11 +9,13 @@
 import os
 import re
 import pwd
+import getpass
 import grp
 import shutil
 import json
 import fcntl
 import errno
+import stat
 import time
 
 from kano.utils.user import get_user_unsudoed
@@ -22,6 +24,20 @@ from kano.utils.shell import run_cmd
 
 class TimeoutException(Exception):
     pass
+
+
+def get_path_owner(path):
+    owner = ''
+    try:
+        owner = pwd.getpwuid(os.stat(path).st_uid).pw_name
+    except (IOError, OSError) as exc_err:
+        from kano.logging import logger
+        logger.warn(
+            "Can't get path owner on {} due to permission/IO issues - {}"
+            .format(path, exc_err)
+        )
+
+    return owner
 
 
 def read_file_contents(path):
@@ -51,6 +67,82 @@ def delete_dir(directory):
 def delete_file(file_path):
     if os.path.exists(file_path):
         os.remove(file_path)
+
+
+def empty_directory(dir_path):
+    """ This function removes all files and directories from a directory
+    without deleting it.
+    """
+    if not os.path.exists(dir_path):
+        from kano.logging import logger
+        logger.warn("Can't empty, '{}' it doesn't exist".format(dir_path))
+        return False
+
+    if not os.path.isdir(dir_path):
+        from kano.logging import logger
+        logger.warn("Can't empty, '{}' it isn't a directory".format(dir_path))
+        return False
+
+    # If the current user is not the same as path owner we want to stop to
+    # prevent silently introducing ownership issues
+    if not getpass.getuser() != get_path_owner(dir_path):
+        from kano.logging import logger
+        logger.warn(
+            "Can't empty, '{}' owner is not as current user"
+            .format(dir_path)
+        )
+        return False
+
+    try:
+        perm_mask = stat.S_IMODE(os.stat(dir_path).st_mode)
+        shutil.rmtree(dir_path, ignore_errors=True)
+        os.makedirs(dir_path, mode=perm_mask)
+    except (IOError, OSError) as exc_err:
+        from kano.logging import logger
+        logger.warn(
+            "Can't empty, '{}' due to permission/IO issues - {}"
+            .format(dir_path, exc_err)
+        )
+        return False
+
+    return True
+
+
+def recursively_copy(src, dst):
+    src_dir = os.path.abspath(src)
+    dest_dir = os.path.abspath(dst)
+
+    if not os.path.isdir(src_dir) or not os.path.isdir(dest_dir):
+        from kano.logging import logger
+        logger.warn(
+            "Can't copy '{}' contents into '{}', one of them is not a dir"
+            .format(src_dir, dest_dir)
+        )
+        return False
+
+    try:
+        for root_d, dirs, files in os.walk(src_dir):
+            # Firstly create the dirs
+            dest_root = os.path.join(
+                dest_dir,
+                os.path.relpath(root_d, src_dir)
+            )
+            for dir_n in dirs:
+                new_dir = os.path.join(dest_root, dir_n)
+                os.mkdir(new_dir)
+            # Now deal with the files
+            for file_n in files:
+                src_file = os.path.join(root_d, file_n)
+                new_file = os.path.join(dest_root, file_n)
+                shutil.copy(src_file, new_file)
+    except (IOError, OSError) as exc_err:
+        from kano.logging import logger
+        logger.warn(
+            "Can't copy '{}' contents into '{}', due to permission/IO - {}"
+            .format(src_dir, dest_dir, exc_err)
+        )
+        return False
+    return True
 
 
 def ensure_dir(directory):
