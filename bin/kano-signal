@@ -49,7 +49,7 @@ def set_focus(app, verbose=False):
         'make-light': 'Make Light'
     }
 
-    if app in app_titles_dict.itervalues():
+    if app in app_titles_dict:
         # switch user focus back to the game app.
         cmd = 'wmctrl -a "{}"'.format(app)
         if verbose:
