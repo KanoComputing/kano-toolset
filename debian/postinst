@@ -2,7 +2,7 @@
 
 # postinst
 #
-# Copyright (C) 2014 Kano Computing Ltd.
+# Copyright (C) 2014-2016 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
@@ -10,6 +10,12 @@ TMP_FILE=/tmp/kano-toolset_conf
 
 case "$1" in
     configure)
+        if [ "$2" != "" ]; then
+            # When separating utils into submodules, the .pyc isn't deleted
+            if `dpkg --compare-versions $2 lt 2.3.0-2`; then
+                rm -f /usr/lib/python2.7/dist-packages/kano/utils.pyc
+            fi
+        fi
 
         # Create custom sudoers file
         echo 'Defaults env_keep += "KLOG_FORCE_FLUSH NO_AT_BRIDGE"' > $TMP_FILE
