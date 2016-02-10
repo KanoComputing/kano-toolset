@@ -85,7 +85,7 @@ def empty_directory(dir_path):
 
     # If the current user is not the same as path owner we want to stop to
     # prevent silently introducing ownership issues
-    if not getpass.getuser() != get_path_owner(dir_path):
+    if getpass.getuser() != get_path_owner(dir_path):
         from kano.logging import logger
         logger.warn(
             "Can't empty, '{}' owner is not as current user"
