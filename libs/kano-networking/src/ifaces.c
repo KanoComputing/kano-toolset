@@ -23,7 +23,7 @@
  *
  * Upon error, iface_name does not need freeing
  */
-int select_iface(char * iface_type, char **iface_name)
+int select_iface(const char *iface_type, char **iface_name)
 {
     struct ifaddrs *iface_addr;
 
@@ -31,23 +31,26 @@ int select_iface(char * iface_type, char **iface_name)
         return E_NO_INTERFACES;
 
     struct ifaddrs *candidate_iface = iface_addr;
+    bool match = false;
 
-    do {
-        candidate_iface = candidate_iface->ifa_next;
-
-        if (strstr(candidate_iface->ifa_name, iface_type) != NULL)
+    while (candidate_iface != NULL && !match) {
+        if (strstr(candidate_iface->ifa_name, iface_type) != NULL) {
+            match = true;
             break;
-
-        if (candidate_iface->ifa_next == NULL) {
-            freeifaddrs(iface_addr);
-            return E_NO_INTERFACES;
         }
 
-    } while (candidate_iface->ifa_next != NULL);
+        candidate_iface = candidate_iface->ifa_next;
+    }
 
-    size_t len = strlen(candidate_iface->ifa_name);
-    *iface_name = (char *) malloc((len + 1) * sizeof(char));
-    strncpy(*iface_name, candidate_iface->ifa_name, len + 1);
+    if (!match) {
+        freeifaddrs(iface_addr);
+        return E_NO_INTERFACES;
+    }
+
+    // Allow for termination character
+    size_t len = strlen(candidate_iface->ifa_name) + 1;
+    *iface_name = (char *) malloc(len * sizeof(char));
+    strncpy(*iface_name, candidate_iface->ifa_name, len);
 
     freeifaddrs(iface_addr);
 
@@ -57,7 +60,7 @@ int select_iface(char * iface_type, char **iface_name)
 /**
  * Check for interfaces of the provided type and print the interface name
  */
-int check_iface_type(char * iface_type)
+int check_iface_type(const char *iface_type)
 {
     char *iface;
 

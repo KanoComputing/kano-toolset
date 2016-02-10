@@ -14,7 +14,7 @@ enum ERRORS {
     E_NO_INTERFACES = -1
 };
 
-int select_iface(char * iface_type, char **iface_name);
-int check_iface_type(char * iface_type);
+int select_iface(const char *iface_type, char **iface_name);
+int check_iface_type(const char *iface_type);
 
 #endif
