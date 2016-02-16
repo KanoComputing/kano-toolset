@@ -1,3 +1,9 @@
+kano-toolset (2.3.0-6) unstable; urgency=low
+
+  * Added simple way of logging an exception.
+
+ -- Team Kano <dev@kano.me>  Thu, 19 Jan 2016 15:11:00 +0100
+
 kano-toolset (2.3.0-5) unstable; urgency=low
 
   * Added option for kano-signal to open new projects (launch-share)

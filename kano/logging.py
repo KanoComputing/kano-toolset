@@ -175,6 +175,14 @@ class Logger:
             log.update(kwargs)
             log["level"] = lname
 
+            # if an exception object was passed in, add it to the log fields
+            tbk = None
+            if 'exception' in kwargs:
+                import traceback
+                tbk = traceback.format_exc()
+                log['exception'] = str(kwargs['exception'])
+                log['traceback'] = tbk
+
             for line in lines:
                 log["time"] = time.time()
                 log["message"] = line
