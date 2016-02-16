@@ -10,8 +10,28 @@ from kano.utils.shell import run_cmd
 from kano.utils.file_operations import read_file_contents_as_lines
 
 
-def detect_kano_keyboard():
+# "performance" scores for RPi boards
+RPI_A_SCORE = 1000
+RPI_A_PLUS_SCORE = 1000
+RPI_B_SCORE = 2000
+RPI_B_PLUS_SCORE = 2000
+RPI_ZERO_SCORE = 3000
+RPI_COMPUTE_SCORE = 4000
+RPI_2_B_SCORE = 5000
 
+# "performance" scores lookup table with keys as given by get_rpi_model()
+PERFORMANCE_SCORES = {
+    'RPI/A': RPI_A_SCORE,
+    'RPI/A+': RPI_A_PLUS_SCORE,
+    'RPI/B': RPI_B_SCORE,
+    'RPI/B+': RPI_B_PLUS_SCORE,
+    'RPI/Zero': RPI_ZERO_SCORE,
+    'RPI/Compute': RPI_COMPUTE_SCORE,
+    'RPI/2/B': RPI_2_B_SCORE,
+}
+
+
+def detect_kano_keyboard():
     # Get information of all devices
     o, _, _ = run_cmd('lsusb -v')
 
@@ -43,6 +63,10 @@ def is_model_2_b(revision=None):
     return get_rpi_model(revision) == 'RPI/2/B'
 
 
+def is_model_zero(revision=None):
+    return get_rpi_model(revision) == 'RPI/Zero'
+
+
 def get_rpi_model(revision=None):
     '''
     Returns a string identifying the RaspberryPI model (RPI A/B/B+/2B)
@@ -62,18 +86,20 @@ def get_rpi_model(revision=None):
 
         if revision == 'Beta':
             model_name = 'RPI/B (Beta)'
-        elif int(revision, 16)  & 0x00ff in (0x2, 0x3, 0x4, 0x5, 0x6, 0xd, 0xe, 0xf):
+        elif int(revision, 16) & 0x00ff in (0x2, 0x3, 0x4, 0x5, 0x6, 0xd, 0xe, 0xf):
             model_name = 'RPI/B'
         elif int(revision, 16) & 0x00ff in (0x7, 0x8, 0x9):
             model_name = 'RPI/A'
-        elif int(revision, 16) & 0x00ff == 0x10:
+        elif int(revision, 16) & 0x00ff in (0x10, 0x13):
             model_name = 'RPI/B+'
         elif int(revision, 16) & 0x00ff == 0x11:
             model_name = 'Compute Module'
         elif int(revision, 16) & 0x00ff == 0x12:
             model_name = 'RPI/A+'
-        elif int(revision, 16) & 0x00FFFFFF >= 0x00A01041:
+        elif int(revision, 16) & 0x00FFFFFF in (0x00A01041, 0x00A21041):
             model_name = 'RPI/2/B'
+        elif int(revision, 16) & 0x00FFFFFF == 0x00900092:
+            model_name = 'RPI/Zero'
         else:
             model_name = 'unknown revision: {}'.format(revision)
 
@@ -112,3 +138,26 @@ def get_mac_address():
     mac_addr_str = mac_addr.upper()
     if len(mac_addr_str) == 17:
         return mac_addr_str
+
+
+def has_min_performance(score):
+    """
+    Check if the hardware we're running on has a minimum given performance.
+
+    Args:
+        score (int) - A performance score just like the ones in PERFORMANCE_SCORES
+
+    Returns:
+        rv (bool) - True if the hardware has a higher score than the given or if the
+                    hardware could not be detected; and False otherwise
+    """
+    rv = True
+    model = get_rpi_model()
+
+    if model in PERFORMANCE_SCORES:
+        model_score = PERFORMANCE_SCORES[model]
+
+        if model_score < score:
+            rv = False
+
+    return rv
