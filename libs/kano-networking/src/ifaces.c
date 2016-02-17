@@ -47,11 +47,7 @@ int select_iface(const char *iface_type, char **iface_name)
         return E_NO_INTERFACES;
     }
 
-    // Allow for termination character
-    size_t len = strlen(candidate_iface->ifa_name) + 1;
-    *iface_name = (char *) malloc(len * sizeof(char));
-    strncpy(*iface_name, candidate_iface->ifa_name, len);
-
+    *iface_name = strdup(candidate_iface->ifa_name);
     freeifaddrs(iface_addr);
 
     return 0;
