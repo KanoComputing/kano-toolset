@@ -2,9 +2,9 @@
 # Placeholder makefile so "debuild" can be gently persuaded to work
 #
 
-.PHONY: kano-keys-pressed kano-splash kano-launcher kano-logging
+.PHONY: kano-keys-pressed kano-splash kano-launcher kano-logging kano-networking
 
-all: kano-keys-pressed kano-splash kano-launcher
+all: kano-keys-pressed kano-splash kano-launcher kano-networking
 
 kano-keys-pressed:
 	cd kano-keys-pressed && make
@@ -17,3 +17,6 @@ kano-launcher: kano-logging
 
 kano-logging:
 	cd kano-logging && make
+
+kano-networking:
+	cd libs/kano-networking && make

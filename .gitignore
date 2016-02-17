@@ -5,3 +5,7 @@
 *.swo
 *.pyo
 *.pyc
+
+*.o
+*.a
+*.so

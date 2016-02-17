@@ -26,3 +26,6 @@ share/kano-launcher/conf usr/share/kano-toolset/kano-launcher/
 kano-launcher/kano-launcher usr/bin/
 kano-launcher/kano-kill-ns usr/bin/
 
+libs/kano-networking/libkano_networking.so.1 usr/lib/
+libs/kano-networking/includes/ifaces.h usr/include/kano/networking/
+libs/kano-networking/pyinterface/ifaces.py usr/lib/python2.7/dist-packages/kano_networking/
