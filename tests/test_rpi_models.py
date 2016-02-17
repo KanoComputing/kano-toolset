@@ -25,7 +25,7 @@ class TestRaspberryPIModels(unittest.TestCase):
         self.assertIn(getrpi('0008'), modela)
         self.assertIn(getrpi('0009'), modela)
 
-    def test_model_A_plus(self):
+    def test_module_a_plus(self):
         self.assertEqual(getrpi('0012'), 'RPI/A+')
 
     def test_model_B(self):
@@ -45,15 +45,17 @@ class TestRaspberryPIModels(unittest.TestCase):
 
     def test_model_B_plus(self):
         self.assertEqual(getrpi('0010'), 'RPI/B+')
+        self.assertEqual(getrpi('0013'), 'RPI/B+')
 
     def test_compute_module(self):
         self.assertEqual(getrpi('0011'), 'Compute Module')
 
-    def test_module_a_plus(self):
-        self.assertEqual(getrpi('0012'), 'RPI/A+')
-
     def test_model_rpi2(self):
         self.assertEqual(getrpi('A01041'), 'RPI/2/B')
+        self.assertEqual(getrpi('A21041'), 'RPI/2/B')
+
+    def test_model_zero(self):
+        self.assertEqual(getrpi('900092'), 'RPI/Zero')
 
 
 class TestRaspberryPIOverclocked(unittest.TestCase):
