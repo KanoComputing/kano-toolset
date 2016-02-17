@@ -1,6 +1,6 @@
 # decorators.py
 #
-# Copyright (C) 2015 Kano Computing Ltd.
+# Copyright (C) 2015-2016 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Decorators used to simplify control and ease modularity
@@ -8,6 +8,8 @@
 
 import os
 import sys
+from functools import wraps
+
 from kano.logging import logger
 
 ERR_ROOT_PERMISSIONS_REQ = -1
@@ -31,6 +33,7 @@ def require_root(exit_on_failure=False, verbose=False):
         Actual decorator that gets applied to functions
         '''
 
+        @wraps(func)
         def ensure_root(*args, **kwargs):
             if os.getuid() != 0:
                 msg = 'You need to run this option as root, try with sudo'
