@@ -346,7 +346,7 @@ def log_excepthook(exc_class, exc_value, tb):
     except:
         exc_txt = ""
 
-    logger.error("Unhandled exception '{}' at {} (see logfile for full trace)"
+    logger.error("Unhandled exception '{}' at {}"
                  .format(exc_value, exc_txt),
                  traceback=tb_txt,
                  exc_class=str(exc_class),

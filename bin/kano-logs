@@ -75,7 +75,7 @@ def get_log_data(path):
     return data
 
 
-def show_logs(app=None, linearised=False):
+def show_logs(app=None, linearised=False, tracebacks=False):
     logfiles = get_logfiles(app)
 
     output = ""
@@ -85,18 +85,18 @@ def show_logs(app=None, linearised=False):
             all_data += get_log_data(log)
 
         all_data.sort(lambda a, b: cmp(a["time"], b["time"]))
-        output += format_log_data(all_data)
+        output += format_log_data(all_data, tracebacks=tracebacks)
     else:
         for log in logfiles:
             label = decorate_string_only_terminal("LOGFILE", "green")
             output += "{}: {}\n".format(label, log)
-            output += format_log_data(get_log_data(log)) + "\n"
+            output += format_log_data(get_log_data(log), tracebacks=tracebacks) + "\n"
 
     if len(output) > 0:
         pydoc.pipepager(output, cmd='less -R')
 
 
-def format_log_data(data, default_app_name=""):
+def format_log_data(data, default_app_name="", tracebacks=False):
     output = ""
 
     for entry in data:
@@ -104,15 +104,26 @@ def format_log_data(data, default_app_name=""):
         if "app_name" in entry:
             app_name = entry["app_name"]
 
+        opt = ''
+        if "exception" in entry:
+            opt += decorate_string_only_terminal(entry['exception'], "light-magenta") + ' '
+        if "traceback" in entry:
+            opt += decorate_string_only_terminal('[TBK] ', "light-magenta")
+
         dt = datetime.datetime.fromtimestamp(entry["time"])
         time = dt.strftime('%Y-%m-%d %H:%M:%S')
-        output += "{} {}[{}] {} {}\n".format(
+        output += "{} {}[{}] {} {}{}\n".format(
             decorate_string_only_terminal(time, "cyan"),
             app_name,
             decorate_string_only_terminal(entry["pid"], "yellow"),
             decorate_with_preset(entry["level"], entry["level"], True),
+            opt,
             entry["message"]
         )
+        if tracebacks and "traceback" in entry:
+            lines = entry['traceback'].split('\n')
+            lines = [decorate_string_only_terminal(l, 'light-magenta') for l in lines]
+            output += '\n' + '\n'.join(lines)
 
     return output
 
@@ -224,6 +235,14 @@ def process_args():
         default=False
     )
 
+    show.add_argument(
+        "-t", "--tracebacks",
+        help="output tracebacks",
+        action="store_const",
+        const=True,
+        default=False
+    )
+
     config = subparsers.add_parser("config", help="configure logging")
     config.set_defaults(which="config")
     config.add_argument(
@@ -262,7 +281,7 @@ def main():
         if args["watch"]:
             watch_logs(args["app"])
         else:
-            show_logs(args["app"], args["linearised"])
+            show_logs(args["app"], args["linearised"], args["tracebacks"])
     elif args["which"] == "config":
         if args["log_level"] is None and args["output_level"] is None and args["show_value"] is None:
             ll = logger.get_log_level()
