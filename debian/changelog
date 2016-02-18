@@ -2,6 +2,9 @@ kano-toolset (2.4.0-1) unstable; urgency=low
 
   * Added a number of hardware feature operation utils
   * Add libkano_networking library
+  * Add decorators:
+    * 'retry'
+    * 'queue_cb'
 
  -- Team Kano <dev@kano.me>  Mon, 15 Feb 2016 17:11:00 +0100
 
