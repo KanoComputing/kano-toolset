@@ -10,25 +10,26 @@
 # /sbin/poweroff, reboot, and loginctl.
 #
 
-# The steps needed before showing the dialog are a bit time consuming
-# so we raise the hourglass as soon as possible
-from kdesk.hourglass import hourglass_start, hourglass_end
-hourglass_start('kano-shutdown')
 
 from gi.repository import Gtk, Gdk
 
 from kano.gtk3.buttons import KanoButton
 from kano.gtk3.application_window import ApplicationWindow
 from kano.gtk3.apply_styles import apply_styling_to_screen
-from kano.utils import run_cmd, run_bg
 
 from kano.paths import common_css_dir
+from kano.utils import run_cmd, run_bg
+
+# The steps needed before showing the dialog are a bit time consuming
+# so we raise the hourglass as soon as possible
+from kdesk.hourglass import hourglass_start, hourglass_end
+hourglass_start('kano-shutdown')
 
 
 class ShutdownOptions(ApplicationWindow):
-    '''
+    """
     Displays a dialog with logout, poweroff and reboot buttons
-    '''
+    """
     def __init__(self, title='', width=300, height=550):
 
         self.top_image_file = '/usr/share/kano-desktop/images/kano-logout-face.png'
@@ -41,9 +42,6 @@ class ShutdownOptions(ApplicationWindow):
         self.set_default_size(width, height)
         self.set_decorated(False)
 
-        # The ESC key will terminate the app
-        self.connect('key-press-event', self.on_key_function)
-
         # Create ad eventbox that has all the action buttons and image
         background = Gtk.EventBox()
 
@@ -55,16 +53,19 @@ class ShutdownOptions(ApplicationWindow):
 
         # All the action buttons
         self.btn_shutdown = KanoButton('Shutdown')
-        self.btn_shutdown.connect('button-press-event', self.button_click)
+        self.btn_shutdown.connect('button-press-event', self._on_shutdown)
 
         self.btn_reboot = KanoButton('Reboot')
-        self.btn_reboot.connect('button-press-event', self.button_click)
+        self.btn_reboot.connect('button-press-event', self._on_reboot)
 
         self.btn_logout = KanoButton('Logout')
-        self.btn_logout.connect('button-press-event', self.button_click)
+        self.btn_logout.connect('button-press-event', self._on_logout)
 
         self.btn_cancel = KanoButton('Cancel')
-        self.btn_cancel.connect('button-press-event', self.button_click)
+        self.btn_cancel.connect('button-press-event', self._on_cancel)
+
+        # The ESC key will terminate the app
+        self.connect('key-press-event', self._on_key_press)
 
         # A vertical box where all widgets will sit
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -92,43 +93,33 @@ class ShutdownOptions(ApplicationWindow):
         self.set_main_widget(background)
         self.show_all()
 
-    def shutdown(self):
+    def _on_shutdown(self, button=None, event=None):
+        # run the updater to install urgent or prompt for updating now
+        hourglass_start('kano-updater')
+        run_cmd('sudo kano-updater ui shutdown-window')
         run_bg('sudo systemctl poweroff')
 
-    def reboot(self):
+    def _on_reboot(self, button=None, event=None):
         run_bg('sudo systemctl reboot')
 
-    def logout(self):
+    def _on_logout(self, button=None, event=None):
         # Kill the user desktop session manager and everything below it
         run_bg('pkill lxsession')
 
-    def button_click(self, button, event):
-        '''
-        Called when any of the buttons is clicked
-        '''
-        if button == self.btn_shutdown:
-            self.shutdown()
-        elif button == self.btn_reboot:
-            self.reboot()
-        elif button == self.btn_logout:
-            self.logout()
-
+    def _on_cancel(self, button=None, event=None):
         # If Cancel button or otherwise, terminate the app
         Gtk.main_quit()
 
-    def on_key_function(self, window=None, event=None):
-        '''
+    def _on_key_press(self, window=None, event=None):
+        """
         The ESC key will also dismiss any action and return to Desktop
-        '''
+        """
         if event and event.get_keyval()[1] == Gdk.KEY_Escape:
             Gtk.main_quit()
 
 
 if __name__ == '__main__':
     try:
-        # run the updater to install urgent or prompt for updating now
-        run_cmd('sudo kano-updater ui shutdown-window')
-
         # Report to Kano Tracker, and kano-sync
         # asynchronously for faster UI response time
         run_bg('kano-tracker-ctl +1 shutdown')
