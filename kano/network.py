@@ -72,22 +72,29 @@ class IWList():
             cellDataL = []
             #currentCell = None
             for s in rawdatas:
-                # skip empty lines
-                if not s.strip():
-                    continue
-                # If new cell:
-                if s.lstrip().startswith("Cell "):
-                    # log.debug("parseRawData: new cell")
-                    cellDataL.append([])
-                if len(cellDataL) > 0 and len(s) > 0:
-                    cellDataL[len(cellDataL) - 1].append(s)
+                try:
+                    # skip empty lines
+                    if not s.strip():
+                        continue
+                    # If new cell:
+                    if s.lstrip().startswith("Cell "):
+                        # log.debug("parseRawData: new cell")
+                        cellDataL.append([])
+                    if len(cellDataL) > 0 and len(s) > 0:
+                        cellDataL[len(cellDataL) - 1].append(s)
+                except Exception as e:
+                    logger.error('unexpected error occurred while looping rawdatas {}'
+                                 .format(rawdata), exception=e)
 
             # Data is separated by cells, now we'll parse each cell's data
             parsedCellData = {}
             for s in cellDataL:
-                cellNumber, cellData = parseCellData("\n".join(s))
-                parsedCellData[cellNumber] = cellData
-            #log.debug("parseRawData: parsed "+str(len(cellDataL))+" cells")
+                try:
+                    cellNumber, cellData = parseCellData("\n".join(s))
+                    parsedCellData[cellNumber] = cellData
+                except Exception as e:
+                    logger.error('unexpected error occurred while parsing cellDataL {}'
+                                 .format(rawdata), exception=e)
             return parsedCellData
 
         def parseCellData(rawCellData):
@@ -209,7 +216,8 @@ class IWList():
                 try:
                     self.data = parseRawData(rawdata)
                 except Exception as e:
-                    logger.error('unexpected error occurred while parsing rawdata {}'.format(rawdata), exception=e)
+                    logger.error('unexpected error occurred while parsing rawdata {}'
+                                 .format(rawdata), exception=e)
 
                 logger.debug('found {} networks in scanning loop'.format(len(self.data)))
             else:
