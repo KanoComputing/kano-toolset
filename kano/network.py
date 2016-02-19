@@ -206,7 +206,11 @@ class IWList():
 
             # Parse raw data into a dictionary
             if rawdata:
-                self.data = parseRawData(rawdata)
+                try:
+                    self.data = parseRawData(rawdata)
+                except Exception as e:
+                    logger.error('unexpected error occurred while parsing rawdata {}'.format(rawdata), exception=e)
+
                 logger.debug('found {} networks in scanning loop'.format(len(self.data)))
             else:
                 logger.debug('not found any networks in scanning loop'.format(len(self.data)))
