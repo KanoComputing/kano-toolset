@@ -6,6 +6,7 @@ kano-toolset (2.4.0-1) unstable; urgency=low
     * 'retry'
     * 'queue_cb'
   * Add DBus helper utilities
+  * Add Gtk blur mixin
 
  -- Team Kano <dev@kano.me>  Mon, 15 Feb 2016 17:11:00 +0100
 
