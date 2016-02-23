@@ -292,6 +292,9 @@ def is_device(iface):
     '''
     Returns True if wireless dongle is connected, False otherwise
     '''
+    if not iface:
+        return False
+
     with open('/proc/net/dev', 'r') as f:
         read_data = f.read()
         if read_data.find(iface) != -1:
@@ -317,6 +320,9 @@ def is_connected(iface):
     Returns details on which wireless network we are currently associated.
     The linked variable tells us if Internet is reachable.
     '''
+    if not is_device(iface):
+        return ('', '', '', False)
+
     essid = mode = ap = None
     linked = False
 
@@ -602,6 +608,9 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
 
 
 def disconnect(iface, clear_cache=False):
+    if not iface:
+        return
+
     # Stop the Kano reconnecting to the internet
     run_cmd('wpa_cli terminate')
 
