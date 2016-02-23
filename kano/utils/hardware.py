@@ -42,48 +42,54 @@ BOARD_PROPERTIES = {
     RPI_A_KEY: {
         'name': 'Raspberry Pi A',
         'cpu_profile': RPI_1_CPU_PROFILE,
-        'performance': RPI_A_SCORE
+        'performance': RPI_A_SCORE,
+        'arch': "armv6"
     },
     RPI_A_PLUS_KEY: {
         'name': 'Raspberry Pi A+',
         'cpu_profile': RPI_1_CPU_PROFILE,
-        'performance': RPI_A_PLUS_SCORE
-
+        'performance': RPI_A_PLUS_SCORE,
+        'arch': "armv6"
     },
     RPI_B_BETA_KEY: {
         'name': 'Raspberry Pi B (Beta)',
         'cpu_profile': RPI_1_CPU_PROFILE,
-        'performance': RPI_B_SCORE
-
+        'performance': RPI_B_SCORE,
+        'arch': "armv6"
     },
     RPI_B_KEY: {
         'name': 'Raspberry Pi B',
         'cpu_profile': RPI_1_CPU_PROFILE,
-        'performance': RPI_B_SCORE
+        'performance': RPI_B_SCORE,
+        'arch': "armv6"
 
     },
     RPI_B_PLUS_KEY: {
         'name': 'Raspberry Pi B+',
         'cpu_profile': RPI_1_CPU_PROFILE,
-        'performance': RPI_B_PLUS_SCORE
+        'performance': RPI_B_PLUS_SCORE,
+        'arch': "armv6"
 
     },
     RPI_ZERO_KEY: {
         'name': 'Raspberry Pi Zero',
         'cpu_profile': RPI_1_CPU_PROFILE,
-        'performance': RPI_ZERO_SCORE
+        'performance': RPI_ZERO_SCORE,
+        'arch': "armv6"
 
     },
     RPI_COMPUTE_KEY: {
         'name': 'Raspberry Pi Compute Module',
         'cpu_profile': RPI_1_CPU_PROFILE,
-        'performance': RPI_COMPUTE_SCORE
+        'performance': RPI_COMPUTE_SCORE,
+        'arch': "armv6"
 
     },
     RPI_2_B_KEY: {
         'name': 'Raspberry Pi 2',
         'cpu_profile': RPI_2_CPU_PROFILE,
-        'performance': RPI_2_B_SCORE
+        'performance': RPI_2_B_SCORE,
+        'arch': "armv7"
     }
 }
 
