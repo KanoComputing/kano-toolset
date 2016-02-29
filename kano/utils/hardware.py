@@ -17,6 +17,7 @@ RPI_B_PLUS_KEY = 'RPI/B+'
 RPI_ZERO_KEY = 'RPI/Zero'
 RPI_COMPUTE_KEY = 'RPI/Compute'
 RPI_2_B_KEY = 'RPI/2/B'
+RPI_3_KEY = 'RPI/3'
 
 
 # "performance" scores for RPi boards
@@ -27,9 +28,11 @@ RPI_B_PLUS_SCORE = 2000
 RPI_ZERO_SCORE = 3000
 RPI_COMPUTE_SCORE = 4000
 RPI_2_B_SCORE = 5000
+RPI_3_SCORE = 7000
 
 RPI_1_CPU_PROFILE = 'rpi_1'
 RPI_2_CPU_PROFILE = 'rpi_2'
+RPI_3_CPU_PROFILE = 'rpi_3'
 
 
 '''
@@ -90,6 +93,12 @@ BOARD_PROPERTIES = {
         'cpu_profile': RPI_2_CPU_PROFILE,
         'performance': RPI_2_B_SCORE,
         'arch': "armv7"
+    },
+    RPI_3_KEY: {
+        'name': 'Raspberry Pi 3',
+        'cpu_profile': RPI_3_CPU_PROFILE,
+        'performance': RPI_3_SCORE,
+        'arch': 'armv8'
     }
 }
 
@@ -177,6 +186,8 @@ def get_rpi_model(revision=None):
             model_name = RPI_2_B_KEY
         elif int(revision, 16) & 0x00FFFFFF == 0x00900092:
             model_name = RPI_ZERO_KEY
+        elif int(revision, 16) & 0x00FFFFFF == 0x00a02082:
+            model_name = RPI_3_KEY
         else:
             model_name = 'unknown revision: {}'.format(revision)
 
