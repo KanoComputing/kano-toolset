@@ -11,6 +11,8 @@
 # These are queued to run next.
 #
 # Usage: kano-dispmanx-launch cmd
+# Example: kano-dispmanx-launch "/usr/bin/love-0.10 /usr/bin/kanoOverworld.love"
+
 import subprocess
 import sys
 
