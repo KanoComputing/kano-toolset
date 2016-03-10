@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
 
@@ -74,6 +75,7 @@ int main(int argc, char *argv[])
     char *binary;
     int is_interp;
     int error=0;
+    pid_t child_pid=0;
 
     binary=basename(argv[0]);
     is_interp=strcmp(binary,"kano-splash")==0;
@@ -136,8 +138,8 @@ int main(int argc, char *argv[])
 	setenv("SPLASH_START_TIME",start_time_str,1);
 
 	// launch command
-        pid_t pid=fork();
-        if(pid==0){
+        child_pid=fork();
+        if(child_pid==0){
           execvp(real_interp,argv);	
         }
     }
@@ -330,6 +332,11 @@ close_display:
 
     //---------------------------------------------------------------------
 end:
+    if(child_pid){
+      int status;
+      int r = waitpid(child_pid, &status, 0);
+      // could check child status here
+    }
     return error;
 }
 
