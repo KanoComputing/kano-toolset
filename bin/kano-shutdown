@@ -20,6 +20,8 @@ from kano.gtk3.apply_styles import apply_styling_to_screen
 from kano.paths import common_css_dir
 from kano.utils import run_cmd, run_bg
 
+import os
+
 # The steps needed before showing the dialog are a bit time consuming
 # so we raise the hourglass as soon as possible
 from kdesk.hourglass import hourglass_start, hourglass_end
@@ -103,6 +105,11 @@ class ShutdownOptions(ApplicationWindow):
         run_bg('sudo systemctl reboot')
 
     def _on_logout(self, button=None, event=None):
+        # Disregard Computer Mode, so this user next login brings him to the Dashboard
+        dashboard_xsession_file=os.path.join(os.path.expanduser('~'), '.xsessionrc')
+        if os.path.isfile(dashboard_xsession_file):
+            os.unlink(dashboard_xsession_file)
+
         # Kill the user desktop session manager and everything below it
         run_bg('pkill lxsession')
 
