@@ -235,8 +235,10 @@ int main(int argc, char *argv[])
     char *file;
     char *binary;
     int is_interp;
+    int status;
     int error=0;
-    pid_t child_pid=0;
+    pid_t command_child_pid=0;
+    pid_t image_child_pid=0;
     int launch_command=false;
 
     binary=basename(argv[0]);
@@ -323,31 +325,35 @@ int main(int argc, char *argv[])
     
     }
 
+    image_child_pid = fork();
+    if(image_child_pid==0){
+      error = display_image(file, timeout, background);
+      exit(error);
+    }
+
     if(launch_command){
 	// save pid info so child can halt the splash
 	char pid_str[32];
 	char start_time_str[32];
-	pid_t mypid=getpid();
-	snprintf(pid_str,32,"%u",mypid);
-	snprintf(start_time_str,32,"%llu",get_process_start_time(mypid));
+	snprintf(pid_str,32,"%u",image_child_pid);
+	snprintf(start_time_str,32,"%llu",get_process_start_time(image_child_pid));
 	// set environment variables for stopping the splash
 	setenv("SPLASH_PID",pid_str,1);
 	setenv("SPLASH_START_TIME",start_time_str,1);
 
 	// launch command
-        child_pid=fork();
-        if(child_pid==0){
+        command_child_pid=fork();
+        if(command_child_pid==0){
           execvp(real_interp,argv);	
         }
     }      
+    error = waitpid(image_child_pid, &status, 0);
 
-    error = display_image(file, timeout, background);
-
-    if(launch_command){
-      if(child_pid){
-      int status;
-      int r = waitpid(child_pid, &status, 0);
-      // could check child status here
+    if(command_child_pid){
+      int r = waitpid(command_child_pid, &status, 0);
+      if(r){
+        kano_log_error("kano-splash: error from child\n");
+      }
     }
     return error;
 }
