@@ -241,7 +241,38 @@ int main(int argc, char *argv[])
     binary=basename(argv[0]);
     is_interp=strcmp(binary,"kano-splash")==0;
       
-    if(is_interp){
+    if(!is_interp){
+        int opt=0;
+        
+        while ((opt = getopt(argc, argv, "b:t:")) != -1)
+        {
+            switch(opt)
+            {
+            case 'b':
+        
+                background = strtol(optarg, NULL, 16);
+                break;
+        
+            case 't':
+        
+                timeout = strtol(optarg, NULL, 10);
+                break;
+        
+            default:
+        
+                usage();
+                break;
+            }
+        }
+        file=argv[optind];
+        //---------------------------------------------------------------------
+   
+        if (optind >= argc)
+        {
+            usage();
+        }
+    }
+    else{
 
         // Parse command arguments
         // As we are acting as an 'interpreter' arguments are as follows:
@@ -304,38 +335,6 @@ int main(int argc, char *argv[])
           execvp(real_interp,argv);	
         }
     }
-    else{
-        int opt=0;
-        
-        while ((opt = getopt(argc, argv, "b:t:")) != -1)
-        {
-            switch(opt)
-            {
-            case 'b':
-        
-                background = strtol(optarg, NULL, 16);
-                break;
-        
-            case 't':
-        
-                timeout = strtol(optarg, NULL, 10);
-                break;
-        
-            default:
-        
-                usage();
-                break;
-            }
-        }
-        file=argv[optind];
-        //---------------------------------------------------------------------
-   
-        if (optind >= argc)
-        {
-            usage();
-        }
-    }
-
 
     error = display_image(file, timeout, background);
 
