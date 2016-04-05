@@ -237,6 +237,7 @@ int main(int argc, char *argv[])
     int is_interp;
     int error=0;
     pid_t child_pid=0;
+    int launch_command=false;
 
     binary=basename(argv[0]);
     is_interp=strcmp(binary,"kano-splash")==0;
@@ -318,8 +319,12 @@ int main(int argc, char *argv[])
         // save back to argv for exec
         argv[0]=real_interp;
 
-	// save pid info so child can halt the splash
+        launch_command = true;
     
+    }
+
+    if(launch_command){
+	// save pid info so child can halt the splash
 	char pid_str[32];
 	char start_time_str[32];
 	pid_t mypid=getpid();
@@ -334,11 +339,12 @@ int main(int argc, char *argv[])
         if(child_pid==0){
           execvp(real_interp,argv);	
         }
-    }
+    }      
 
     error = display_image(file, timeout, background);
 
-    if(child_pid){
+    if(launch_command){
+      if(child_pid){
       int status;
       int r = waitpid(child_pid, &status, 0);
       // could check child status here
