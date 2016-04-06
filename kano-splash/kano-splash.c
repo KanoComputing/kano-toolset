@@ -63,125 +63,15 @@ void usage(void)
   exit(EXIT_FAILURE);
 }
 
-
-//-------------------------------------------------------------------------
-
-int main(int argc, char *argv[])
+int display_image( char *file, uint16_t timeout, uint16_t background)
 {
-    uint16_t background = 0x000F;
-    uint16_t timeout = 15;
-    char *real_interp;
-    char *file;
-    char *binary;
-    int is_interp;
-    int error=0;
-    pid_t child_pid=0;
-
-    binary=basename(argv[0]);
-    is_interp=strcmp(binary,"kano-splash")==0;
-      
-    if(is_interp){
-
-        // Parse command arguments
-        // As we are acting as an 'interpreter' arguments are as follows:
-        // argv[0] path to this binary
-        // argv[1] arguments on the #! line, if any (otherwise skipped..)
-        // argv[2] the script we are called on
-        // argv[3..] command line arguments
-    
-        // we expect argv[1] to contain the filename followed by the next interpreter we want to invoke and
-        // its arguments. so we extract these and then do the following mapping:
-    
-        // splash file = arg[1][0]
-        // argv[0] = argv[1][1..]
-        // 
-        // This leaves the command line 
-        
-    
-        background=0; // full transparency        
-    
-        if(argc<2) {
-          fprintf(stderr,"Insufficient arguments\n");
-          exit(1);
-        }
-    
-        file=strsep(&argv[1]," ");
-    
-        if(!file) {
-          fprintf(stderr,"filename is NULL \n");      
-	  exit(1);
-        }
-    
-        real_interp=strsep(&argv[1]," ");
-          
-        if(!real_interp) {
-          fprintf(stderr,"real interpreter is not specified!\n");
-          exit(1);
-        }
-    
-        if(argv[1]==0){
-          argv++;
-          argc--;
-        }
-        // save back to argv for exec
-        argv[0]=real_interp;
-
-	// save pid info so child can halt the splash
-    
-	char pid_str[32];
-	char start_time_str[32];
-	pid_t mypid=getpid();
-	snprintf(pid_str,32,"%u",mypid);
-	snprintf(start_time_str,32,"%llu",get_process_start_time(mypid));
-	// set environment variables for stopping the splash
-	setenv("SPLASH_PID",pid_str,1);
-	setenv("SPLASH_START_TIME",start_time_str,1);
-
-	// launch command
-        child_pid=fork();
-        if(child_pid==0){
-          execvp(real_interp,argv);	
-        }
-    }
-    else{
-        int opt=0;
-        
-        while ((opt = getopt(argc, argv, "b:t:")) != -1)
-        {
-            switch(opt)
-            {
-            case 'b':
-        
-                background = strtol(optarg, NULL, 16);
-                break;
-        
-            case 't':
-        
-                timeout = strtol(optarg, NULL, 10);
-                break;
-        
-            default:
-        
-                usage();
-                break;
-            }
-        }
-        file=argv[optind];
-        //---------------------------------------------------------------------
-   
-        if (optind >= argc)
-        {
-            usage();
-        }
-    }
-
+    int error = 0;
     // don't allow us to be killed, because this causes a videocore memory leak
     signal(SIGKILL,SIG_IGN); 
 
     sigset_t waitfor;
     sigaddset(&waitfor,SIGALRM);
     sigprocmask(SIG_BLOCK,&waitfor,NULL); // switch off ALRM in case we are sent it before we want
-        
     //---------------------------------------------------------------------
 
     bcm_host_init();
@@ -311,6 +201,7 @@ int main(int argc, char *argv[])
     ts.tv_nsec=0;
       
     sigtimedwait(&waitfor,NULL, &ts);
+   
     //---------------------------------------------------------------------
 
 
@@ -329,13 +220,140 @@ close_display:
     
     result = vc_dispmanx_display_close(display);
 
-
     //---------------------------------------------------------------------
 end:
-    if(child_pid){
-      int status;
-      int r = waitpid(child_pid, &status, 0);
-      // could check child status here
+    return error;
+}
+
+//-------------------------------------------------------------------------
+
+int main(int argc, char *argv[])
+{
+    uint16_t background = 0x000F;
+    uint16_t timeout = 15;
+    char *real_interp;
+    char *file;
+    char *binary;
+    int is_interp;
+    int status;
+    int error=0;
+    pid_t command_child_pid=0;
+    pid_t image_child_pid=0;
+    int launch_command=false;
+
+    binary=basename(argv[0]);
+    is_interp=strcmp(binary,"kano-splash")==0;
+      
+    if(!is_interp){
+        int opt=0;
+        
+        while ((opt = getopt(argc, argv, "b:t:")) != -1)
+        {
+            switch(opt)
+            {
+            case 'b':
+        
+                background = strtol(optarg, NULL, 16);
+                break;
+        
+            case 't':
+        
+                timeout = strtol(optarg, NULL, 10);
+                break;
+        
+            default:
+        
+                usage();
+                break;
+            }
+        }
+        file=argv[optind];
+        //---------------------------------------------------------------------
+   
+        if (optind >= argc)
+        {
+            usage();
+        }
+    }
+    else{
+
+        // Parse command arguments
+        // As we are acting as an 'interpreter' arguments are as follows:
+        // argv[0] path to this binary
+        // argv[1] arguments on the #! line, if any (otherwise skipped..)
+        // argv[2] the script we are called on
+        // argv[3..] command line arguments
+    
+        // we expect argv[1] to contain the filename followed by the next interpreter we want to invoke and
+        // its arguments. so we extract these and then do the following mapping:
+    
+        // splash file = arg[1][0]
+        // argv[0] = argv[1][1..]
+        // 
+        // This leaves the command line 
+        
+    
+        background=0; // full transparency        
+    
+        if(argc<2) {
+          fprintf(stderr,"Insufficient arguments\n");
+          exit(1);
+        }
+    
+        file=strsep(&argv[1]," ");
+    
+        if(!file) {
+          fprintf(stderr,"filename is NULL \n");      
+	  exit(1);
+        }
+    
+        real_interp=strsep(&argv[1]," ");
+          
+        if(!real_interp) {
+          fprintf(stderr,"real interpreter is not specified!\n");
+          exit(1);
+        }
+    
+        if(argv[1]==0){
+          argv++;
+          argc--;
+        }
+        // save back to argv for exec
+        argv[0]=real_interp;
+
+        launch_command = true;
+    
+    }
+
+    image_child_pid = fork();
+    if(image_child_pid==0){
+      error = display_image(file, timeout, background);
+      exit(error);
+    }
+
+    if(launch_command){
+	// save pid info so child can halt the splash
+	char pid_str[32];
+	char start_time_str[32];
+	snprintf(pid_str,32,"%u",image_child_pid);
+	snprintf(start_time_str,32,"%llu",get_process_start_time(image_child_pid));
+	// set environment variables for stopping the splash
+	setenv("SPLASH_PID",pid_str,1);
+	setenv("SPLASH_START_TIME",start_time_str,1);
+
+	// launch command
+        command_child_pid=fork();
+        if(command_child_pid==0){
+          execvp(real_interp,argv);	
+        }
+    }      
+    error = waitpid(image_child_pid, &status, 0);
+
+    if(command_child_pid){
+      int r = waitpid(command_child_pid, &status, 0);
+      if(r){
+        kano_log_error("kano-splash: error from child\n");
+      }
     }
     return error;
 }
