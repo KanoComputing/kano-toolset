@@ -3,15 +3,59 @@ Maintainer: Team Kano <dev@kano.me>
 Section: admin
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), libraspberrypi-dev, libpng12-dev
+Build-Depends: debhelper (>= 9), libraspberrypi-dev, libpng12-dev, python-dev,
+               gcc, g++
 
 Package: kano-toolset
 Architecture: any
 Depends: ${misc:Depends}, python-gtk2, python-webkit,
          fping, python, zenity, bc, ifplugd, python-yaml, python-pyinotify,
          resolvconf, libpng12-0, libraspberrypi-bin, procps, x11-utils, dbus,
-         wmctrl, libc-bin
+         wmctrl, libc-bin, libkano-networking
 Replaces: kano-init (<< 1.0-46)
 Breaks: kano-init (<< 1.0-46)
 Description: Collection of tools for Kanux
  Contains mostly generic tools that are used at many places in Kano OS.
+
+Package: libkano-python
+Architecture: any
+Depends: ${misc:Depends},
+         python
+Description: Python helper libraries
+ Libraries to help with Python interfacing
+
+Package: libkano-python-dbg
+Architecture: any
+Depends: ${misc:Depends},
+         python
+Description: Python helper libraries
+ Libraries to help with Python interfacing
+
+Package: libkano-python-dev
+Architecture: any
+Depends: ${misc:Depends},
+         python,
+         libkano-python (= ${source:Version})
+Description: Python helper libraries with debug symbols
+ Libraries to help with Python interfacing
+
+Package: libkano-networking
+Architecture: any
+Breaks: kano-toolset (<< 3.1.0-1)
+Replaces: kano-toolset (<< 3.1.0-1)
+Depends: ${misc:Depends}
+Description: Networking helper functions
+ Libraries supply and interface with networking functionality
+
+Package: libkano-networking-dbg
+Architecture: any
+Depends: ${misc:Depends}
+Description: Networking helper functions with debug symbols
+ Libraries supply and interface with networking functionality
+
+Package: libkano-networking-dev
+Architecture: any
+Depends: ${misc:Depends},
+         libkano-networking (= ${source:Version})
+Description: Networking helper functions
+ Libraries supply and interface with networking functionality

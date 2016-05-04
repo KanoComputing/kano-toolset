@@ -2,3 +2,8 @@
 
 %:
 	dh $@
+
+.PHONY: override_dh_strip
+override_dh_strip:
+	dh_strip -plibkano-networking --dbg-package=libkano-networking-dbg
+	dh_strip -plibkano-python --dbg-package=libkano-python-dbg
