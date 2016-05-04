@@ -9,3 +9,7 @@ Files: kano-splash
 Copyright: 2013 Andrew Duncan, 2015 Kano Computing Ltd
 License: MIT
 Source: https://github.com/AndrewFromMelbourne/raspidmx
+
+Files: libs/parson/lib/*
+Copyright: 2012-2016 Krzysztof Gabis (kgabis@gmail.com)
+License: MIT
