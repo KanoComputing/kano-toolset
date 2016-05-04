@@ -9,13 +9,16 @@ PLATFORM := $(shell uname)
 
 ifeq ($(PLATFORM), Linux)
 	SONAME_FLAG=-soname
+	SONAME=libkano_python.so.1
+	LD_TYPE=-shared
 else ifeq ($(PLATFORM), Darwin)
 	SONAME_FLAG=-install_name
+	SONAME=libkano_python.dylib
+	LD_TYPE=-dynamiclib
 endif
 
-SONAME=libkano_python.so.1
 CXXFLAGS+=-Wall -Wextra -O3 -fPIC -c -std=c++11 `python-config --cflags`
-LDFLAGS+=-shared -Wl,$(SONAME_FLAG),$(SONAME) `python-config --ldflags`
+LDFLAGS+=$(LD_TYPE) -Wl,$(SONAME_FLAG),$(SONAME) `python-config --ldflags`
 INCLUDES+=-I./includes
 OBJS=python_helpers.so
 

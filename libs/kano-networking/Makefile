@@ -9,13 +9,16 @@ PLATFORM := $(shell uname)
 
 ifeq ($(PLATFORM), Linux)
 	SONAME_FLAG=-soname
+	SONAME=libkano_networking.so.1
+	LD_TYPE=-shared
 else ifeq ($(PLATFORM), Darwin)
 	SONAME_FLAG=-install_name
+	SONAME=libkano_networking.dylib
+	LD_TYPE=-dynamiclib
 endif
 
-SONAME=libkano_networking.so.1
 CFLAGS+=-Wall -Wextra -g -fPIC -c
-LDFLAGS+=-shared -Wl,$(SONAME_FLAG),$(SONAME)
+LDFLAGS+=$(LD_TYPE) -Wl,$(SONAME_FLAG),$(SONAME)
 INCLUDES+=-I./includes
 OBJS=ifaces.so
 
