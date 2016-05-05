@@ -2,9 +2,9 @@
 # Placeholder makefile so "debuild" can be gently persuaded to work
 #
 
-.PHONY: kano-keys-pressed kano-splash kano-launcher kano-logging kano-networking kano-python
+.PHONY: kano-keys-pressed kano-splash kano-launcher kano-logging kano-networking kano-python parson
 
-all: kano-keys-pressed kano-splash kano-launcher kano-networking kano-python
+all: kano-keys-pressed kano-splash kano-launcher kano-networking kano-python parson
 
 kano-keys-pressed:
 	cd kano-keys-pressed && make
@@ -25,3 +25,7 @@ kano-networking:
 kano-python:
 	cd libs/kano-python && make
 	cd libs/kano-python && make debug
+
+parson:
+	cd libs/parson && make
+	cd libs/parson && make debug

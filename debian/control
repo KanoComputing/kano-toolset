@@ -59,3 +59,22 @@ Depends: ${misc:Depends},
          libkano-networking (= ${source:Version})
 Description: Networking helper functions
  Libraries supply and interface with networking functionality
+
+Package: libparson
+Architecture: any
+Depends: ${misc:Depends}
+Description: JSON library
+ JSON library by Krzysztof Gabis
+
+Package: libparson-dbg
+Architecture: any
+Depends: ${misc:Depends}
+Description: Debug version of JSON library
+ Debug version of JSON library by Krzysztof Gabis
+
+Package: libparson-dev
+Architecture: any
+Depends: ${misc:Depends},
+         libparson (= ${source:Version})
+Description: Dev version of JSON library
+ Dev version of JSON library by Krzysztof Gabis
