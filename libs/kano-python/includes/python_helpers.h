@@ -15,8 +15,10 @@
 #include <string>
 
 PyObject *new_pyobject(PyObject *o);
+PyObject *new_pyobject(int o);
 PyObject *new_pyobject(long o);
 PyObject *new_pyobject(double o);
+PyObject *new_pyobject(bool o);
 PyObject *new_pyobject(std::string o);
 PyObject *new_pyobject(char *o);
 void fill_tuple(PyObject *tuple, int pos);
