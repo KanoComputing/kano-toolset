@@ -82,3 +82,8 @@ def get_volume():
         pass
 
     return percent
+
+
+def set_volume(percent):
+    cmd = 'amixer set Master {}%'.format(percent)
+    run_cmd(cmd)

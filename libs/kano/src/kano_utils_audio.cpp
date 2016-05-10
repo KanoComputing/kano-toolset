@@ -83,3 +83,12 @@ long kano::utils::audio::get_volume() const
 
     return vol;
 }
+
+
+void kano::utils::audio::set_volume(float percent) const
+{
+    this->run_func(
+        "set_volume",
+        new_tuple(percent)
+    );
+}

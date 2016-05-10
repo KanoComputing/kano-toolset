@@ -39,6 +39,7 @@ namespace kano {
                 bool play_sound(const std::string audio_file, const bool background=false) const;
                 long percent_to_millibel(const int percent, const bool raspberry_mod=false) const;
                 long get_volume() const;
+                void set_volume(float percent) const;
         };
     }
 
