@@ -1,1 +1,2 @@
-libs/kano-python/debug/libkano_python.so.1 usr/lib/debug/usr/lib/
+#!/usr/bin/dh-exec
+libs/kano-python/debug/libkano_python.so => usr/lib/debug/usr/lib/libkano_python.so.1

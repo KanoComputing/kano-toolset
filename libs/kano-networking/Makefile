@@ -9,7 +9,7 @@ PLATFORM := $(shell uname)
 
 ifeq ($(PLATFORM), Linux)
 	SONAME_FLAG=-soname
-	SONAME=libkano_networking.so.1
+	SONAME=libkano_networking.so
 	LD_TYPE=-shared
 else ifeq ($(PLATFORM), Darwin)
 	SONAME_FLAG=-install_name

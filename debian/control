@@ -3,8 +3,8 @@ Maintainer: Team Kano <dev@kano.me>
 Section: admin
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), libraspberrypi-dev, libpng12-dev, python-dev,
-               gcc, g++
+Build-Depends: debhelper (>= 9), dh-exec, libraspberrypi-dev, libpng12-dev,
+               python-dev, gcc, g++
 
 Package: kano-toolset
 Architecture: any
@@ -28,7 +28,7 @@ Package: libkano-python-dbg
 Architecture: any
 Depends: ${misc:Depends},
          python
-Description: Python helper libraries
+Description: Python helper libraries with debug symbols
  Libraries to help with Python interfacing
 
 Package: libkano-python-dev
@@ -36,8 +36,33 @@ Architecture: any
 Depends: ${misc:Depends},
          python,
          libkano-python (= ${source:Version})
-Description: Python helper libraries with debug symbols
- Libraries to help with Python interfacing
+Description: Development versions of python helper libraries
+ Development libraries to help with Python interfacing
+
+Package: libkano
+Architecture: any
+Depends: ${misc:Depends},
+         python,
+         libkano-python
+Description: Libraries for the 'kano' module
+ Libraries to interface with the 'kano' Python module
+
+Package: libkano-dbg
+Architecture: any
+Depends: ${misc:Depends},
+         python,
+         libkano-python
+Description: Libraries for the 'kano' module with debug symbols
+ Libraries to interface with the 'kano' Python module with debug symbols
+
+Package: libkano-dev
+Architecture: any
+Depends: ${misc:Depends},
+         python,
+         libkano-python-dev,
+         libkano (= ${source:Version})
+Description: Development libraries for the 'kano' module
+ Development libraries to interface with the 'kano' Python module
 
 Package: libkano-networking
 Architecture: any

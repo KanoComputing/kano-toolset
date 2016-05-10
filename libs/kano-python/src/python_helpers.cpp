@@ -12,7 +12,7 @@
 #include <string>
 #include <iostream>
 
-#include "python_helpers.h"
+#include "kano/python/python_helpers.h"
 
 
 /**
@@ -21,6 +21,12 @@
 PyObject *new_pyobject(PyObject *o)
 {
     return o;
+}
+
+
+PyObject *new_pyobject(int o)
+{
+    return new_pyobject(static_cast<long>(o));
 }
 
 
@@ -33,6 +39,16 @@ PyObject *new_pyobject(long o)
 PyObject *new_pyobject(double o)
 {
     return PyFloat_FromDouble(o);
+}
+
+
+PyObject *new_pyobject(bool o)
+{
+    if (o) {
+        Py_RETURN_TRUE;
+    } else {
+        Py_RETURN_FALSE;
+    }
 }
 
 

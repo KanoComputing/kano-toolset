@@ -10,3 +10,10 @@
 *.a
 *.so*
 *.dylib
+
+# Compiled files
+kano-keys-pressed/kano-keys-pressed
+kano-launcher/kano-kill-ns
+kano-launcher/kano-launcher
+kano-splash/kano-get-start-time
+kano-splash/kano-splash
