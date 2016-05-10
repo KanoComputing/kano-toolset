@@ -16,7 +16,7 @@
 #include <unordered_map>
 
 #include <kano/python/python_helpers.h>
-#include "kano_bindings.h"
+#include "kano/kano/kano_bindings.h"
 
 
 std::unordered_map<std::string, std::string> parse_dict(PyObject *py_dict)

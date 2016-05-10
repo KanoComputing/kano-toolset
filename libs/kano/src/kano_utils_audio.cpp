@@ -16,7 +16,7 @@
 #include <string>
 
 #include <kano/python/python_helpers.h>
-#include "kano_bindings.h"
+#include "kano/kano/kano_bindings.h"
 
 
 kano::utils::audio::audio():

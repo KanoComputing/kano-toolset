@@ -1,1 +1,2 @@
-libs/kano/release/libkano.so.1 usr/lib/
+#!/usr/bin/dh-exec
+libs/kano/release/libkano.so => usr/lib/libkano.so.1

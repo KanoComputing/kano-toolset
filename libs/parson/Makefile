@@ -13,7 +13,7 @@ PLATFORM := $(shell uname)
 
 ifeq ($(PLATFORM), Linux)
 	SONAME_FLAG=-soname
-	SONAME=libparson.so.1
+	SONAME=libparson.so
 	LD_TYPE=-shared
 else ifeq ($(PLATFORM), Darwin)
 	SONAME_FLAG=-install_name

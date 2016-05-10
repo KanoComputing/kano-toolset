@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "ifaces.h"
+#include "kano/networking/ifaces.h"
 
 /**
  * Search through the available interfaces and return the first available

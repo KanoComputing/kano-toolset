@@ -1,1 +1,2 @@
-libs/parson/release/libparson.so.1 usr/lib/
+#!/usr/bin/dh-exec
+libs/parson/release/libparson.so => usr/lib/libparson.so.1

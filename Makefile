@@ -18,9 +18,9 @@ kano-launcher: kano-logging
 kano-logging:
 	cd kano-logging && make
 
-kano:
-	cd libs/kano && make
-	cd libs/kano && make debug
+kano: kano-python
+	cd libs/kano && LOCAL_BUILD=1 make
+	cd libs/kano && LOCAL_BUILD=1 make debug
 
 kano-networking:
 	cd libs/kano-networking && make

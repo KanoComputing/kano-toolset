@@ -1,2 +1,3 @@
-libs/kano-networking/release/libkano_networking.so.1 usr/lib/
+#!/usr/bin/dh-exec
+libs/kano-networking/release/libkano_networking.so => usr/lib/libkano_networking.so.1
 libs/kano-networking/pyinterface/* usr/lib/python2.7/dist-packages/kano_networking/
