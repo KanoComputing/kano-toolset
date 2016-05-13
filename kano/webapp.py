@@ -94,6 +94,9 @@ class WebApp(object):
         view.connect('close-web-view', self._close)
         view.connect('onload-event', self._onload)
 
+        language = os.getenv('LANG').replace('_', '-')
+        view.execute_script("window.navigator.userLanguage = '%s'" % language)
+
         if self._inspector:
             view.get_settings().set_property("enable-developer-extras", True)
 
