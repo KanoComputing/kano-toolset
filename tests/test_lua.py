@@ -76,7 +76,8 @@ def random_value(use_float=True, max_depth=5, max_items=1000):
         return randint(0, min(max_items, choice([3, 10, 100, 1000])))
 
     def r_char_unicode():
-        return unichr(randint(0, choice([256, 256 * 256-1])))
+        # don't test code points in the reserved 'high surrogate' area
+        return unichr(randint(0, choice([256, 0xD7FF])))
 
     def r_str(r_char=r_char_ascii):
         return ''.join([r_char() for i in xrange(r_len())])
@@ -160,6 +161,7 @@ def compare(x, y):
     def icmp(x, y):
         equal = x == y
         if not equal:
+            fail()
             print "mismatch: ", x, y
         return res(equal)
 
@@ -203,7 +205,8 @@ def do_test_json(files, j, use_streq):
         ltc.write(sj)
 
     # convert lua back
-    rc = os.system("lua -e 'package.path=package.path..\";./kano/utils/lua/?.lua\"' ./kano/utils/lua/lua_to_json.lua " +
+    dirpath = os.path.dirname(luon.__file__)
+    rc = os.system("lua -e 'package.path=package.path..\";{}/?.lua\"' {}/lua_to_json.lua ".format(dirpath, dirpath) +
                    files.lua_test_file + " " + files.lua_out_json)
 
     if rc != 0:
@@ -228,17 +231,17 @@ def do_test_json(files, j, use_streq):
     return (equal, "compare")
 
 
-def run_tests(jfile=None):
+def run_tests(jfile=None, set_float=True):
     all_succeeded = True
     os.system("mkdir temp")
 
     if jfile:
         # For rerunning a test, pass its json file as argument
 
-        print "Loading: ", sys.argv[1]
-        with open(sys.argv[1]) as jf:
+        print "Loading: ", jfile
+        with open(jfile) as jf:
             j = json.load(jf)
-        success, errmsg = do_test_json(j)
+        success, errmsg = do_test_json(tfilenames('t'),j,int(set_float))
         if not success:
             print "FAILED test {}".format(json.dumps(j))
             all_succeeded = False
@@ -272,12 +275,12 @@ def run_tests(jfile=None):
         return all_succeeded
 
 
-class TestRaspberryPIModels(unittest.TestCase):
+class TestLua(unittest.TestCase):
     def test_lua_json(self):
         self.assertTrue(run_tests())
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        run_tests(sys.argv[1])
+    if len(sys.argv) == 3:
+        run_tests(sys.argv[1], sys.argv[2])
     else:
         unittest.main()
