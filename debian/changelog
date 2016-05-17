@@ -1,3 +1,9 @@
+kano-toolset (3.3.0-1) unstable; urgency=low
+
+  * Add Kano Dialog programmatic close option
+
+ -- Team Kano <dev@kano.me>  Tue, 17 May 2016 18:05:00 +0100
+
 kano-toolset (3.2.0-1) unstable; urgency=low
 
   * Add python module for outputting data to lua
