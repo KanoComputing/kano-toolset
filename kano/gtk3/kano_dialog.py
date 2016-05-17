@@ -254,6 +254,17 @@ class KanoDialog():
 
         return self.returnvalue
 
+    def close(self):
+        '''
+        Use this method if your app is nesting several Kano Dialogs,
+        and you need to step through without stacking them up.
+        '''
+        self.dialog.destroy()
+
+        # Dispatch events so Gtk has a chance to close the dialog
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+
     def set_text(self, title_text, description_text):
         self.title_text = title_text
         self.description_text = description_text
