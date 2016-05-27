@@ -94,7 +94,7 @@ class WebApp(object):
         view.connect('close-web-view', self._close)
         view.connect('onload-event', self._onload)
 
-        language = os.getenv('LANG').replace('_', '-')
+        language = self._get_browser_lang()
         view.execute_script("window.navigator.userLanguage = '%s'" % language)
 
         if self._inspector:
@@ -288,3 +288,16 @@ class WebApp(object):
         import ast
 
         return ast.literal_eval(s) if isinstance(s, basestring) else s
+
+    @staticmethod
+    def _get_browser_lang():
+        '''
+        Get brower language (BCP47), based on OS LANG environment variable (ISO15897).
+        '''
+        LANG = os.getenv('LANG')
+
+        (langcode, charset) = LANG.split('.') if '.' in LANG else (LANG, '')
+        (language, country) = langcode.split('_') if '_' in langcode else (langcode, '')
+
+        return language + '-' + country
+
