@@ -15,7 +15,7 @@
 
 
 
-def escape_char(c):
+def escape_char(c, ascii_only):
     '''
     Escape char 'c' for use in a lua string.
 
@@ -23,16 +23,19 @@ def escape_char(c):
     '''
 
     if ord(c) < ord(' ') or ord(c) >= 127 or c == '"' or c == '\\':
-        return '\\{:03d}'.format(ord(c))
+        if ascii_only:
+            return ''
+        else:
+            return '\\{:03d}'.format(ord(c))
     else:
         return c
 
 
-def escape_string(s):
+def escape_string(s, ascii_only):
     '''
     Escape a whole LSON string
     '''
-    return ''.join([escape_char(c) for c in s])
+    return ''.join([escape_char(c, ascii_only) for c in s])
 
 NL = '\n'
 
@@ -79,7 +82,7 @@ class lines:
         return self.lines+self.curr
 
 
-def to_lua_lines(lines, obj):
+def to_lua_lines(lines, obj, ascii_only):
     '''
     Convert a data item to lua, adding to the 'lines' object
     '''
@@ -89,16 +92,16 @@ def to_lua_lines(lines, obj):
         lines += 'json_nil'
     elif isinstance(obj, str):
         lines += '"'
-        lines += escape_string(obj)
+        lines += escape_string(obj, ascii_only)
         lines += '"'
     elif isinstance(obj, unicode):
-        to_lua_lines(lines, obj.encode('utf8'))
+        to_lua_lines(lines, obj.encode('utf8'), ascii_only)
     elif isinstance(obj, list):
         lines + '{'
         lines.push()
         for i in obj:
             lines += NL
-            to_lua_lines(lines, i)
+            to_lua_lines(lines, i, ascii_only)
             lines += ','
         lines += '}'
         lines.pop()
@@ -110,9 +113,9 @@ def to_lua_lines(lines, obj):
             if not isinstance(k, str) and not isinstance(k, unicode):
                 raise Exception()
             lines += '['
-            to_lua_lines(lines, k)
+            to_lua_lines(lines, k, ascii_only)
             lines += '] = '
-            to_lua_lines(lines, i)
+            to_lua_lines(lines, i, ascii_only)
             lines += ', '+NL
         lines.pop()
         lines += '}'
@@ -128,7 +131,7 @@ def to_lua_lines(lines, obj):
     return lines
 
 
-def dumps(x):
+def dumps(x, ascii_only=False):
     '''
     Convert a data item to lua module, returning as a string
     '''
@@ -136,7 +139,7 @@ def dumps(x):
     l += "function f(json_nil)\n"
     l.push()
     l += "local val ="
-    to_lua_lines(l, x)
+    to_lua_lines(l, x, ascii_only)
     l += "\n"
     l += "return val"
     l += "\n"
