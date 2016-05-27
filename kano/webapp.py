@@ -296,8 +296,8 @@ class WebApp(object):
         '''
         LANG = os.getenv('LANG')
 
-        (langcode, charset) = LANG.split('.') if '.' in LANG else (LANG, '')
-        (language, country) = langcode.split('_') if '_' in langcode else (langcode, '')
+        (langcode, charset) = LANG.split('.')[:2] if '.' in LANG else (LANG, '')
+        (language, country) = langcode.split('_')[:2] if '_' in langcode else (langcode, '')
 
-        return language + '-' + country if country else language
+        return '%s-%s' % (language, country) if country else language
 
