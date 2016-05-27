@@ -299,5 +299,5 @@ class WebApp(object):
         (langcode, charset) = LANG.split('.') if '.' in LANG else (LANG, '')
         (language, country) = langcode.split('_') if '_' in langcode else (langcode, '')
 
-        return language + '-' + country
+        return language + '-' + country if country else language
 
