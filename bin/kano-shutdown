@@ -135,6 +135,7 @@ class ShutdownOptions(ApplicationWindow):
             e.window = self.get_root_window()
             e.send_event = True
             the_button.emit('button-press-event', e)
+            return
 
         if event and event.get_keyval()[1] == Gdk.KEY_Escape:
             Gtk.main_quit()
