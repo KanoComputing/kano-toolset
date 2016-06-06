@@ -125,7 +125,17 @@ class ShutdownOptions(ApplicationWindow):
     def _on_key_press(self, window=None, event=None):
         """
         The ESC key will also dismiss any action and return to Desktop
+        And the Enter key will press the button with the current focus.
         """
+        if event and event.get_keyval()[1] == Gdk.KEY_Return:
+            # If the Enter key is pressed, send a click event
+            # to the button that has the input focus.
+            the_button=window.get_focus()
+            e = Gdk.Event()
+            e.window = self.get_root_window()
+            e.send_event = True
+            the_button.emit('button-press-event', e)
+
         if event and event.get_keyval()[1] == Gdk.KEY_Escape:
             Gtk.main_quit()
 
