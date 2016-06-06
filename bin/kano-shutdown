@@ -44,6 +44,11 @@ class ShutdownOptions(ApplicationWindow):
         self.set_default_size(width, height)
         self.set_decorated(False)
 
+        # Keep dialog always on top, and remove the taskbar icon
+        # Clicking anywhere outside the dialog keeps app focused.
+        self.set_keep_above(True)
+        self.set_skip_taskbar_hint(True)
+
         # Create ad eventbox that has all the action buttons and image
         background = Gtk.EventBox()
 
