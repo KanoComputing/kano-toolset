@@ -188,6 +188,8 @@ def get_rpi_model(revision=None):
             model_name = RPI_ZERO_KEY
         elif int(revision, 16) & 0x00FFFFFF == 0x00a02082:
             model_name = RPI_3_KEY
+        elif int(revision, 16) & 0x00FFFFFF == 0x00a22082:
+            model_name = RPI_3_KEY
         else:
             model_name = 'unknown revision: {}'.format(revision)
 
