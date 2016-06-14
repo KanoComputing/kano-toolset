@@ -20,15 +20,25 @@ to
 #!/usr/bin/kano-splash /usr/share/kano-foo/splash/png /usr/bin/env python 
 ```
 
-The app mush then call `system("kano-stop-splash")` to stop the splash (or wait for it to time out at 15 seconds). 
+The app mush then call `system("kano-stop-splash")` to stop the splash (or wait for it to time out at 15 seconds).
 
-Alternatively, the app can call
+Parameters can also be passed on the shebang with the ampersand delimiter, for example:
+
+```
+#!/usr/bin/kano-splash /usr/share/kano-foo/splash/png&t=60&b=0xffff /usr/bin/env python 
+```
+
+Would set the timeout to 60 seconds and show the splash image on a white background.
+
+Alternatively, the app can call:
 
 ```
  $ kano-start-splash -b <alpha> -t  <timeout> <splashfile>
 ```
 
-It must then save the PID and start time so that kano-stop-splash can determine which process to signal.
+Which is a symbolic link to `kano-splash`.
+
+It must then save the PID and start time so that `kano-stop-splash` can determine which process to signal.
 This is how to do that in bash:
 
 ```
