@@ -168,7 +168,7 @@ class Logger:
             if self._app_name is None:
                 self.set_app_name(sys.argv[0])
 
-            lines = str(msg).strip().split("\n")
+            lines = unicode(msg).strip().split(u"\n")
 
             log = {}
             log["pid"] = self._pid
@@ -180,7 +180,7 @@ class Logger:
             if 'exception' in kwargs:
                 import traceback
                 tbk = traceback.format_exc()
-                log['exception'] = str(kwargs['exception'])
+                log['exception'] = unicode(kwargs['exception'])
                 log['traceback'] = tbk
 
             for line in lines:
@@ -190,13 +190,13 @@ class Logger:
                 if level <= sys_log_level:
                     if self._log_file is None:
                         self._init_log_file()
-                    self._log_file.write("{}\n".format(json.dumps(log)))
+                    self._log_file.write(u"{}\n".format(json.dumps(log)))
 
                     if self._force_flush or force_flush:
                         self.sync()
 
                 if level <= sys_output_level:
-                    output_line = "{}[{}] {} {}\n".format(
+                    output_line = u"{}[{}] {} {}\n".format(
                         self._app_name,
                         decorate_string_only_terminal(self._pid, "yellow"),
                         decorate_with_preset(log["level"], log["level"], True),
@@ -280,7 +280,7 @@ def _set_conf_var(var, value):
     if conf is None:
         conf = {}
 
-    conf[var] = normalise_level(str(value))
+    conf[var] = normalise_level(unicode(value))
 
     with open(CONF_FILE, "w") as f:
         f.write(yaml.dump(conf, default_flow_style=False))
@@ -338,19 +338,19 @@ def __tail_log_file(file_path, length):
 def log_excepthook(exc_class, exc_value, tb):
     import traceback
 
-    tb_txt = ''.join(traceback.format_tb(tb))
+    tb_txt = u''.join(traceback.format_tb(tb))
     try:
         (filename, number, function, line_text) = traceback.extract_tb(tb)[-1]
-        exc_txt = "{} line {} function {} [{}]".format(
+        exc_txt = u"{} line {} function {} [{}]".format(
             filename, number, function, line_text)
     except:
-        exc_txt = ""
+        exc_txt = u""
 
-    logger.error("Unhandled exception '{}' at {}"
+    logger.error(u"Unhandled exception '{}' at {}"
                  .format(exc_value, exc_txt),
                  traceback=tb_txt,
-                 exc_class=str(exc_class),
-                 exc_value=str(exc_value))
+                 exc_class=unicode(exc_class),
+                 exc_value=unicode(exc_value))
     sys.__excepthook__(exc_class, exc_value, tb)
 
 sys.excepthook = log_excepthook
