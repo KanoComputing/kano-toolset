@@ -78,7 +78,7 @@ def get_log_data(path):
 def show_logs(app=None, linearised=False, tracebacks=False):
     logfiles = get_logfiles(app)
 
-    output = ""
+    output = []
     if linearised:
         all_data = []
         for log in logfiles:
@@ -89,43 +89,44 @@ def show_logs(app=None, linearised=False, tracebacks=False):
     else:
         for log in logfiles:
             label = decorate_string_only_terminal("LOGFILE", "green")
-            output += "{}: {}\n".format(label, log)
-            output += format_log_data(get_log_data(log), tracebacks=tracebacks) + "\n"
+            output.append(u"{}: {}\n".format(label, log))
+            output.append(format_log_data(get_log_data(log), tracebacks=tracebacks) + u"\n")
+    output = ''.join(output)
 
     if len(output) > 0:
         pydoc.pipepager(output, cmd='less -R')
 
 
 def format_log_data(data, default_app_name="", tracebacks=False):
-    output = ""
+    output = []
 
     for entry in data:
         app_name = default_app_name
         if "app_name" in entry:
             app_name = entry["app_name"]
 
-        opt = ''
+        opt = u''
         if "exception" in entry:
-            opt += decorate_string_only_terminal(entry['exception'], "light-magenta") + ' '
+            opt += decorate_string_only_terminal(entry['exception'], "light-magenta") + u' '
         if "traceback" in entry:
-            opt += decorate_string_only_terminal('[TBK] ', "light-magenta")
+            opt += decorate_string_only_terminal(u'[TBK] ', "light-magenta")
 
         dt = datetime.datetime.fromtimestamp(entry["time"])
         time = dt.strftime('%Y-%m-%d %H:%M:%S')
-        output += "{} {}[{}] {} {}{}\n".format(
+        output.append(u"{} {}[{}] {} {}{}\n".format(
             decorate_string_only_terminal(time, "cyan"),
             app_name,
             decorate_string_only_terminal(entry["pid"], "yellow"),
             decorate_with_preset(entry["level"], entry["level"], True),
             opt,
             entry["message"]
-        )
+        ))
         if tracebacks and "traceback" in entry:
             lines = entry['traceback'].split('\n')
             lines = [decorate_string_only_terminal(l, 'light-magenta') for l in lines]
-            output += '\n' + '\n'.join(lines)
+            output += u'\n' + '\n'.join(lines)
 
-    return output
+    return ''.join(output)
 
 
 class EventHandler(pyinotify.ProcessEvent):
