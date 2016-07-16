@@ -27,12 +27,6 @@ In this example, we're going to add a French translation:
     
     cd ..
 
-    # prepare for testing as described in README.md
-    # then change this in /usr/share/xgreeters/kano-greeter-devel.desktop
-    Exec=dash -c "LC_ALL=fr_FR.utf8 /path/to/repo/bin/kano-greeter"
-    
-    # run test as in described in README.md
-
 ## How to make sure your code is i18n-aware
 
 Add the gettext `_()` macro to all the user-visible message strings in your Python. List the Python source files that contain message strings in `PYPOTFILES`.
