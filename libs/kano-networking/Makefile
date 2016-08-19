@@ -8,22 +8,23 @@
 PLATFORM := $(shell uname)
 
 ifeq ($(PLATFORM), Linux)
-	SONAME_FLAG=-soname
-	SONAME=libkano_networking.so
-	LD_TYPE=-shared
+	SONAME_FLAG = -soname
+	SONAME = libkano_networking.so
+	LD_TYPE = -shared
 else ifeq ($(PLATFORM), Darwin)
-	SONAME_FLAG=-install_name
-	SONAME=libkano_networking.dylib
-	LD_TYPE=-dynamiclib
+	SONAME_FLAG = -install_name
+	SONAME = libkano_networking.dylib
+	LD_TYPE = -dynamiclib
 endif
 
-CFLAGS+=-Wall -Wextra -g -fPIC -c
-LDFLAGS+=$(LD_TYPE) -Wl,$(SONAME_FLAG),$(SONAME)
-INCLUDES+=-I./includes
-OBJS=ifaces.so
+CFLAGS += -Wall -Wextra -g -fPIC -c
+LDFLAGS += $(LD_TYPE) -Wl,$(SONAME_FLAG),$(SONAME)
+INCLUDES += -I./includes
+OBJS = ifaces.so
 
-OUTDIR=release
-DEBUG_OUTDIR=debug
+OUTDIR = release
+DEBUG_OUTDIR = debug
+
 
 all: ensure-dir $(SONAME)
 
@@ -41,6 +42,9 @@ $(SONAME): $(OBJS)
 %.so: src/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $(OUTDIR)/$@
 
+
+clean: clean-release clean-debug
+
 clean-release:
 	@rm -f $(OUTDIR)/$(OBJS)
 	@rm -f $(OUTDIR)/$(SONAME)
@@ -49,4 +53,11 @@ clean-debug:
 	@rm -f $(DEBUG_OUTDIR)/$(OBJS)
 	@rm -f $(DEBUG_OUTDIR)/$(SONAME)
 
-clean: clean-release clean-debug
+link: all  # for Mac OS
+	mkdir -p /usr/local/include/kano
+	ln -fs `pwd`/includes/kano/* /usr/local/include/kano
+	ln -fs `pwd`/release/$(SONAME) /usr/local/lib
+
+unlink: all  # for Mac OS
+	rm -rf /usr/local/include/kano/networking
+	rm -f /usr/local/lib/$(SONAME)
