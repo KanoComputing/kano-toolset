@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 %:
+	cd po && make
 	dh $@
 
 .PHONY: override_dh_strip
