@@ -17,8 +17,9 @@ RESOLV_CONF="/etc/resolv.conf"
 
 . /usr/share/kano-toolset/logging.sh
 
-# Hook script to be called when network DHCP events occur
+# Hook scripts to be called when network DHCP events occur
 network_hook="/usr/bin/kano-network-hook"
+updates_hook="/usr/bin/kano-dashboard-sysupdates"
 
 # Config files in kano-settings
 SERVER_CONFIG='/usr/bin/start-sentry-server'
@@ -29,8 +30,14 @@ function call_hook {
     # If bound or renew, the IP address of the lease will be given through the second parameter
     # The script will run as the superuser and started in the background, the return code is meaningless.
 
+    # Collect and report RPi CPU ID
     if [ -x $network_hook ]; then
         $network_hook $@ &
+    fi
+
+    # Download updates in the background
+    if [ -x $updates_hook ]; then
+        $updates_hook $@ &
     fi
 }
 
