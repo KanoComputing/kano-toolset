@@ -8,6 +8,8 @@
 
 import os
 
+kanux_stamp_file='/boot/kanux_stamp'
+
 
 def is_jessie():
     '''
@@ -37,3 +39,47 @@ def is_systemd():
         return os.readlink('/sbin/init') == '/lib/systemd/systemd'
     except Exception:
         return False
+
+
+def get_kano_version_stamp():
+    '''
+    Returns the raw string from the version stamp file
+    '''
+    with open(kanux_stamp_file, 'r') as f:
+        return f.read().strip(' \n')
+
+
+def get_kano_version_date():
+    '''
+    Returns the date this version was built
+    '''
+    try:
+        return get_kano_version_stamp().split('-')[0].strip('Kanux')
+    except:
+        return 'n/a'
+
+
+def get_kano_version_number():
+    '''
+    returns the Kano OS version number
+    '''
+    stamp=get_kano_version_stamp().split('-')
+    for item in stamp:
+        if item.startswith('v'):
+            return item
+
+    return 'n/a'
+
+
+def is_kano_public_release():
+    '''
+    returns True if this Kano system is a public release version
+    '''
+    return 'release' in get_kano_version_stamp().split('-')
+
+
+def is_kano_internal_development():
+    '''
+    returns True if this Kano system is an internal development version
+    '''
+    return not is_kano_public_release()
