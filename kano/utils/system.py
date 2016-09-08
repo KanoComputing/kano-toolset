@@ -44,6 +44,8 @@ def is_systemd():
 def get_kano_version_stamp():
     '''
     Returns the raw string from the version stamp file
+    Kanux version stamps come in this form:
+       " Sat Sep  3 03:18:24 BST 2016 Kanux-Beta-v3.5.0-jessie"
     '''
     with open(kanux_stamp_file, 'r') as f:
         return f.read().strip(' \n')
@@ -54,6 +56,7 @@ def get_kano_version_date():
     Returns the date this version was built
     '''
     try:
+        # FIXME: This is a little obscure
         return get_kano_version_stamp().split('-')[0].strip('Kanux')
     except:
         return 'n/a'
