@@ -9,6 +9,10 @@
 #
 # Call kano-logs -h for help
 #
+# If you want to enable all log levels both on console and through "kano-logs show":
+#
+#  $ sudo kano-logs config -l debug -o debug
+#
 
 import os
 import re
