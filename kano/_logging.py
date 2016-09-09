@@ -286,9 +286,21 @@ def _set_conf_var(var, value):
         f.write(yaml.dump(conf, default_flow_style=False))
 
 
+def _get_log_dirs():
+    log_dirs = [SYSTEM_LOGS_DIR]
+    if os.getuid() != 0:
+        log_dirs.append(USER_LOGS_DIR)
+    else:
+        for f in os.listdir('/home'):
+            user_log_dir = '/home/{}/.kano-logs'.format(f)
+            if os.path.isdir(user_log_dir):
+                log_dirs.append(user_log_dir)
+    return log_dirs
+
+
 def read_logs(app=None):
     data = {}
-    for d in [USER_LOGS_DIR, SYSTEM_LOGS_DIR]:
+    for d in _get_log_dirs():
         if os.path.isdir(d):
             for log in os.listdir(d):
                 if app is None or re.match("^{}\.log".format(app), log):
