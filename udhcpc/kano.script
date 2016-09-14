@@ -32,12 +32,14 @@ function call_hook {
 
     # Collect and report RPi CPU ID
     if [ -x $network_hook ]; then
+        # TODO: investigate whether the process below would also need to pipe
+        # stdout and stderr to /dev/null if it uses run_cmd
         $network_hook $@ &
     fi
 
     # Download updates in the background
     if [ -x $updates_hook ]; then
-        $updates_hook $@ &
+        $updates_hook $@ > /dev/null 2>/dev/null &
     fi
 }
 
