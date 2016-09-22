@@ -9,6 +9,10 @@
 #
 # Call kano-logs -h for help
 #
+# If you want to enable all log levels both on console and through "kano-logs show":
+#
+#  $ sudo kano-logs config -l debug -o debug
+#
 
 import os
 import re
@@ -32,16 +36,9 @@ import pyinotify
 # Used for looking at logs off the pi. See -d option
 force_log_dirs = None
 
-def get_logfiles(app=None):
-    log_dirs = [logging.SYSTEM_LOGS_DIR]
-    if os.getuid() != 0:
-        log_dirs.append(logging.USER_LOGS_DIR)
-    else:
-        for f in os.listdir('/home'):
-            user_log_dir = '/home/{}/.kano-logs'.format(f)
-            if os.path.isdir(user_log_dir):
-                log_dirs.append(user_log_dir)
 
+def get_logfiles(app=None):
+    log_dirs = logging._get_log_dirs()
     if force_log_dirs is not None:
         log_dirs = force_log_dirs
 

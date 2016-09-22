@@ -10,6 +10,8 @@
 *.a
 *.so*
 *.dylib
+*.mo
+po/messages.pot
 
 # Compiled files
 kano-keys-pressed/kano-keys-pressed
