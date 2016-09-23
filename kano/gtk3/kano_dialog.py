@@ -78,7 +78,7 @@ class KanoDialog():
 
         # If button_info is None, or an empty dictionary or list, default to an OK button
         if not self.button_info:
-            button_defaults["label"] = "OK"
+            button_defaults['label'] = _("OK")
             self.button_info = [button_defaults]
 
         # convert button dictionary to list
@@ -125,13 +125,13 @@ class KanoDialog():
         return scrolledwindow
 
     def __add_orange_button(self, orange_info, kano_button_box):
-        orange_text = orange_info["name"]
-        orange_return_value = orange_info["return_value"]
+        orange_text = orange_info['name']
+        orange_return_value = orange_info['return_value']
 
         button_container = Gtk.ButtonBox(spacing=10)
         button_container.set_layout(Gtk.ButtonBoxStyle.SPREAD)
         self.orange_button = OrangeButton(orange_text)
-        self.orange_button.connect("button-release-event", self.exit_dialog, orange_return_value)
+        self.orange_button.connect('button-release-event', self.exit_dialog, orange_return_value)
 
         button_container.pack_start(self.orange_button, False, False, 0)
         button_container.pack_start(kano_button_box, False, False, 0)
@@ -144,17 +144,17 @@ class KanoDialog():
     def __colour_dialog_background(self):
         content_area = self.dialog.get_content_area()
         self.content_background = Gtk.EventBox()
-        self.add_style(self.content_background, "white")
+        self.add_style(self.content_background, 'white')
         self.content_background.set_size_request(140, 140)
         content_area.reparent(self.content_background)
         action_area = self.dialog.get_action_area()
         self.action_background = Gtk.EventBox()
-        self.add_style(self.action_background, "white")
+        self.add_style(self.action_background, 'white')
         action_area.reparent(self.action_background)
         action_area.set_layout(Gtk.ButtonBoxStyle.CENTER)
 
         # Set area around the buttons grey by default
-        self.set_action_background("grey")
+        self.set_action_background('grey')
 
         container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         container.add(self.content_background)
@@ -167,7 +167,7 @@ class KanoDialog():
         button_list = []
 
         for button_name, button_arguments in self.button_info.iteritems():
-            button_arguments["label"] = button_name
+            button_arguments['label'] = button_name
             button_list.append(button_arguments)
 
         self.button_info = button_list
@@ -184,24 +184,24 @@ class KanoDialog():
                     button[argument] = value
 
                     # Create default return values for OK and CANCEL buttons
-                    if argument == "return_value":
-                        if hasattr(button, "label"):
-                            if button["label"].upper() == "OK":
-                                button["return_value"] = 0
-                            elif button["label"].upper() == "CANCEL":
-                                button["return_value"] = 1
-                    if argument == "color":
-                        if button["label"].upper() == "CANCEL":
-                            button["color"] = "red"
+                    if argument == 'return_value':
+                        if hasattr(button, 'label'):
+                            if button['label'] == _("OK"):
+                                button['return_value'] = 0
+                            elif button['label'] == _("CANCEL"):
+                                button['return_value'] = 1
+                    if argument == 'color':
+                        if button['label'] == _("CANCEL"):
+                            button['color'] = 'red'
 
             color = button['color']
             return_value = button['return_value']
-            button_name = button["label"]
+            button_name = button['label']
 
             button = KanoButton(button_name)
             button.set_color(color)
-            button.connect("button-release-event", self.exit_dialog, return_value)
-            button.connect("key-release-event", self.exit_dialog, return_value)
+            button.connect('button-release-event', self.exit_dialog, return_value)
+            button.connect('key-release-event', self.exit_dialog, return_value)
             self.buttons.append(button)
             kano_button_box.pack_start(button, False, False, 6)
 
@@ -220,11 +220,11 @@ class KanoDialog():
             if self.has_entry:
                 # We have to click an OK button to get entry value
                 # May want to change this logic later to be more flexible
-                if button.get_label().upper() == "OK":
+                if button.get_label() == _("OK"):
                     self.returnvalue = self.widget.get_text()
             elif self.has_list:
                 # get selected radio button only if press the OK button
-                if button.get_label().upper() == "OK":
+                if button.get_label() == _("OK"):
                     self.returnvalue = radio_returnvalue
             # TODO: change the structure so we emit different signals depending on the button clicked
             self.dialog.response(Gtk.ResponseType.OK)
@@ -292,7 +292,7 @@ def parse_items(args):
     for arg in args:
         split = arg.split('=')
 
-        if split[0] == "button":
+        if split[0] == 'button':
             button_options = {}
             button_values = split[1].split(',')
             button_name = button_values[0]
@@ -303,7 +303,7 @@ def parse_items(args):
                         pair = value.split(':')
                         button_options[pair[0]] = pair[1]
 
-        if split[0] == "buttons":
+        if split[0] == 'buttons':
             buttons_arg = split[1].split(',')
             for button_arg in buttons_arg:
                 name, color, rc = button_arg.split(':')
@@ -312,23 +312,23 @@ def parse_items(args):
                     'return_value': int(rc),
                 }
 
-        if split[0] == "radiolist":
+        if split[0] == 'radiolist':
             widget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             has_list = True
-            radio_list = split[1].split(",")
+            radio_list = split[1].split(',')
             radio = Gtk.RadioButton.new_with_label_from_widget(None, radio_list[0])
-            radio.connect("toggled", on_button_toggled)
+            radio.connect('toggled', on_button_toggled)
             radio_returnvalue = radio_list[0]
             widget.pack_start(radio, False, False, 5)
             for i in radio_list[1:]:
                 r = Gtk.RadioButton.new_with_label_from_widget(radio, i)
-                r.connect("toggled", on_button_toggled)
+                r.connect('toggled', on_button_toggled)
                 widget.pack_start(r, False, False, 5)
 
-        elif split[0] == "entry":
+        elif split[0] == 'entry':
             widget = Gtk.Entry()
             has_entry = True
-            if len(split) == 2 and split[1] == "hidden":
+            if len(split) == 2 and split[1] == 'hidden':
                 widget.set_visibility(False)
 
         if split[0] == 'title':
@@ -337,13 +337,13 @@ def parse_items(args):
         if split[0] == 'description':
             description = split[1]
 
-        if split[0] == "scrolled_text":
+        if split[0] == 'scrolled_text':
             scrolled_text = split[1]
 
-        if split[0] == "global_style":
+        if split[0] == 'global_style':
             global_style = True
 
-        if split[0] == "no-taskbar":
+        if split[0] == 'no-taskbar':
             hide_from_taskbar = True
 
     return title, description, buttons, widget, has_entry, has_list, scrolled_text, global_style, hide_from_taskbar

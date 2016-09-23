@@ -49,5 +49,5 @@ def get_all_home_folders(root=False, skel=False):
 
 def enforce_root(msg):
     if os.getuid() != 0:
-        sys.stderr.write(msg + "\n")
+        sys.stderr.write(msg.encode('utf-8') + "\n")
         sys.exit(1)
