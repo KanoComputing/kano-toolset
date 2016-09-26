@@ -220,11 +220,11 @@ class KanoDialog():
             if self.has_entry:
                 # We have to click an OK button to get entry value
                 # May want to change this logic later to be more flexible
-                if button.get_label() == _("OK"):
+                if unicode(button.get_label().decode('utf8')) == _("OK"):
                     self.returnvalue = self.widget.get_text()
             elif self.has_list:
                 # get selected radio button only if press the OK button
-                if button.get_label() == _("OK"):
+                if unicode(button.get_label().decode('utf8')) == _("OK"):
                     self.returnvalue = radio_returnvalue
             # TODO: change the structure so we emit different signals depending on the button clicked
             self.dialog.response(Gtk.ResponseType.OK)
