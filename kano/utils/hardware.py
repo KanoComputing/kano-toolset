@@ -117,20 +117,23 @@ def get_board_property(board_key, prop):
     return board_prop
 
 
-def detect_kano_keyboard():
+def detect_kano_keyboard_type():
     # Get information of all devices
-    o, _, _ = run_cmd('lsusb -v')
+    o, _, _ = run_cmd('lsusb')
 
-    # Kano keyboard has the following information:
-    # Vendor id:  0x1997
-    # Product id: 0x2433
-    try:
-        o.index('1997')
-        o.index('2433')
-    except:
-        return False
+    keyboard_ids = {
+        'en': 'ID 1997:2433',
+        'es': 'ID 1997:2434'
+    }
+    kano_keyboard = None
+    for lang, id in keyboard_ids.iteritems():
+        if id in o:
+            kano_keyboard = lang
+    return kano_keyboard
 
-    return True
+
+def detect_kano_keyboard():
+    return detect_kano_keyboard_type() is not None
 
 
 def is_model_a(revision=None):
