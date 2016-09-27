@@ -168,7 +168,8 @@ class Logger:
             if self._app_name is None:
                 self.set_app_name(sys.argv[0])
 
-            lines = msg.encode('utf8').strip().split("\n")
+            lines = msg.encode('utf8') if type(msg) == unicode else msg
+            lines = lines.strip().split("\n")
 
             log = {}
             log["pid"] = self._pid
