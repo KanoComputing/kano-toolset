@@ -692,6 +692,13 @@ static JSON_Value * parse_boolean_value(const char **string) {
 static JSON_Value * parse_number_value(const char **string) {
     char *end;
     double number = strtod(*string, &end);
+
+    // Localised numbers can use `,` as a decimal separator and can end with ','
+    if (end
+            && strncmp(end, &entry_separator, 1) != 0
+            && strncmp(end - 1, &entry_separator, 1) == 0)
+        end--;
+
     JSON_Value *output_value;
     if (is_decimal(*string, end - *string)) {
         *string = end;

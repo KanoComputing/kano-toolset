@@ -215,6 +215,8 @@ const char  *   json_string (const JSON_Value *value);
 double          json_number (const JSON_Value *value);
 int             json_boolean(const JSON_Value *value);
     
+const char entry_separator = ',';
+
 #ifdef __cplusplus
 }
 #endif
