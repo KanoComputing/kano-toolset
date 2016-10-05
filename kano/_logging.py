@@ -55,6 +55,12 @@ LEVELS = {
 }
 
 
+def _test_override_logs_dir(logs_dir):
+    # For unit test purposes only
+    global USER_LOGS_DIR
+    USER_LOGS_DIR = logs_dir
+
+
 def normalise_level(level):
     '''
     Normalise the input string, i.e.
