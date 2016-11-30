@@ -187,7 +187,7 @@ class Logger:
             if 'exception' in kwargs:
                 import traceback
                 tbk = traceback.format_exc()
-                log['exception'] = kwargs['exception'].encode('utf8')
+                log['exception'] = unicode(kwargs['exception']).encode('utf8')
                 log['traceback'] = tbk
 
             for line in lines:
