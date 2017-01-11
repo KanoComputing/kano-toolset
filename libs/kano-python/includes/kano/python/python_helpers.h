@@ -56,6 +56,7 @@ class Binding {
         ~Binding();
     protected:
         PyObject *run_func(const std::string function_name, PyObject *args = NULL) const;
+        void finalise();
 
         const std::string module_name;
         PyObject *module;

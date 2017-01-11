@@ -124,3 +124,12 @@ PyObject *Binding::run_func(const std::string function_name, PyObject *args) con
 
     return ret;
 }
+
+
+/**
+ * Deallocate and stop the Python interpreters.
+ */
+void Binding::finalise()
+{
+    Py_Finalize();
+}
