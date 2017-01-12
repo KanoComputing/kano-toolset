@@ -34,7 +34,7 @@ Description: Python helper libraries with debug symbols
 Package: libkano-python-dev
 Architecture: any
 Depends: ${misc:Depends},
-         python,
+         python-dev,
          libkano-python (= ${source:Version})
 Description: Development versions of python helper libraries
  Development libraries to help with Python interfacing
