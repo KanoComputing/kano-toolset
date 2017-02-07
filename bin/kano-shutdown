@@ -159,7 +159,6 @@ if __name__ == '__main__':
         # asynchronously for faster UI response time
         run_bg('kano-tracker-ctl +1 shutdown')
         run_bg('kano-sync --backup -s &')
-        run_bg('sudo /usr/bin/expand-rootfs')
 
         # Show up to the dialog
         win = ShutdownOptions()
