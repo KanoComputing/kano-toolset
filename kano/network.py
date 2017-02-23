@@ -2,7 +2,7 @@
 
 # network.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
+# Copyright (C) 2014-2017 Kano Computing Ltd.
 # License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # This script benefits from the great work by Ovidiu Ciule, ovidiu.ciule@gmail.com
@@ -384,6 +384,30 @@ def wpa_conf(essid, psk, confile, wep=False):
     Prepare and save a configuration file for WPA Supplicant daemon
     '''
 
+    #
+    # Support for Wireless channel 13, by using a country code.
+    # Force it by setting KANO_WIFI_COUNTRY envvar to the ISO/IEC alpha2
+    # country code format ("ES", "US", etc).
+    #
+    # Otherwise it is currently set automatically if ES locales are detected,
+    # in the form "es_AR.UTF-8" through the LANG envvar, translated to "ES".
+    #
+    # TODO: expect to have more mappings, i.e. en_US.UTF-8 => US
+    # Query current wireless country with "sudo iw reg get"
+    #
+    country_code=None
+    try:
+        cc=os.getenv('KANO_WIFI_COUNTRY')
+        if not cc:
+            cc=os.getenv('LANG')
+
+        cc = cc.split('_')[1][:2]
+        if cc and cc not in ('US'):
+            country_code=cc.upper()
+
+    except:
+        pass
+
     # Prepare settings section for WEP or WPA
     if wep is True:
         # If the key starts with "hex" lowercase, what follows is the Hexadecimal form
@@ -397,7 +421,6 @@ def wpa_conf(essid, psk, confile, wep=False):
             psk='"%s"' % psk
 
         lines_wpa_conf = '''
-          ctrl_interface=/var/run/wpa_supplicant
           network={
              ssid="%s"
              scan_ssid=1
@@ -406,7 +429,11 @@ def wpa_conf(essid, psk, confile, wep=False):
              wep_tx_keyidx=0
              auth_alg=OPEN SHARED
          }
+         ctrl_interface=/var/run/wpa_supplicant
         ''' % (essid, psk)
+
+        if country_code:
+            lines_wpa_conf += ' country={}\n'.format(country_code)
     else:
         wpa_epilog = '''
           scan_ssid=1
@@ -415,6 +442,9 @@ def wpa_conf(essid, psk, confile, wep=False):
          }
          ctrl_interface=/var/run/wpa_supplicant
         '''
+
+        if country_code:
+            wpa_epilog += ' country={}\n'.format(country_code)
 
         if psk.startswith('hex'):
             # In WPA hex mode, the provided key needs to go as is

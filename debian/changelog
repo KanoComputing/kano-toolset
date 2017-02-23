@@ -1,3 +1,9 @@
+kano-toolset (3.8.0-1) unstable; urgency=low
+
+  * Added Wireless support for Spanish/Latin and custom country codes
+
+ -- Team Kano <dev@kano.me>  Wed, 01 Feb 2017 15:49:00 +0000
+
 kano-toolset (3.7.0-1) unstable; urgency=low
 
   * i18n setup and Spanish translations

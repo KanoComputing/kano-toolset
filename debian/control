@@ -11,7 +11,7 @@ Architecture: any
 Depends: ${misc:Depends}, python-gtk2, python-webkit,
          fping, python, zenity, bc, ifplugd, python-yaml, python-pyinotify,
          resolvconf, libpng12-0, libraspberrypi-bin, procps, x11-utils, dbus,
-         wmctrl, libc-bin, libkano-networking, kano-i18n
+         wmctrl, libc-bin, libkano-networking, kano-i18n, iw, wireless-regdb, crda
 Replaces: kano-init (<< 1.0-46)
 Breaks: kano-init (<< 1.0-46)
 Description: Collection of tools for Kanux
