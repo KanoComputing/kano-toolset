@@ -43,6 +43,9 @@ class IWList():
         self.interface = interface
         self.refresh(iwlist=iwlist)
 
+        # Announce country to the driver so we can scan correct channels 13 and above
+        get_wireless_country(enable_driver=True)
+
     def refresh(self, iwlist=None):
 
         def getRawData(interface, iwlist=None):
@@ -379,23 +382,26 @@ def is_internet():
     return rc == 0
 
 
-def wpa_conf(essid, psk, confile, wep=False):
+def get_wireless_country(enable_driver=False):
     '''
-    Prepare and save a configuration file for WPA Supplicant daemon
+    Support for Wireless channel 13, by using a country code.
+    You can force it by setting KANO_WIFI_COUNTRY envvar to the ISO/IEC alpha2
+    country code format ("ES", "US", etc).
+
+    Otherwise it is currently set automatically if ES locales are detected,
+    in the form "es_AR.UTF-8" through the LANG envvar, translated to "ES".
+
+    enable_driver allows to set the country to the driver,
+    needed for scanning more frequencies.
+
+    Returns the country code or None if not found
+
+    TODO: expect to have more mappings, i.e. en_US.UTF-8 => US
+    Query current wireless country with "sudo iw reg get"
     '''
 
-    #
-    # Support for Wireless channel 13, by using a country code.
-    # Force it by setting KANO_WIFI_COUNTRY envvar to the ISO/IEC alpha2
-    # country code format ("ES", "US", etc).
-    #
-    # Otherwise it is currently set automatically if ES locales are detected,
-    # in the form "es_AR.UTF-8" through the LANG envvar, translated to "ES".
-    #
-    # TODO: expect to have more mappings, i.e. en_US.UTF-8 => US
-    # Query current wireless country with "sudo iw reg get"
-    #
     country_code=None
+
     try:
         cc=os.getenv('KANO_WIFI_COUNTRY')
         if not cc:
@@ -404,9 +410,23 @@ def wpa_conf(essid, psk, confile, wep=False):
         cc = cc.split('_')[1][:2]
         if cc and cc not in ('US'):
             country_code=cc.upper()
-
     except:
         pass
+
+    # Tell the wireless driver to operate on this country
+    # Allows to scan for more channels where available
+    if country_code and enable_driver:
+        run_cmd('iw reg set %s' % country_code)
+
+    return country_code
+
+
+def wpa_conf(essid, psk, confile, wep=False):
+    '''
+    Prepare and save a configuration file for WPA Supplicant daemon
+    '''
+
+    country_code = get_wireless_country(enable_driver=False)
 
     # Prepare settings section for WEP or WPA
     if wep is True:
