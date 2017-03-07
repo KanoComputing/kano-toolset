@@ -64,7 +64,7 @@ class TestForceFlush(unittest.TestCase):
         os.environ[klm.OUTPUT_ENV] = 'error'
 
         self.temp_dir = tempfile.mkdtemp(dir='/tmp')
-        klm._test_override_log_dir(self.temp_dir)
+        klm._test_override_logs_dir(self.temp_dir)
 
         self.data_from_log = {}
 
