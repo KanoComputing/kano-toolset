@@ -27,8 +27,22 @@ def play_sound(audio_file, background=False):
         volume_percent = get_volume()
         volume_str = '--vol {}'.format(
             percent_to_millibel(volume_percent, raspberry_mod=True))
-        cmd = 'omxplayer -o both {volume} {link}'.format(
-            volume=volume_str, link=audio_file)
+
+        # Set the audio output between HDMI or Jack. Default is HDMI since it's the
+        # safest route given the PiHat lib getting destabilised if Jack is used.
+        audio_out = 'hdmi'
+        try:
+            from kano_settings.system.audio import is_HDMI
+            if not is_HDMI():
+                audio_out = 'local'
+        except Exception:
+            pass
+
+        cmd = 'omxplayer -o {audio_out} {volume} {link}'.format(
+            audio_out=audio_out,
+            volume=volume_str,
+            link=audio_file
+        )
 
     logger.debug('cmd: {}'.format(cmd))
 
