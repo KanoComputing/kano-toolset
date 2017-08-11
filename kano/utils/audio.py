@@ -11,7 +11,7 @@ import os
 from kano.utils.shell import run_cmd, run_bg, run_cmd_log
 
 
-def play_sound(audio_file, background=False):
+def play_sound(audio_file, background=False, delay=0):
     from kano.logging import logger
 
     # Check if file exists
@@ -45,6 +45,10 @@ def play_sound(audio_file, background=False):
         )
 
     logger.debug('cmd: {}'.format(cmd))
+
+    # Delay the sound playback if specified
+    if delay:
+        cmd = '/bin/sleep {} ; {}'.format(delay, cmd)
 
     if background:
         run_bg(cmd)
