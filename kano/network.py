@@ -555,13 +555,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             run_cmd('pkill -f kano-connect')
             time.sleep(1)
 
-    udhcpc_cmdline = 'udhcpc -S -t 70 -A 20 -n -a --script=/etc/udhcpc/kano.script -i %s' % iface
-    time.sleep(1)
-
-    # kill previous connection daemons
-    run_cmd("pkill -f '%s'" % (udhcpc_cmdline))
-
-    # and wpa supllicant daemon, politely through wpa_cli
+    # terminate wpa supllicant daemon, politely through wpa_cli
     run_cmd("wpa_cli terminate")
 
     #
@@ -664,9 +658,13 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
         if not associated:
             return False
 
-    logger.info("Starting UDHCPC client '%s'" % (udhcpc_cmdline))
-    out, err, rc = run_cmd(udhcpc_cmdline)
-    return rc == 0
+    # Wait until we verify that we have an Internet link
+    for retry in range(0, 60):
+        time.sleep(1)
+        if is_connected(iface):
+            return True
+
+    return False
 
 
 def disconnect(iface, clear_cache=False):
