@@ -535,7 +535,7 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
     return reloaded
 
 
-def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
+def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, connect_timeout=60):
     '''
     Attempts a wireless association with provided parameters.
 
@@ -546,6 +546,9 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     encrypt can either be "off", "wep" or "wpa"
     in the latter 2 cases, seckey should be the encryption key
     of the wireless network AP.
+
+    connect_timeout is the time in seconds to wait for the DHCP lease
+    and internet connection to become ready.
     '''
 
     if os.access('/var/run/kano-connect.pid', os.R_OK):
@@ -659,7 +662,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             return False
 
     # Wait until we verify that we have an Internet link
-    for retry in range(0, 60):
+    for retry in range(0, connect_timeout):
         time.sleep(1)
         if is_connected(iface):
             return True
