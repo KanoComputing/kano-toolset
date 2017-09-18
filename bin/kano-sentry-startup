@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# kano-sentry-startup
+#
+# Copyright (C) 2017 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Starts the sentry server depending on Parental control settings.
+# This script is executed from the dhcpcd-hook scripts
+#
+
+# First check that server config file exists.
+if [ -x $SERVER_CONFIG ]; then
+
+    # Run the script that switches on the parental control if the config is set
+    # Will return 1 if it doesn't launch the server
+    logger_info "The sentry server script $SERVER_CONFIG exists"
+    $SERVER_CONFIG
+    server_rv=$?
+    logger_info "Run script $SERVER_CONFIG, return value is $server_rv"
+    parental_control_on=$server_rv
+else
+    # The ultimate parental control was not turned on
+    logger_info "The sentry server script $SERVER_CONFIG does not exist"
+    parental_control_on=1
+fi
+
+# If the parental control was not switched on, go through the other options
+if [ $parental_control_on -eq 1 ]; then
+    logger_info "Ultimate parental control is NOT switched on"
+    if [ -x /sbin/resolvconf ]; then
+        echo -n "$R" | resolvconf -a "${interface}.udhcpc"
+    else
+        echo -n "$R" > "$RESOLV_CONF"
+        
+        # Add a fallback DNS server to the end of the list, including a new line
+        echo "nameserver 8.8.8.8" >> "$RESOLV_CONF"
+    fi
+else
+    logger_info "Ultimate parental control IS switched on"
+fi

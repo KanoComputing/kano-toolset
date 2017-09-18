@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-
+#
 # kano-network-hook
 #
-# Copyright (C) 2015 Kano Computing Ltd.
+# Copyright (C) 2015-2017 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# This script is called when network DHCP events occur
-# It is called from /etc/udhcpc/kano.script (Kano Toolset packge)
-# and sends the RaspberryPI CPU Serial Number to Kano. It runs as the superuser.
+# This script is called from the dhcpcd-hooks scripts,
+# to send the RaspberryPI CPU Serial Number to Kano.
+# It runs as the superuser.
 #
 
 import os

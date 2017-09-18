@@ -1,0 +1,21 @@
+#
+# 65-kano-dhcp-hook
+#
+# Copyright (C) 2017 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# DHCP hook script to prepare Kano OS settings when network comes up
+#
+# TODO: This is an initial first version
+#
+
+logfile="/tmp/kano-dhcp-hook.log"
+
+# TODO: Discern from multiple network devices
+if [ "$reason" == "REBOOT" ]; then
+    systemd-run /usr/bin/kano-sentry-startup
+    systemd-run /usr/bin/kano-set-system-date
+
+    systemd-run /usr/bin/kano-network-hook boot
+    systemd-run /usr/bin/kano-dashboard-sysupdates boot
+fi

@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# kano-set-system-date
+#
+# Copyright (C) 2017 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Sets the Kit's timezone and system date from a remote time server.
+# This script is executed from the dhcpcd-hooks
+#
+
+. /usr/share/kano-toolset/logging.sh
+
+# find the local timezone based on the IP address, then set local system
+if [ ! -L /etc/localtime ]; then
+    tzupdated=`/usr/bin/kano-tzupdate 2>&1`
+    if [ "$?" -eq 0 ]; then
+        logger_info "tzupdate SUCCESS: $tzupdated"
+        logger_info "tzupdate result: $(file /etc/localtime)"
+    else
+        IFS=$'\n'
+        for line in ${tzupdated}; do
+            logger_error "tzupdate FAIL: $line"
+        done
+    fi
+else
+    logger_info "skipping tzupdate"
+fi
+
+
+# Set the system time from a network server, retry if it fails.
+for dateretries in 1 2 3 4 5
+do
+    time_server=`cat /etc/timeserver.conf`
+    logger_info "rdate using ntp server: $time_server"
+    dated=`/usr/bin/rdate -4 -u -v -c -n $time_server 2>&1`
+    if [ "$?" -eq 0 ]; then
+        logger_info "rdate SUCCESS: $dated"
+        break
+    else
+        IFS=$'\n'
+        for line in ${dated}; do
+            logger_error "rdate FAIL: $line"
+        done
+        sleep 1
+    fi
+done
