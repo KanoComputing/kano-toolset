@@ -4,16 +4,16 @@
 # Copyright (C) 2017 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-# Simple script to diagnose dhcpcd events.
+# Simple script to diagnose dhcpcd events
 #
 # To enable, edit /etc/dhcpcd.conf and add the key "env DHCP_LOG=1"
 # Reboot, and tail the logfile locally to follow the events.
 #
 
 if [ $DHCP_LOG -eq 1 ]; then
-    logfile=/tmp/kano-dhcp-debug.log
+    logfile=/kano-dhcp-debug.log
     echo "\nkano-debug reason: $reason at `date`" >> $logfile
     echo "uptime: `cat /proc/uptime`" >> $logfile
     echo ">>> ifup? $if_up interface? $interface carrier? $ifcarrier wireless? $ifwireless ssid=$ifssid" >> $logfile
-    ip addr show wlan0 >> $logfile
+    ip addr show $interface >> $logfile
 fi

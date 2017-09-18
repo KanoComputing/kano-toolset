@@ -9,6 +9,8 @@
 # This script is executed from the dhcpcd-hook scripts when a DHCP lease is obtained.
 #
 
+. /usr/share/kano-toolset/logging.sh
+
 # First check that server config file exists.
 if [ -x $SERVER_CONFIG ]; then
 

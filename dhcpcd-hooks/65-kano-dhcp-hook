@@ -9,25 +9,29 @@
 # To enable this hook for logging, edit /etc/dhcpcd.conf and add the key "env DHCP_LOG=1"
 # Reboot, and tail the logfile locally to follow the events.
 #
+# To enable syslog, edit /etc/systemd/journalctl.conf and add "Storage=persistent"
+#
 
 # logfile used in log mode
 logfile="/tmp/kano-dhcp-hook.log"
 
 # file that external applications can monitor for internet availability triggers
-monitor_file="/var/opt/internet_monitor"
-
-# logfile used in log mode
-logfile="/tmp/kano-dhcp-hook.log"
-
-# file that external applications can monitor for internet availability triggers
-monitor_file="/var/opt/internet_monitor"
+monitor_file="/var/run/internet_monitor"
 
 case "$reason" in
 REBOOT)
-    echo "internet: up" > $monitor_file
-
     ip_addr=`ip addr show wlan0 | grep inet | awk '{print $2}' | sed -s 's/\/.*//')`
-    echo "ipaddr: $ip_addr" >> $logfile
+    logger "kano-dhcp-hook: REBOOT event ipaddr=$ip_addr on iface=$interface"
+
+    # Are we already connected through a different device?
+    if [ -f $monitor_file ]; then
+        logger "kano-dhcp-hook: REBOOT hook discarded, already networked from a previous REBOOT"
+        exit 0
+    else
+        echo "internet: up" > $monitor_file
+    fi
+
+    logger "kano-dhcp-hook: launching network up scripts"
 
     systemd-run /usr/bin/kano-sentry-startup $reason
     systemd-run /usr/bin/kano-set-system-date $reason
@@ -35,4 +39,18 @@ REBOOT)
     systemd-run /usr/bin/kano-network-hook $reason
     systemd-run /usr/bin/kano-dashboard-sysupdates "bound" "$ip_addr"
     ;;
+
+STOPPED)
+    # Are we still networked due to multihomed connection?
+    logger "kano-dhcp-hook: NOCARRIER on iface=iface=$interface"
+    is_internet
+    if [ $? -eq 0 ]; then
+	logger "kano-dhcp-hook: NOCARRIER/STOPPED but still connected, aborting action"
+	exit 0
+    else
+        logger "kano-dhcp-hook: NOCARRIER/STOPPED and connectivity lost"
+        rm $monitor_file
+    fi
+    ;;
+
 esac
