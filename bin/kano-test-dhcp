@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #
-#  Copyright (C) 2015-2017 Kano Computing Ltd.
+#  kano-test-dhcp
+#
+#  Copyright (C) 2017 Kano Computing Ltd.
 #  License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 #  Simple test for the new DHCP hooks.
@@ -17,12 +19,27 @@
 
 import os
 import sys
-import json
 
 failures=0
 
-def testlog(logs, entry, verbose=False):
+# Patterns to test on a successful network on boot
+test_patterns_boot=[
+   'REBOOT event',
+   'launching network up scripts',
+   'Started /usr/bin/kano-sentry-startup',
+   'Started /usr/bin/kano-network-hook',
+   'Started /usr/bin/kano-set-system-date',
+   'info Ultimate parental control IS switched on',
+   'Started /usr/bin/kano-dashboard-sysupdates',
+   'Time has been changed',
+   'info rdate SUCCESS'
+   ]
 
+
+def testlog(logs, entry, verbose=False):
+   '''
+   Tests that a text entry is registered in the logs
+   '''
    global failures
    
    for line in logs:
@@ -37,33 +54,28 @@ def testlog(logs, entry, verbose=False):
 
 if __name__ == '__main__':
 
-   verbose=True
    dump=False
 
    if len(sys.argv) > 1 and sys.argv[1] == '--dump':
       dump=True
 
-   patterns=[
-      'REBOOT event',
-      'launching network up scripts',
-      'Started /usr/bin/kano-sentry-startup',
-      'Started /usr/bin/kano-network-hook',
-      'Started /usr/bin/kano-set-system-date',
-      'info Ultimate parental control IS switched on',
-      'Started /usr/bin/kano-dashboard-sysupdates',
-      'Time has been changed',
-      'info rdate SUCCESS'
-      ]
-
    # Collect the journal from the current system bootup sequence alone
    output=os.popen('sudo journalctl --boot=0 | grep "REBOOT" -A 15').readlines()
+   if not len(output):
+      # TODO: Teach "kano-dev" to do it for us
+      print 'No logs found, did you enable journalctl?'
+      print 'Set "Storage=persistent" in /etc/systemd/journalctl.conf'
+      sys.exit(1)
+
+   # Simply dump the logs and exit
    if dump:
       for line in output:
          print line,
       sys.exit(0)
 
-   for test in patterns:
-      testlog(output, test, verbose=verbose)
+   # Go through the test patterns and give a report
+   for test in test_patterns_boot:
+      testlog(output, test, verbose=True)
 
    print 'failures={}'.format(failures)
    sys.exit(failures > 0)
