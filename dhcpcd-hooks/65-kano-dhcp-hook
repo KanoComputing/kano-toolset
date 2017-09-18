@@ -6,14 +6,9 @@
 #
 # DHCP hook script to prepare Kano OS settings when network comes up
 #
-# To enable this hook for logging, edit /etc/dhcpcd.conf and add the key "env DHCP_LOG=1"
-# Reboot, and tail the logfile locally to follow the events.
+# To enable this hook for logging, edit /etc/systemd/journalctl.conf and set Storage=persistent
+# Reboot, and execute "kano-test-dhcp".
 #
-# To enable syslog, edit /etc/systemd/journalctl.conf and add "Storage=persistent"
-#
-
-# logfile used in log mode
-logfile="/tmp/kano-dhcp-hook.log"
 
 # file that external applications can monitor for internet availability triggers
 monitor_file="/var/run/internet_monitor"
