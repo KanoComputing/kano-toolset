@@ -6,7 +6,7 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # Starts the sentry server depending on Parental control settings.
-# This script is executed from the dhcpcd-hook scripts
+# This script is executed from the dhcpcd-hook scripts when a DHCP lease is obtained.
 #
 
 # First check that server config file exists.

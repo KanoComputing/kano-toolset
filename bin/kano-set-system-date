@@ -6,7 +6,7 @@
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 # Sets the Kit's timezone and system date from a remote time server.
-# This script is executed from the dhcpcd-hooks
+# This script is executed from the dhcpcd-hooks when a DHCP lease is obtained
 #
 
 . /usr/share/kano-toolset/logging.sh

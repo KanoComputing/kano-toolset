@@ -6,16 +6,33 @@
 #
 # DHCP hook script to prepare Kano OS settings when network comes up
 #
-# TODO: This is an initial first version
+# To enable this hook for logging, edit /etc/dhcpcd.conf and add the key "env DHCP_LOG=1"
+# Reboot, and tail the logfile locally to follow the events.
 #
 
+# logfile used in log mode
 logfile="/tmp/kano-dhcp-hook.log"
 
-# TODO: Discern from multiple network devices
-if [ "$reason" == "REBOOT" ]; then
-    systemd-run /usr/bin/kano-sentry-startup
-    systemd-run /usr/bin/kano-set-system-date
+# file that external applications can monitor for internet availability triggers
+monitor_file="/var/opt/internet_monitor"
 
-    systemd-run /usr/bin/kano-network-hook boot
-    systemd-run /usr/bin/kano-dashboard-sysupdates boot
-fi
+# logfile used in log mode
+logfile="/tmp/kano-dhcp-hook.log"
+
+# file that external applications can monitor for internet availability triggers
+monitor_file="/var/opt/internet_monitor"
+
+case "$reason" in
+REBOOT)
+    echo "internet: up" > $monitor_file
+
+    ip_addr=`ip addr show wlan0 | grep inet | awk '{print $2}' | sed -s 's/\/.*//')`
+    echo "ipaddr: $ip_addr" >> $logfile
+
+    systemd-run /usr/bin/kano-sentry-startup $reason
+    systemd-run /usr/bin/kano-set-system-date $reason
+
+    systemd-run /usr/bin/kano-network-hook $reason
+    systemd-run /usr/bin/kano-dashboard-sysupdates "bound" "$ip_addr"
+    ;;
+esac
