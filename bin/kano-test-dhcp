@@ -31,6 +31,7 @@ test_patterns_boot=[
    'Started /usr/bin/kano-set-system-date',
    'info Ultimate parental control IS switched on',
    'Started /usr/bin/kano-dashboard-sysupdates',
+   'dashboard-sysupdates: updates check starting',
    'Time has been changed',
    'info rdate SUCCESS'
    ]
@@ -49,7 +50,7 @@ def testlog(logs, entry, verbose=False):
          return True
 
    failures += 1
-   print 'FAIL: {} not found in the logs'.format(entry)
+   print 'FAIL: {}'.format(entry)
 
 
 if __name__ == '__main__':
@@ -60,7 +61,7 @@ if __name__ == '__main__':
       dump=True
 
    # Collect the journal from the current system bootup sequence alone
-   output=os.popen('sudo journalctl --boot=0 | grep "REBOOT" -A 15').readlines()
+   output=os.popen('sudo journalctl --boot=0 | grep "REBOOT" -A 60').readlines()
    if not len(output):
       # TODO: Teach "kano-dev" to do it for us
       print 'No logs found, did you enable journalctl?'

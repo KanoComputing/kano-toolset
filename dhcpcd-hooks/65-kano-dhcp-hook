@@ -13,6 +13,8 @@
 # file that external applications can monitor for internet availability triggers
 monitor_file="/var/run/internet_monitor"
 
+logger "kano-dhcp-hook: info reason=$reason iface=$interface"
+
 case "$reason" in
 REBOOT)
     ip_addr=`ip addr show wlan0 | grep inet | awk '{print $2}' | sed -s 's/\/.*//')`
@@ -35,9 +37,8 @@ REBOOT)
     systemd-run /usr/bin/kano-dashboard-sysupdates "bound" "$ip_addr"
     ;;
 
-STOPPED)
+NOCARRIER | STOPPED)
     # Are we still networked due to multihomed connection?
-    logger "kano-dhcp-hook: NOCARRIER on iface=iface=$interface"
     is_internet
     if [ $? -eq 0 ]; then
 	logger "kano-dhcp-hook: NOCARRIER/STOPPED but still connected, aborting action"
