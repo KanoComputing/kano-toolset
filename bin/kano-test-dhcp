@@ -5,18 +5,27 @@
 #  Copyright (C) 2017 Kano Computing Ltd.
 #  License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
-#  Simple test for the new DHCP hooks.
-#  Searches the systemd journal for entries emitted by the various network scripts
+#  Simple test to make sure that various setup scripts have run on new DHCP hooks.
+#  Searches the systemd journal for entries emitted by the network scripts.
 #
 #  To run these tests:
 #   Enable journalctl adding "Storage=persistent" to /etc/systemd/journalctl.conf
 #   Reboot the kit
 #   Run this program to expect 0 failures
 #
-#  Call with "--dump" to query the system logs manually.
-#  This test can only succeed on a real RaspberryPI.
-#
 
+'''
+kano-test-dhcp   Tests that network setup scripts have run correctly
+Usage:
+ kano-tesst-dhcp
+ kano-tesst-dhcp [--dump]
+
+Options:
+ --dump                    Just dump journalctl logs
+
+'''
+
+import docopt
 import os
 import sys
 
@@ -29,7 +38,7 @@ test_patterns_boot=[
    'Started /usr/bin/kano-sentry-startup',
    'Started /usr/bin/kano-network-hook',
    'Started /usr/bin/kano-set-system-date',
-   'info Ultimate parental control IS switched on',
+   'Ultimate parental control',
    'Started /usr/bin/kano-dashboard-sysupdates',
    'dashboard-sysupdates: updates check starting',
    'Time has been changed',
@@ -55,13 +64,15 @@ def testlog(logs, entry, verbose=False):
 
 if __name__ == '__main__':
 
-   dump=False
+   args = docopt.docopt(__doc__)
 
-   if len(sys.argv) > 1 and sys.argv[1] == '--dump':
-      dump=True
+   # Permissions check
+   if os.getuid() != 0:
+      print 'You need root permissions'
+      sys.exit(1)
 
    # Collect the journal from the current system bootup sequence alone
-   output=os.popen('sudo journalctl --boot=0 | grep "REBOOT" -A 60').readlines()
+   output=os.popen('journalctl --boot=0 | grep "REBOOT" -A 60').readlines()
    if not len(output):
       # TODO: Teach "kano-dev" to do it for us
       print 'No logs found, did you enable journalctl?'
@@ -69,7 +80,7 @@ if __name__ == '__main__':
       sys.exit(1)
 
    # Simply dump the logs and exit
-   if dump:
+   if args['--dump']:
       for line in output:
          print line,
       sys.exit(0)

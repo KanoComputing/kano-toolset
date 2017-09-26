@@ -39,14 +39,28 @@ from python e.g. ```from kano.utils import get_rpi_model; print get_rpi_model()`
 The `gtk3` subdirectory contains a collection of UI widgets with a uniform Kano look & feel.
 Gtk styles used across these are located under the `media` directory.
 
-## Network startup script
+## Network setup scripts
 
-`kano.script` under `udhcpc` is a script that is invoked to support the DHCP network connections.
-It sets up the IP address, DNS servers, and default route.
+Connecting to the network requires some extra steps on Kano OS.
 
-It also provides a hook script which is called when DHCP events occur, for example when
-obtaining a lease: `bin/kano-network-hook`. This hook script is used to send the CPU ID 
-and model name to Kano for usage statistics.
+ * Setting the timezone depending on your geographic location
+ * Setting the local time from a remote time server
+ * Starting a server to apply network restrictions in Parental Mode
+ * Checking for system updates availability to inform the user
+
+Therefore, a custom dhcp hook is installed under `/lib/dhcpcd/dhcpcd-hooks/`, which starts
+these tasks in the background. A debug version is also available under
+`/usr/share/kano-toolset/dhcpcd-hooks` to diagnose any issues.
+
+These hooks allow for the system to reconnect automatically to the Wireless Access Point.
+The tool `kano-test-dhcp` is now provided which can be used to make sure the steps above run correctly.
+
+Network connection through Ethernet is managed by the system itself, thanks to ifplugd.
+For wireless networking, the `kano-connect` program handles the WPA supplicant startup when needed,
+which is configured through the GUI app `kano-wifi-gui`.
+
+The classic Debian file `/etc/network/interfaces` is not used anymore. It can still be installed manually
+should the kit need a special configuration, like a fixed IP address.
 
 ## uinput
 

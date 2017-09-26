@@ -10,7 +10,8 @@ uinput/uinput usr/bin/
 uinput/pyinputevent.py usr/lib/python2.7/dist-packages/
 uinput/scancodes.py usr/lib/python2.7/dist-packages/
 
-dhcpcd-hooks/* /lib/dhcpcd/dhcpcd-hooks
+dhcpcd-hooks/65-kano-dhcp-hook /lib/dhcpcd/dhcpcd-hooks
+dhcpcd-hooks/60-kano-dhcp-debug /usr/share/kano-toolset/dhcpcd-hooks
 
 ifplugd/kano-ifplugd etc/ifplugd/action.d
 

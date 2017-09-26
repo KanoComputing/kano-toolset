@@ -11,6 +11,8 @@
 
 . /usr/share/kano-toolset/logging.sh
 
+SERVER_CONFIG='/usr/bin/start-sentry-server'
+
 # First check that server config file exists.
 if [ -x $SERVER_CONFIG ]; then
 
