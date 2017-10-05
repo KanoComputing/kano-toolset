@@ -546,7 +546,7 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
     return reloaded
 
 
-def do_connect(iface, wpa_file, connection_timeout, verbose=False):
+def do_connect(iface, wpa_file, connection_timeout, debug=False):
     '''
     This function connects to the WPA supplicant event flow to detect the result of a connection attempt.
     It returns a return code with an indication of the connection result. See the RC_* constants.
@@ -557,6 +557,10 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
     connected=False
     scans = 0
     max_scans=3   # Heuristics: Maximum number of scans before assuming the AP is not in range
+
+    def debug_msg(message):
+        if debug:
+            print '[[[ {} ]]]'.format(message)
 
     def is_internet_up(monitor_file=INTERNET_UP_FILE):
         return os.path.isfile(monitor_file)
@@ -570,7 +574,7 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
 
     # Start the WPA supplicant in the background
     supplicant_command=SUPPLICANT_CMD.format(wpa_file, iface, SUPPLICANT_LOGFILE)
-    print '>>> run_cmd:', supplicant_command
+    debug_msg ('do_connect starts: {}'.format(supplicant_command))
     run_cmd(supplicant_command)
 
     cli=subprocess.Popen(['wpa_cli'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -578,20 +582,20 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
     rc=cli.poll()
     while rc == None:
         output = cli.stdout.readline().replace('\n', '')
-        print '>>> {} <<<'.format(output)
+        debug_msg(output)
 
         if output.find('CTRL-EVENT-CONNECTED') != -1:
-            print '[[[ Associated ]]]'
+            debug_msg('Event "Associated" detected')
             close_wpa_cli(cli)
             rc=RC_CONNECTED
             break
         elif output.find('reason=WRONG_KEY') != -1:
-            print '[[[ Wrong key ]]]'
+            debug_msg('Event "wrong key" detected')
             close_wpa_cli(cli)
             rc=RC_BAD_PASSWORD
             break
         elif output.find('reason=CONN_FAILED') != -1:
-            print '[[[ AP not in range ]]]'
+            debug_msg('Event "AP not in range" detected')
             close_wpa_cli(cli)
             rc=RC_AP_NOT_IN_RANGE
             break
@@ -599,7 +603,7 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
         if output.find('WPS-AP-AVAILABLE') != -1:
             scans += 1
             if scans == max_scans:
-                print '[[[ timeout due to too much scanning, router not in range ]]]'
+                debug_msg('Event "timeout due to too many scans" detected')
                 close_wpa_cli(cli)
                 reason_code = RC_AP_NOT_IN_RANGE
                 break
@@ -609,7 +613,7 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
     # If we are associated, wait for DHCP lease to become available
     if rc==RC_CONNECTED:
         for attempt in xrange(0, connection_timeout):
-            print 'waiting for DHCP lease'
+            debug_msg('waiting for DHCP lease')
             time.sleep(1)
             if is_internet_up():
                 connected=True
@@ -618,11 +622,12 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
         if not is_internet_up():
             rc=RC_NO_DHCP_LEASE
 
-    print 'connection_result() rc={}'.format(rc)
+    debug_msg('do_connect() returns rc={}'.format(rc))
     return rc
 
 
-def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, connect_timeout=60):
+def connect(iface, essid, encrypt='off', seckey=None, \
+                wpa_custom_file=None, connect_timeout=60, debug=False):
     '''
     Attempts a wireless association with provided parameters.
 
@@ -636,6 +641,8 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
     connect_timeout is the time in seconds to wait for the DHCP lease
     and internet connection to become ready.
+
+    Passing True to debug, will display events emitted by WPA supplicant to stdout.
 
     Returns one of the RC_* constants defined at the top of this module.
     '''
@@ -721,7 +728,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
 
     # Wait until we are associated, and that we have an Internet link
-    reason = do_connect(iface, wifi_conf_file, connect_timeout)
+    reason = do_connect(iface, wifi_conf_file, connect_timeout, debug=debug)
     return reason
 
 
