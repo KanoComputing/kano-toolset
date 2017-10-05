@@ -561,7 +561,10 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
     def is_internet_up(monitor_file=INTERNET_UP_FILE):
         return os.path.isfile(monitor_file)
 
-    run_cmd("wpa_supplicant -D nl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_file, iface))
+    # Start the WPA supplicant in the background
+    supplicant_command=SUPPLICANT_CMD.format(wpa_file, iface, SUPPLICANT_LOGFILE)
+    print '>>> run_cmd:', supplicant_command
+    run_cmd(supplicant_command)
 
     cli=subprocess.Popen(['wpa_cli'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     time.sleep(1)
