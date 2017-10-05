@@ -36,7 +36,7 @@ SUPPLICANT_LOGFILE = '/var/log/kano_wpa.log'
 INTERNET_UP_FILE = '/var/run/internet_monitor'
 KANO_CONNECT_PIDFILE = '/var/run/kano-connect.pid'
 
-# Return codes used by connection_result
+# Return codes returned by connect() and do_connect() functions
 RC_CONNECTED = 0
 RC_BAD_PASSWORD = 1
 RC_AP_NOT_IN_RANGE = 2
@@ -636,6 +636,8 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
     connect_timeout is the time in seconds to wait for the DHCP lease
     and internet connection to become ready.
+
+    Returns one of the RC_* constants defined at the top of this module.
     '''
 
     wifi_conf_file=None
@@ -665,9 +667,8 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
     if wpa_custom_file:
         # Start the supplicant daemon using a user-defined configuration file
-        #logger.info("Starting wpa_supplicant with custom config: {}".format(wpa_custom_file))
-        #run_cmd(SUPPLICANT_CMD.format(wpa_custom_file, iface, SUPPLICANT_LOGFILE))
         wifi_conf_file = wpa_custom_file
+        logger.info("Starting wpa_supplicant with custom config: {}".format(wifi_conf_file))
 
     elif encrypt == 'wep':
 
@@ -697,22 +698,11 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
         if not wpa_conf(essid, seckey, confile=wifi_conf_file, wep=True):
             return False
 
-        # wpa_supplicant might complain even if it goes ahead doing its job
-        #run_cmd(SUPPLICANT_CMD.format(wpa_custom_file, iface, SUPPLICANT_LOGFILE))
-
-        # TODO: setup a WEP based AP to test the change below
-        # Wait for wpa_supplicant to become associated to the AP - key validation.
-        # For WEP Open networks it will always proceed, beacuse there is no real authentication,
-        # connection will fail during DHCP process. For WEP Shared networks it will fail here if the key is wrong.
-        #assoc_timeout = 20  # seconds
-        #assoc_start = time.time()
-        #while (time.time() - assoc_start) < assoc_timeout:
-        #    out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
-        #    wpa_state = out.strip('\n')
-        #    if len(wpa_state) and wpa_state.split('=')[1] == 'COMPLETED':
-        #        associated = True
-        #        break
-        #    time.sleep(0.5)
+        # TODO: setup a WEP based AP to test the implementation of the do_connect() function.
+        #
+        # For WEP Open networks, the supplicant will always proceed, beacuse there is no real authentication,
+        # connection would fail during DHCP process. For WEP Shared networks it would fail if the key is wrong.
+        #
 
     elif encrypt == 'wpa':
 
@@ -729,11 +719,8 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
         if not wpa_conf(essid, seckey, confile=wifi_conf_file):
             return False
 
-        # wpa_supplicant might complain even if it goes ahead doing its job
-        #run_cmd(SUPPLICANT_CMD.format(wpa_custom_file, iface, SUPPLICANT_LOGFILE))
 
-
-    # Wait until we are associated and that we have an Internet link
+    # Wait until we are associated, and that we have an Internet link
     reason = do_connect(iface, wifi_conf_file, connect_timeout)
     return reason
 
