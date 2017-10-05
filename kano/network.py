@@ -638,7 +638,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
     and internet connection to become ready.
     '''
 
-    wpafile=None
+    wifi_conf_file=None
 
     if os.access(KANO_CONNECT_PIDFILE, os.R_OK):
         client_module=sys.argv[0]
@@ -667,7 +667,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
         # Start the supplicant daemon using a user-defined configuration file
         #logger.info("Starting wpa_supplicant with custom config: {}".format(wpa_custom_file))
         #run_cmd(SUPPLICANT_CMD.format(wpa_custom_file, iface, SUPPLICANT_LOGFILE))
-        wpafile = wpa_custom_file
+        wifi_conf_file = wpa_custom_file
 
     elif encrypt == 'wep':
 
@@ -693,8 +693,8 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
             return False
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
-        wpafile = '/etc/kano_wpa_connect.conf'
-        if not wpa_conf(essid, seckey, confile=wpafile, wep=True):
+        wifi_conf_file = '/etc/kano_wpa_connect.conf'
+        if not wpa_conf(essid, seckey, confile=wifi_conf_file, wep=True):
             return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
@@ -725,8 +725,8 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
                 return False
 
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
-        wpafile = '/etc/kano_wpa_connect.conf'
-        if not wpa_conf(essid, seckey, confile=wpafile):
+        wifi_conf_file = '/etc/kano_wpa_connect.conf'
+        if not wpa_conf(essid, seckey, confile=wifi_conf_file):
             return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
@@ -734,7 +734,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
 
     # Wait until we are associated and that we have an Internet link
-    reason = do_connect(iface, wpafile, connect_timeout)
+    reason = do_connect(iface, wifi_conf_file, connect_timeout)
     return reason
 
 
