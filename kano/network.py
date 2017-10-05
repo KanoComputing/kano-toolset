@@ -31,6 +31,16 @@ from kano.logging import logger
 DNS_FILE = '/etc/resolvconf/resolv.conf.d/base'
 DNS_INTERFACES_FILE = '/etc/resolvconf/interface-order'
 DNS_INTERFACES_BACKUP_FILE = '/etc/resolvconf/interface-order.backup'
+SUPPLICANT_CMD = 'wpa_supplicant -D nl80211,wext -t -d -c{} -i{} -f {} -B'
+SUPPLICANT_LOGFILE = '/var/log/kano_wpa.log'
+INTERNET_UP_FILE = '/var/run/internet_monitor'
+KANO_CONNECT_PIDFILE = '/var/run/kano-connect.pid'
+
+# Return codes used by connection_result
+RC_CONNECTED = 0
+RC_BAD_PASSWORD = 1
+RC_AP_NOT_IN_RANGE = 2
+RC_NO_DHCP_LEASE = 3
 
 
 class IWList():
@@ -525,6 +535,7 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
         time.sleep(5)
         rc_load += rc
 
+
         logger.info('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' %
                     (module, device_vendor, device_product, rc_load))
         if rc_load == 0:
@@ -533,6 +544,75 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
         logger.info('Not reloading kernel module because device not found (%s:%s)' % (device_vendor, device_product))
 
     return reloaded
+
+
+def connection_result(iface, wpa_file, connection_timeout, verbose=False):
+    '''
+    This function connects to the WPA supplicant event flow to detect the result of a connection attempt.
+    It returns a return code with an indication of the connection result. See the RC_* constants.
+
+    This code uses heuristics based on the supplicant source code: https://w1.fi/wpa_supplicant/
+    '''
+    rc=None
+    connected=False
+    scans = 0
+
+    def is_internet_up(monitor_file=INTERNET_UP_FILE):
+        return os.path.isfile(monitor_file)
+
+    run_cmd("wpa_supplicant -D nl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_file, iface))
+
+    cli=subprocess.Popen(['wpa_cli'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    time.sleep(1)
+    rc=cli.poll()
+    while rc == None:
+        output = cli.stdout.readline().replace('\n', '')
+        print '>>> {} <<<'.format(output)
+
+        if output.find('CTRL-EVENT-CONNECTED') != -1:
+            print '[[[ Associated ]]]'
+            cli.stdin.write('quit\n')
+            cli.stdin.flush()
+            rc=RC_CONNECTED
+            break
+        elif output.find('reason=WRONG_KEY') != -1:
+            print '[[[ Wrong key ]]]'
+            cli.stdin.write('quit\n')
+            cli.stdin.flush()
+            rc=RC_BAD_PASSWORD
+            break
+        elif output.find('reason=CONN_FAILED') != -1:
+            print '[[[ AP not in range ]]]'
+            cli.stdin.write('quit\n')
+            cli.stdin.flush()
+            rc=RC_AP_NOT_IN_RANGE
+            break
+
+        if output.find('WPS-AP-AVAILABLE') != -1:
+            scans += 1
+            if scans == 5:
+                print '[[[ timeout due to too much scanning, router not in range ]]]'
+                cli.stdin.write('quit\n')
+                cli.stdin.flush()
+                reason_code = RC_AP_NOT_IN_RANGE
+                break
+
+        rc=cli.poll()
+
+    # If we are associated, wait for DHCP lease to become available
+    if rc==0:
+        for attempt in range(0, connection_timeout):
+            print 'waiting for DHCP lease'
+            time.sleep(1)
+            if is_internet_up():
+                connected=True
+                break
+
+        if not is_internet_up():
+            rc=RC_NO_DHCP_LEASE
+
+    print 'connection_result() rc={}'.format(rc)
+    return rc
 
 
 def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, connect_timeout=60):
@@ -551,7 +631,9 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
     and internet connection to become ready.
     '''
 
-    if os.access('/var/run/kano-connect.pid', os.R_OK):
+    wpafile=None
+
+    if os.access(KANO_CONNECT_PIDFILE, os.R_OK):
         client_module=sys.argv[0]
         if client_module.find('kano-connect') == -1:
             logger.info ('Cancelling kano-connect to give control to %s' % sys.argv[0])
@@ -575,9 +657,10 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
     run_cmd("ifconfig %s up" % iface)
 
     if wpa_custom_file:
-        logger.info("Starting wpa_supplicant with custom config: %s" % wpa_custom_file)
-        # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -D nl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
+        # Start the supplicant daemon using a user-defined configuration file
+        #logger.info("Starting wpa_supplicant with custom config: {}".format(wpa_custom_file))
+        #run_cmd(SUPPLICANT_CMD.format(wpa_custom_file, iface, SUPPLICANT_LOGFILE))
+        wpafile = wpa_custom_file
 
     elif encrypt == 'wep':
 
@@ -604,28 +687,25 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
         wpafile = '/etc/kano_wpa_connect.conf'
-        associated = False
         if not wpa_conf(essid, seckey, confile=wpafile, wep=True):
             return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -D nl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+        #run_cmd(SUPPLICANT_CMD.format(wpa_custom_file, iface, SUPPLICANT_LOGFILE))
 
+        # TODO: setup a WEP based AP to test the change below
         # Wait for wpa_supplicant to become associated to the AP - key validation.
         # For WEP Open networks it will always proceed, beacuse there is no real authentication,
         # connection will fail during DHCP process. For WEP Shared networks it will fail here if the key is wrong.
-        assoc_timeout = 20  # seconds
-        assoc_start = time.time()
-        while (time.time() - assoc_start) < assoc_timeout:
-            out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
-            wpa_state = out.strip('\n')
-            if len(wpa_state) and wpa_state.split('=')[1] == 'COMPLETED':
-                associated = True
-                break
-            time.sleep(0.5)
-
-        if not associated:
-            return False
+        #assoc_timeout = 20  # seconds
+        #assoc_start = time.time()
+        #while (time.time() - assoc_start) < assoc_timeout:
+        #    out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
+        #    wpa_state = out.strip('\n')
+        #    if len(wpa_state) and wpa_state.split('=')[1] == 'COMPLETED':
+        #        associated = True
+        #        break
+        #    time.sleep(0.5)
 
     elif encrypt == 'wpa':
 
@@ -639,35 +719,16 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
         wpafile = '/etc/kano_wpa_connect.conf'
-        associated = False
         if not wpa_conf(essid, seckey, confile=wpafile):
             return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -D nl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+        #run_cmd(SUPPLICANT_CMD.format(wpa_custom_file, iface, SUPPLICANT_LOGFILE))
 
-        # Wait for wpa_supplicant to become associated to the AP
-        # or give up if it takes too long
-        assoc_timeout = 20  # seconds
-        assoc_start = time.time()
-        while (time.time() - assoc_start) < assoc_timeout:
-            out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
-            wpa_state = out.strip('\n')
-            if len(wpa_state) and wpa_state.split('=')[1] == 'COMPLETED':
-                associated = True
-                break
-            time.sleep(0.5)
 
-        if not associated:
-            return False
-
-    # Wait until we verify that we have an Internet link
-    for retry in range(0, connect_timeout):
-        time.sleep(1)
-        if is_connected(iface):
-            return True
-
-    return False
+    # Wait until we are associated and that we have an Internet link
+    reason = connection_result(iface, wpafile, connect_timeout)
+    return reason
 
 
 def disconnect(iface, clear_cache=False):
