@@ -607,8 +607,8 @@ def do_connect(iface, wpa_file, connection_timeout, verbose=False):
         rc=cli.poll()
 
     # If we are associated, wait for DHCP lease to become available
-    if rc==0:
-        for attempt in range(0, connection_timeout):
+    if rc==RC_CONNECTED:
+        for attempt in xrange(0, connection_timeout):
             print 'waiting for DHCP lease'
             time.sleep(1)
             if is_internet_up():
