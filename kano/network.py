@@ -546,7 +546,7 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
     return reloaded
 
 
-def connection_result(iface, wpa_file, connection_timeout, verbose=False):
+def do_connect(iface, wpa_file, connection_timeout, verbose=False):
     '''
     This function connects to the WPA supplicant event flow to detect the result of a connection attempt.
     It returns a return code with an indication of the connection result. See the RC_* constants.
@@ -728,7 +728,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None, conn
 
 
     # Wait until we are associated and that we have an Internet link
-    reason = connection_result(iface, wpafile, connect_timeout)
+    reason = do_connect(iface, wpafile, connect_timeout)
     return reason
 
 
