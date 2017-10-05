@@ -556,6 +556,7 @@ def connection_result(iface, wpa_file, connection_timeout, verbose=False):
     rc=None
     connected=False
     scans = 0
+    max_scans=3   # Heuristics: Maximum number of scans before assuming the AP is not in range
 
     def is_internet_up(monitor_file=INTERNET_UP_FILE):
         return os.path.isfile(monitor_file)
@@ -590,7 +591,7 @@ def connection_result(iface, wpa_file, connection_timeout, verbose=False):
 
         if output.find('WPS-AP-AVAILABLE') != -1:
             scans += 1
-            if scans == 5:
+            if scans == max_scans:
                 print '[[[ timeout due to too much scanning, router not in range ]]]'
                 cli.stdin.write('quit\n')
                 cli.stdin.flush()
