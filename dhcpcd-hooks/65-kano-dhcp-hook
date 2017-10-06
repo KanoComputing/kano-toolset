@@ -16,7 +16,7 @@ monitor_file="/var/run/internet_monitor"
 logger "kano-dhcp-hook: info reason=$reason iface=$interface"
 
 case "$reason" in
-REBOOT)
+REBOOT | BOUND)
     ip_addr=`ip addr show wlan0 | grep inet | awk '{print $2}' | sed -s 's/\/.*//')`
     logger "kano-dhcp-hook: REBOOT event ipaddr=$ip_addr on iface=$interface"
 
