@@ -714,9 +714,8 @@ def connect(iface, essid, encrypt='off', seckey=None, \
         if not wpa_conf(essid, seckey, confile=wifi_conf_file, wep=True):
             return RC_INTERNAL_ERROR
 
-        # TODO: setup a WEP based AP to test the implementation of the do_connect() function.
         #
-        # For WEP Open networks, the supplicant will always proceed, beacuse there is no real authentication,
+        # NOTE: For WEP Open networks, the supplicant will always proceed, beacuse there is no real authentication,
         # connection would fail during DHCP process. For WEP Shared networks it would fail if the key is wrong.
         #
 
