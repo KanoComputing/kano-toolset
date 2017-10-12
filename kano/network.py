@@ -41,6 +41,8 @@ RC_CONNECTED = 0
 RC_BAD_PASSWORD = 1
 RC_AP_NOT_IN_RANGE = 2
 RC_NO_DHCP_LEASE = 3
+RC_INCORRECT_PASSWORD_LEN=4
+RC_INTERNAL_ERROR=5
 
 
 class IWList():
@@ -239,7 +241,7 @@ class IWList():
 
         logger.error('found {} networks in {} tries in {} seconds'.format(len(self.data), tries, time.time() - start_time))
 
-    def getList(self, unsecure=False, first=False, debug=False):
+    def getList(self, unsecure=False, first=False, debug=True):
         '''
         Return a comfortable list of wireless networks
         sorted by signal strength (strongest first)
@@ -546,6 +548,23 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
     return reloaded
 
 
+def do_wait_for_dhcp(connection_timeout=60):
+    '''
+    Waits for a DHCP lease to be obtained, returns True on success
+    '''
+    connected=False
+
+    def is_internet_up(monitor_file=INTERNET_UP_FILE):
+        return os.path.isfile(monitor_file)
+
+    for attempt in xrange(0, connection_timeout):
+        time.sleep(1)
+        if is_internet_up():
+            return True
+
+    return is_internet_up()
+
+
 def do_connect(iface, wpa_file, connection_timeout, debug=False):
     '''
     This function connects to the WPA supplicant event flow to detect the result of a connection attempt.
@@ -561,9 +580,6 @@ def do_connect(iface, wpa_file, connection_timeout, debug=False):
     def debug_msg(message):
         if debug:
             print '[[[ {} ]]]'.format(message)
-
-    def is_internet_up(monitor_file=INTERNET_UP_FILE):
-        return os.path.isfile(monitor_file)
 
     def close_wpa_cli(proc):
         '''
@@ -612,14 +628,7 @@ def do_connect(iface, wpa_file, connection_timeout, debug=False):
 
     # If we are associated, wait for DHCP lease to become available
     if rc==RC_CONNECTED:
-        for attempt in xrange(0, connection_timeout):
-            debug_msg('waiting for DHCP lease')
-            time.sleep(1)
-            if is_internet_up():
-                connected=True
-                break
-
-        if not is_internet_up():
+        if not do_wait_for_dhcp(connection_timeout=connection_timeout):
             rc=RC_NO_DHCP_LEASE
 
     debug_msg('do_connect() returns rc={}'.format(rc))
@@ -694,16 +703,16 @@ def connect(iface, essid, encrypt='off', seckey=None, \
                 seckey='hex' + seckey
             else:
                 logger.error("The WEP key lenght is incorrect (%d) should be 5/13/58 (ASCII) or 10/26/116 (HEX)" % (len(seckey)))
-                return False
+                return RC_INCORRECT_PASSWORD_LEN
         elif len(seckey) not in (10+3, 26+3, 116+3):
             # For keys that start with "hex", make sure their length is also correct.
             logger.error("The HEX WEP key lenght is incorrect (%d) should 10/26/116" % (len(seckey)))
-            return False
+            return RC_INCORRECT_PASSWORD_LEN
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
         wifi_conf_file = '/etc/kano_wpa_connect.conf'
         if not wpa_conf(essid, seckey, confile=wifi_conf_file, wep=True):
-            return False
+            return RC_INTERNAL_ERROR
 
         # TODO: setup a WEP based AP to test the implementation of the do_connect() function.
         #
@@ -719,12 +728,18 @@ def connect(iface, essid, encrypt='off', seckey=None, \
                 # WPA passphrases lenght is not correct
                 logger.error("The WPA key lenght is incorrect " \
                                  "(%d) should be between 8 and 63 chars" % wpalen)
-                return False
+                return RC_INCORRECT_PASSWORD_LEN
 
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
         wifi_conf_file = '/etc/kano_wpa_connect.conf'
         if not wpa_conf(essid, seckey, confile=wifi_conf_file):
-            return False
+            return RC_INTERNAL_ERROR
+
+    elif encrypt == 'off':
+        if do_wait_for_dhcp(connection_timeout=connect_timeout):
+            return RC_CONNECTED
+        else:
+            return RC_NO_DHCP_LEASE
 
 
     # Wait until we are associated, and that we have an Internet link
