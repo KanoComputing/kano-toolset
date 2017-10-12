@@ -241,7 +241,7 @@ class IWList():
 
         logger.error('found {} networks in {} tries in {} seconds'.format(len(self.data), tries, time.time() - start_time))
 
-    def getList(self, unsecure=False, first=False, debug=True):
+    def getList(self, unsecure=False, first=False, debug=False):
         '''
         Return a comfortable list of wireless networks
         sorted by signal strength (strongest first)
