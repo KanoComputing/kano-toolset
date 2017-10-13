@@ -30,7 +30,7 @@ REBOOT | BOUND)
 
     logger "kano-dhcp-hook: launching network up scripts"
 
-    systemd-run /usr/bin/kano-sentry-startup $reason
+    /usr/bin/kano-sentry-startup $reason
     systemd-run /usr/bin/kano-set-system-date $reason
 
     systemd-run /usr/bin/kano-network-hook $reason
