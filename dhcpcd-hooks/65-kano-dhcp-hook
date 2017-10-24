@@ -1,4 +1,3 @@
-#
 # 65-kano-dhcp-hook
 #
 # Copyright (C) 2017 Kano Computing Ltd.
@@ -8,7 +7,7 @@
 #
 # To enable this hook for logging, edit /etc/systemd/journalctl.conf and set Storage=persistent
 # Reboot, and execute "kano-test-dhcp".
-#
+
 
 # file that external applications can monitor for internet availability triggers
 monitor_file="/var/run/internet_monitor"
@@ -35,14 +34,24 @@ REBOOT | BOUND)
 
     systemd-run /usr/bin/kano-network-hook $reason
     systemd-run /usr/bin/kano-dashboard-sysupdates "bound" "$ip_addr"
+
+    # Try uploading the tracking data to our servers
+    # Should be quiet on failure
+    kano-sync --upload-tracking-data --silent &
+
+    # Sync objects from the content API in the background
+    # TODO: This should be removed once we have the daemon done
+    kano-content sync &
+
+    kano-tracker-ctl +1 'internet-connection-established' &
     ;;
 
 NOCARRIER | STOPPED)
     # Are we still networked due to multihomed connection?
     is_internet
     if [ $? -eq 0 ]; then
-	logger "kano-dhcp-hook: NOCARRIER/STOPPED but still connected, aborting action"
-	exit 0
+    	logger "kano-dhcp-hook: NOCARRIER/STOPPED but still connected, aborting action"
+    	exit 0
     else
         logger "kano-dhcp-hook: NOCARRIER/STOPPED and connectivity lost"
         rm $monitor_file

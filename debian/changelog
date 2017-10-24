@@ -1,3 +1,9 @@
+kano-toolset (3.14.0-0) unstable; urgency=low
+
+  * Moved kano content and tracking sync to network hooks from kano-ui-autostart
+
+ -- Team Kano <dev@kano.me>  Tue, 24 Oct 2017 14:40:00 +0100
+
 kano-toolset (3.13.0-0) unstable; urgency=low
 
   * Migrated Busybox dhcp client to a more modern implementation
