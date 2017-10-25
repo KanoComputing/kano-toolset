@@ -90,7 +90,7 @@ class WebApp(object):
 
         self._view = view = webkit.WebView()
         view.connect('navigation-policy-decision-requested',
-                     self._api_handler)
+                     self._nav_req_handler)
         view.connect('close-web-view', self._close)
         view.connect('onload-event', self._onload)
 
@@ -246,8 +246,45 @@ class WebApp(object):
 
         return call
 
-    def _api_handler(self, view, frame, request, action, decision, data=None):
+    def _nav_req_handler(self, view, frame, request, action, decision, data=None):
+        '''
+        Intercepts the navigation requests and processes them if they are
+        related to the custom API backend or a custom URI scheme.
+
+        Returning true acknowledges that the requrest has been handled,
+        returning false passes the request on to webkit to hanlde.
+        '''
+
         uri = action.get_original_uri()
+
+        # Custom URI schemes
+        if self._scheme_handler(uri):
+            return True
+
+        # API calls
+        if self._api_handler(view, uri):
+            return True
+
+        return False
+
+    def _scheme_handler(self, uri):
+        '''
+        Parses the URI to determine if it uses one of our custom schemes and, if
+        so, launches the scheme accordingly
+        '''
+
+        # We only know how to deal with the kano schemes
+        if not uri.startswith('kano:'):
+            return False
+
+        os.system('systemd-run --user /usr/bin/xdg-open {}'.format(uri))
+        return True
+
+    def _api_handler(self, view, uri):
+        '''
+        Parses the URI to determine if it uses the custom API calls to the
+        webengine backend and processes it appropriately
+        '''
 
         # Not an api call, let webkit handle it
         if re.search("#api:", uri) is None:
