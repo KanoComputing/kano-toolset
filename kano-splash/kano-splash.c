@@ -36,6 +36,10 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include <dirent.h>
+#include <limits.h>
+#include <sys/stat.h>
+
 #include "backgroundLayer.h"
 #include "imageLayer.h"
 #include "loadpng.h"
@@ -48,7 +52,9 @@
 
 #define NDEBUG
 
-//-------------------------------------------------------------------------
+// Animated splash windows - Frames per second and milliseconds per frame
+#define FPS 15
+#define MS_PER_FRAME (1000 / FPS)
 
 
 //-------------------------------------------------------------------------
@@ -63,29 +69,203 @@ void usage(void)
   exit(EXIT_FAILURE);
 }
 
-int display_image( char *file, uint16_t timeout, uint16_t background)
+DISPMANX_DISPLAY_HANDLE_T display_init(sigset_t *pwaitfor)
 {
-    int error = 0;
-    // don't allow us to be killed, because this causes a videocore memory leak
-    signal(SIGKILL,SIG_IGN); 
+    if (!pwaitfor) {
+        return -1;
+    }
+    else {
+        // don't allow us to be killed, because this causes a videocore memory leak
+        signal(SIGKILL, SIG_IGN); 
+        sigaddset(pwaitfor, SIGALRM);
+        sigprocmask(SIG_BLOCK, pwaitfor, NULL); // switch off ALRM in case we are sent it before we want
+    }
 
-    sigset_t waitfor;
-    sigaddset(&waitfor,SIGALRM);
-    sigprocmask(SIG_BLOCK,&waitfor,NULL); // switch off ALRM in case we are sent it before we want
-    //---------------------------------------------------------------------
-
+    // Acces to dispmanx and obtaining an EGL display surface
     bcm_host_init();
-
-    //---------------------------------------------------------------------
-
     DISPMANX_DISPLAY_HANDLE_T display = vc_dispmanx_display_open(0);
     if(!display){
-        error=1;
         kano_log_error("kano-splash: failed to open display\n");
+        return 0;
+    }
+
+    return display;
+}
+
+int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
+                       char *animation_directory, uint16_t timeout, uint16_t background, int looping)
+{
+    int error=0;
+    struct dirent **namelist;
+    int number_of_frames=0, current_frame_number=0;
+    int32_t xOffset = 0;
+    int32_t yOffset = 0;
+    char *next_frame;
+    struct timespec ts, frame_start, frame_end;
+    long ms_frame_time=0L;
+    int debug=0;
+
+
+    // allocate space for the next frame filename
+    next_frame = (char *) calloc(PATH_MAX, sizeof(char));
+    if (!next_frame) {
+        error = 2;
         goto end;
     }
 
-    //---------------------------------------------------------------------
+    // obtain geometric information from the display surface
+    DISPMANX_MODEINFO_T info;
+    error = vc_dispmanx_display_get_info(display, &info);
+    if (error != DISPMANX_SUCCESS) {
+	error = 1;
+	kano_log_error("kano-splash: failed to get display info\n");
+	goto close_display;
+    }
+
+    // initialize a transparent background
+    BACKGROUND_LAYER_T backgroundLayer;
+    bool okay = initBackgroundLayer(&backgroundLayer, background, 0);
+    if(!okay){
+         kano_log_error("kano-splash: failed to init background layer\n");
+	 error=1;
+	 goto close_display;
+    }
+
+    // Find the first image from the animation directory
+    printf ("Searching for image frames at: %s\n", animation_directory);
+    number_of_frames = scandir(animation_directory, &namelist, 0, alphasort);
+    if (number_of_frames < 0) {
+        printf ("Error: could not find animation frames at: %s\n", animation_directory);
+        error = 2;
+        goto close_background;
+    }
+    else {
+
+        current_frame_number = 0;
+        do {
+            sprintf(next_frame, "%s/%s", animation_directory, namelist[++current_frame_number]->d_name);
+
+        } while(!strstr(next_frame, "png"));
+
+        printf ("loading first animation frame: %s\n", next_frame);
+    }
+
+    IMAGE_LAYER_T imageLayer;
+    if (loadPng(&(imageLayer.image), next_frame) == false)
+    {
+        fprintf(stderr, "unable to load frame: %s\n", next_frame);
+        error = 2;
+        goto close_imagelayer;
+        
+    }
+    // TODO: parametrize "1" which is the layer number
+    createResourceImageLayer(&imageLayer, 1);
+
+    // position the background and the first frame, centered on the screen
+    xOffset = (info.width - imageLayer.image.width) / 2;
+    yOffset = (info.height - imageLayer.image.height) / 2;
+    
+    DISPMANX_UPDATE_HANDLE_T update = vc_dispmanx_update_start(0);
+    if (!update) {
+        error = -1;
+        goto close_imagelayer;
+    }
+
+    addElementBackgroundLayer(&backgroundLayer, display, update);
+    addElementImageLayerOffset(&imageLayer, xOffset, yOffset, display, update);
+
+    error = vc_dispmanx_update_submit_sync(update);
+    if (error) {
+        goto close_imagelayer;
+    }
+
+    // start rendering each of the frames
+
+    while (current_frame_number++ < number_of_frames || looping) {
+
+        if (strstr(namelist[current_frame_number]->d_name, ".png")) {
+
+            clock_gettime(CLOCK_MONOTONIC_RAW, &frame_start);
+
+            sprintf(next_frame, "%s/%s", animation_directory, namelist[current_frame_number]->d_name);
+            if (debug)
+                printf("frame #%d loading next frame: %s\n", current_frame_number, next_frame);
+
+            // replace frame on the screen
+            destroyImage(&(imageLayer.image));
+            loadPng(&(imageLayer.image), next_frame);
+            changeSourceAndUpdateImageLayer(&imageLayer);
+
+            // break the animation if the signal is received - kano-stop-splash
+            // poll for if the signal has been raised, return immediately in any case
+            ts.tv_sec=0;
+            ts.tv_nsec=0;
+            if (sigtimedwait(pwaitfor,NULL, &ts) > 0) {
+                // a signal was raised: stop the animation
+                error = 0;
+                goto close_imagelayer;
+            }
+
+            // Calculate how long it took to render the frame, in milliseconds
+            clock_gettime(CLOCK_MONOTONIC_RAW, &frame_end);
+            ms_frame_time = (frame_start.tv_sec == frame_end.tv_sec ?
+                             frame_end.tv_nsec - frame_start.tv_nsec :
+                             (1000000000  + frame_end.tv_nsec ) - frame_start.tv_nsec) / 1000000;
+
+            if (debug) {
+                printf ("frame #%d ms_frame_time=%ld fps=%d\n", current_frame_number, ms_frame_time, FPS);
+            }
+
+            // Delay the next frame to smooth the correct Frames per Second rate
+            if (ms_frame_time < MS_PER_FRAME) {
+                long delay = (MS_PER_FRAME - ms_frame_time) * 1000;
+                if (debug) {
+                    printf("ms_per_frame=%d usleep: %ld\n", MS_PER_FRAME, delay);
+                }
+                usleep (delay);
+            }
+        }
+        else {
+            if (debug)
+                printf ("skipping file: %s\n", namelist[current_frame_number]->d_name);
+        }
+
+        if (looping && current_frame_number == number_of_frames - 1) {
+            current_frame_number = 0;
+        }
+    }
+
+close_imagelayer:
+
+    destroyImageLayer(&imageLayer);
+
+close_background:
+    
+    destroyBackgroundLayer(&backgroundLayer);
+    
+close_display:
+
+    vc_dispmanx_display_close(display);
+
+end:
+
+    if (next_frame) {
+        number_of_frames--;
+        while(number_of_frames >= 0) {
+            free(namelist[number_of_frames--]);
+        }
+        free(namelist);
+        free(next_frame);
+    }
+
+    printf ("animation terminates with errorcode=%d\n", error);
+    return error;
+}
+
+int display_image (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
+                   char *file, uint16_t timeout, uint16_t background)
+{
+    int error = 0;
 
     DISPMANX_MODEINFO_T info;
     int result = vc_dispmanx_display_get_info(display, &info);
@@ -113,6 +293,9 @@ int display_image( char *file, uint16_t timeout, uint16_t background)
 	goto close_background;
 
     }
+
+    // TODO: parametrize "1" which is the layer number
+
     okay = createResourceImageLayer(&imageLayer, 1);
     if(!okay){
 	 
@@ -120,8 +303,6 @@ int display_image( char *file, uint16_t timeout, uint16_t background)
         error=1;
 	goto close_background;
     }
-	 
-	 
 
     //---------------------------------------------------------------------
 
@@ -194,17 +375,15 @@ int display_image( char *file, uint16_t timeout, uint16_t background)
 	 error = 1;
 	 goto close_imagelayer;
     }
+
     //---------------------------------------------------------------------
     // wait to be signalled with SIGARLM or timeout
     struct timespec ts;
     ts.tv_sec=timeout;
     ts.tv_nsec=0;
       
-    sigtimedwait(&waitfor,NULL, &ts);
+    sigtimedwait(pwaitfor,NULL, &ts);
    
-    //---------------------------------------------------------------------
-
-
     //---------------------------------------------------------------------
 
 close_imagelayer:
@@ -215,13 +394,12 @@ close_background:
     
     destroyBackgroundLayer(&backgroundLayer);
 
-    //---------------------------------------------------------------------
 close_display:
     
     result = vc_dispmanx_display_close(display);
 
     //---------------------------------------------------------------------
-end:
+
     return error;
 }
 
@@ -327,8 +505,29 @@ int main(int argc, char *argv[])
 
     image_child_pid = fork();
     if(image_child_pid==0){
-      error = display_image(file, timeout, background);
-      exit(error);
+
+        // Decide whether to start a static image or an animation splash image
+        sigset_t waitfor;
+        DISPMANX_DISPLAY_HANDLE_T display = display_init(&waitfor);
+        if (!display) {
+            return(-1);
+        }
+        else {
+            struct stat file_type;
+            stat (file, &file_type);
+            if (S_ISDIR(file_type.st_mode)) {
+                // TODO: parametrize loop mode - last function option
+                error = display_animation (display, &waitfor, file, timeout, background, 1);
+            }
+            else if (S_ISREG(file_type.st_mode)) {
+                error = display_image (display, &waitfor, file, timeout, background);
+            }
+            else {
+                error = 2; // file not found or not accessible
+            }
+
+            exit(error);
+        }
     }
 
     if(launch_command){
@@ -357,4 +556,3 @@ int main(int argc, char *argv[])
     }
     return error;
 }
-
