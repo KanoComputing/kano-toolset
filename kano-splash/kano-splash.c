@@ -56,6 +56,17 @@
 #define FPS 15
 #define MS_PER_FRAME (1000 / FPS)
 
+// Animation keywords accepted through shebang second parameter
+// this avoids the need to use hard coded paths.
+typedef struct _DEFAULT_ANIMATIONS {
+    char *keyword;
+    char *animation_path;
+
+} DEFAULT_ANIMATIONS;
+
+DEFAULT_ANIMATIONS animations[] = {
+    { "loader-animation", "/usr/share/kano-toolset/kano-splash/splash-animation-loader" }
+};
 
 //-------------------------------------------------------------------------
 
@@ -132,10 +143,13 @@ int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
     }
 
     // Find the first image from the animation directory
-    printf ("Searching for image frames at: %s\n", animation_directory);
+    if(debug)
+        printf ("Searching for image frames at: %s\n", animation_directory);
+
     number_of_frames = scandir(animation_directory, &namelist, 0, alphasort);
     if (number_of_frames < 0) {
-        printf ("Error: could not find animation frames at: %s\n", animation_directory);
+        if(debug)
+            printf ("Error: could not find animation frames at: %s\n", animation_directory);
         error = 2;
         goto close_background;
     }
@@ -147,7 +161,8 @@ int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
 
         } while(!strstr(next_frame, "png"));
 
-        printf ("loading first animation frame: %s\n", next_frame);
+        if(debug)
+            printf ("loading first animation frame: %s\n", next_frame);
     }
 
     IMAGE_LAYER_T imageLayer;
@@ -513,6 +528,16 @@ int main(int argc, char *argv[])
             return(-1);
         }
         else {
+
+            // Find if the file refers to one of the animation keywords
+            int animid;
+            for (animid=0; animid < sizeof(animations) / sizeof(animations[0]); animid++) {
+                if (!strcmp(file, animations[animid].keyword)) {
+                    file=animations[animid].animation_path;
+                    break;
+                }
+            }
+
             struct stat file_type;
             stat (file, &file_type);
             if (S_ISDIR(file_type.st_mode)) {

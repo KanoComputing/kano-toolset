@@ -27,6 +27,12 @@ The folder must contain a sequence of png files that make up the frames of the a
  * The filenames must be named in a way that are alphabetically sorted, i.e. frame-001.png, frame-002.png, etc.
  * Use the alpha channel to make the animation transparent on top of all apps.
 
+In addition, animation keywords can be specified instead, avoiding the need to establish hard coded paths
+between applications and kano-splash.
+
+If you specify `loader-animation` as the second argument, kano-splash will load the path for you.
+See the kano-splash.c source to find or add more animation keywords.
+
 The app mush then call `system("kano-stop-splash")` to stop the splash (or wait for it to time out at 15 seconds).
 In the case of animations, it will be played in an endless loop until the `kano-stop-splash` tool is called.
 

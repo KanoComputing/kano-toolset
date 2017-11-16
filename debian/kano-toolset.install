@@ -22,6 +22,7 @@ kano-keys-pressed/kano-keys-pressed /usr/bin
 
 kano-splash/kano-splash /usr/bin
 kano-splash/kano-get-start-time /usr/bin
+kano-splash/splash-animation-loader /usr/share/kano-toolset/kano-splash
 
 share/kano-launcher/conf usr/share/kano-toolset/kano-launcher/
 kano-launcher/kano-launcher usr/bin/
