@@ -17,8 +17,9 @@ import time
 from kano.logging import logger
 from kano.utils import get_cpu_id, get_rpi_model, run_cmd
 
+
 def send_cpu_id():
-    sent=False
+    sent = False
 
     # This is a loose dependency as we can't make kano-toolset
     # depend on profile.
@@ -29,9 +30,14 @@ def send_cpu_id():
         logger.error("Error sending the ping event ({})".format(e))
 
     # Get the unit CPU Serial number and send it, save a local copy
-    cpuid_filename = '/etc/cpuid-{}'.format(get_cpu_id())
+    cpuid = get_cpu_id()
+    cpuid_filename = '/etc/cpuid-{}'.format(cpuid)
+    cpuid_filename_boot = '/boot/cpuid.txt'.format(cpuid)
+    utc_time = time.asctime(time.gmtime(time.time()))
+
     if os.path.isfile(cpuid_filename):
         # We have already sent the CPU ID
+        sent = True
         pass
     else:
         try:
@@ -40,21 +46,33 @@ def send_cpu_id():
 
             # Save a trace of the CPUID so we dont send it over again
             # The UTC timestamp is embedded inside the cpuid file as well
-            utc_time=time.asctime(time.gmtime(time.time()))
             with open(cpuid_filename, 'a') as f:
                 os.utime(cpuid_filename, None)
-                f.write('RaspberryPI model: {}\n{}\n'.format(get_rpi_model(), utc_time))
+                f.write('RaspberryPI model: {}\n{}\n'.format(
+                    get_rpi_model(), utc_time))
 
             # Send this file over the network
             cmdline='curl --retry 5 --retry-delay 3 -T "{}" ' \
                 '--user "cpuname:mko821fgx" http://cpuids.kano.me//cpuserialnos/'.format(cpuid_filename)
             _, _,rc = run_cmd(cmdline)
-            assert (rc==0)
-            sent=True
+            assert (rc == 0)
+            sent = True
         except:
             if os.path.isfile(cpuid_filename): os.unlink(cpuid_filename)
             logger.error('Error sending Kit serial number')
- 
+
+    if os.path.isfile(cpuid_filename_boot):
+        pass
+    else:
+        try:
+            with open(cpuid_filename_boot, 'a') as f:
+                f.write('RaspberryPI model: {}\n{}\n{}\n'.format(
+                    get_rpi_model(),
+                    utc_time,
+                    cpuid))
+        except:
+            logger.error('Error writing boot cpuid')
+
     return sent
 
 if __name__ == '__main__':
