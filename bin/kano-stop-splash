@@ -5,8 +5,16 @@
 # Copyright (C) 2015 Kano Computing Ltd.
 # License: http://opensource.org/licenses/MIT
 #
-# Terminate  a splash window when the app has finished loading.
+# Terminate a splash window when the app has finished loading.
+# Provide a name in order to stop a "kano-splash-daemonize" instance.
 #
+
+# See kano-splash-daemonize for details
+splash_daemon_name="/var/run/lock/kano-splash-daemon-$1"
+if [ -f "$splash_daemon_name" ]; then
+    . "$splash_daemon_name"
+    rm "$splash_daemon_name"
+fi
 
 if test -n "$SPLASH_PID" ; then 
    if test -n "$SPLASH_START_TIME" ; then
@@ -16,4 +24,3 @@ if test -n "$SPLASH_PID" ; then
        fi
    fi
 fi
-

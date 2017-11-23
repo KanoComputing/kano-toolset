@@ -3,8 +3,9 @@ kano-toolset (3.14.0-0) unstable; urgency=low
   * Moved kano content and tracking sync to network hooks from kano-ui-autostart
   * Added short video animations to kano-splash, see README for details
   * Add Kano URI scheme comprehension to WebApp
+  * Add feature to stop kano-start-splash running in the background
 
- -- Team Kano <dev@kano.me>  Tue, 24 Oct 2017 14:40:00 +0100
+ -- Team Kano <dev@kano.me>  Wed, 22 Nov 2017 18:48:11 +0100
 
 kano-toolset (3.13.0-0) unstable; urgency=low
 

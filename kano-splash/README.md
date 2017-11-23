@@ -51,7 +51,34 @@ SPLASH_START_TIME=$(kano-get-start-time $SPLASH_PID)
 export SPLASH_PID SPLASH_START_TIME
 ```
 
-###Testing
+### Daemonize
+
+It is possible to daemonize multiple splash windows, giving each a unique name of your liking.
+This allows to manage splash windows in the background from separate processes.
+
+Here is an example code snippet:
+
+```
+#!/bin/bash
+penguin_image="-b 0 /home/myself/penguin.png"
+
+# Display a penguin, then a loader animation on top
+kano-splash-daemonize penguin "$penguin_image"
+sleep 1
+kano-splash-daemonize penguin_loader -b 0 loader-animation
+
+# give some time to see it all running
+sleep 3
+
+# stop the animation first, then remove the penguin
+kano-stop-splash penguin_loader
+sleep 1
+kano-stop-splash penguin
+```
+
+Do not use hyphens in the daemon name.
+
+### Testing
 
 Use the `test_splash.sh` script to test it on the RaspberryPI. Change the second argument in the shebang
 to either point to a static image or a folder containing a png animation.

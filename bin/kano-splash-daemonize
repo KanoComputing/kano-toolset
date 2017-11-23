@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Allows to daemonize multiple splash screens by name. Usage example:
+#
+#  $ kano-splash-daemonize dashboard "-b 0 loader-animation"
+#
+# Then, from a separate process:
+#
+#  $ kano-stop-splash dashboard
+#
+
+splash_filename="/var/run/lock/kano-splash-daemon-$1"
+if [ "$1" == "" ] || [ -f "$splash_filename" ]; then
+    echo "Please provide a unique splash name of your liking"
+    exit 1
+fi
+
+shift
+splash_params=$*
+if [ "$splash_params" == "" ]; then
+    echo "Please provide image parameters to kano-splash"
+    exit 1
+fi
+
+# start kano-splash in the background, collect parameters
+kano-start-splash $splash_params &
+SPLASH_PID=`pgrep -P $!`
+SPLASH_START_TIME=$(kano-get-start-time $SPLASH_PID)
+
+if [ "$SPLASH_PID" == "" ] || [ "$SPLASH_START_TIME" == "" ]; then
+    echo "Splash parameters are incorrect"
+    exit 1
+fi
+
+# save the splash daemon details to terminate it later
+echo "SPLASH_PID=$SPLASH_PID" > $splash_filename
+echo "SPLASH_START_TIME=$SPLASH_START_TIME" >> $splash_filename
