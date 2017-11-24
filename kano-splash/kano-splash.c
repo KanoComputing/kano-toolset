@@ -35,6 +35,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
+#include <errno.h>
 
 #include <dirent.h>
 #include <limits.h>
@@ -237,7 +238,12 @@ int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
                 if (debug) {
                     printf("ms_per_frame=%d usleep: %ld\n", MS_PER_FRAME, delay);
                 }
-                usleep (delay);
+                if (usleep (delay) < 0 && errno == EINTR) {
+                    // The sleep was interrupted due to a signal,
+                    // this means that kano-stop-splash wants to stop it
+                    error = 0;
+                    goto close_imagelayer;
+                }
             }
         }
         else {
