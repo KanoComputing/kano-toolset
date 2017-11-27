@@ -9,10 +9,17 @@
 #  $ kano-stop-splash dashboard
 #
 
-splash_filename="/var/run/lock/kano-splash-daemon-$1"
+splash_dir="/var/tmp/kano-splash"
+splash_filename="$splash_dir/name-$1"
 if [ "$1" == "" ] || [ -f "$splash_filename" ]; then
     echo "Please provide a unique splash name of your liking"
     exit 1
+fi
+
+# Allow anyone to read and write to this directory
+if [ ! -d "$splash_dir" ]; then
+    mkdir -p "$splash_dir"
+    chmod go+rwx "$splash_dir"
 fi
 
 shift
@@ -24,11 +31,7 @@ fi
 
 # start kano-splash in the background, collect parameters
 kano-start-splash $splash_params &
-
-# Eventually pgrep kicks in before start-splash has forked, then leaves an orphan splash
-# FIXME: I do not like this solution
 sleep 1
-
 SPLASH_PID=`pgrep -P $!`
 SPLASH_START_TIME=$(kano-get-start-time $SPLASH_PID)
 
@@ -40,3 +43,6 @@ fi
 # save the splash daemon details to terminate it later
 echo "SPLASH_PID=$SPLASH_PID" > $splash_filename
 echo "SPLASH_START_TIME=$SPLASH_START_TIME" >> $splash_filename
+
+# make sure the file can eventually be deleted by someone else
+chmod go+w $splash_filename

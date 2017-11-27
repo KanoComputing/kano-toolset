@@ -10,7 +10,7 @@
 #
 
 # See kano-splash-daemonize for details
-splash_daemon_name="/var/run/lock/kano-splash-daemon-$1"
+splash_daemon_name="/var/tmp/kano-splash/name-$1"
 if [ -f "$splash_daemon_name" ]; then
     . "$splash_daemon_name"
     rm "$splash_daemon_name"
