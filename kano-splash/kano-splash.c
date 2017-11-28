@@ -279,7 +279,9 @@ end:
         free(next_frame);
     }
 
-    printf ("animation terminates with errorcode=%d\n", error);
+    if(debug)
+        printf ("animation terminates with errorcode=%d\n", error);
+
     return error;
 }
 
