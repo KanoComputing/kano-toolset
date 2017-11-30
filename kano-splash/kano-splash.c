@@ -54,7 +54,7 @@
 #define NDEBUG
 
 // Animated splash windows - Frames per second and milliseconds per frame
-#define FPS 15
+#define FPS 30
 #define MS_PER_FRAME (1000 / FPS)
 
 // Animation keywords accepted through shebang second parameter
