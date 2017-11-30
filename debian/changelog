@@ -4,8 +4,9 @@ kano-toolset (3.14.0-0) unstable; urgency=low
   * Added short video animations to kano-splash, see README for details
   * Add Kano URI scheme comprehension to WebApp
   * Add feature to stop kano-start-splash running in the background
+  * Rerouted Logout to Reboot to avoid bug in kano-boards-daemon (PiHat lib)
 
- -- Team Kano <dev@kano.me>  Wed, 22 Nov 2017 18:48:11 +0100
+ -- Team Kano <dev@kano.me>  Thu, 30 Nov 2017 11:26:00 +0100
 
 kano-toolset (3.13.0-0) unstable; urgency=low
 

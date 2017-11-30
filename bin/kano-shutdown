@@ -77,8 +77,10 @@ class ShutdownOptions(ApplicationWindow):
         self.btn_reboot = KanoButton(_('Reboot'))
         self.btn_reboot.connect('button-press-event', self._on_reboot)
 
+        # TODO: Because of an issue with kano-boards-daemon restarting at logout,
+        # the easiest quickest workaround is to reboot when logging out.
         self.btn_logout = KanoButton(_('Logout'))
-        self.btn_logout.connect('button-press-event', self._on_logout)
+        self.btn_logout.connect('button-press-event', self._on_reboot)
 
         self.btn_cancel = KanoButton(_('Cancel'))
         self.btn_cancel.connect('button-press-event', self._on_cancel)
