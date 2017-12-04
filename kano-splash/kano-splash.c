@@ -40,6 +40,7 @@
 #include <dirent.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <sys/sysinfo.h>
 
 #include "backgroundLayer.h"
 #include "imageLayer.h"
@@ -71,11 +72,12 @@ DEFAULT_ANIMATIONS animations[] = {
 
 //-------------------------------------------------------------------------
 
-void usage(void)
+void usage(uint16_t timeout)
 {
-  fprintf(stderr, "Usage: kano-splash-start [-b <RGBA>] [ -t <timeout> ] <file.png>\n");
-  fprintf(stderr, "    -b - set background colour 16 bit RGBA\n");
-  fprintf(stderr, "    -t - timeout in seconds\n");
+  fprintf(stderr, "Usage: kano-splash-start [-b <RGBA>] [ -t <timeout> ] [ -d 1|0 ] <file.png | animation folder>\n");
+  fprintf(stderr, "    -b - set background colour 16 bit RGBA, example -b 0f00 is transparent red\n");
+  fprintf(stderr, "    -t - timeout in seconds - default is %d\n", timeout);
+  fprintf(stderr, "    -d - enable console debug logs with -d 1, default is off\n");
   fprintf(stderr, "         e.g. 0x000F is opaque black\n");
 
   exit(EXIT_FAILURE);
@@ -105,7 +107,7 @@ DISPMANX_DISPLAY_HANDLE_T display_init(sigset_t *pwaitfor)
 }
 
 int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
-                       char *animation_directory, uint16_t timeout, uint16_t background, int looping)
+                       char *animation_directory, uint16_t timeout, uint16_t background, int looping, int debug)
 {
     int error=0;
     struct dirent **namelist;
@@ -115,8 +117,15 @@ int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
     char *next_frame;
     struct timespec ts, frame_start, frame_end;
     long ms_frame_time=0L;
-    int debug=0;
+    struct sysinfo sysinfo_start, sysinfo_now;
 
+    if(timeout > 0) {
+        if(debug)
+            printf ("timeout specified: %dsecs\n", timeout);
+
+        memset(&sysinfo_start, 0, sizeof(sysinfo_start));
+        sysinfo(&sysinfo_start);
+    }
 
     // allocate space for the next frame filename
     next_frame = (char *) calloc(PATH_MAX, sizeof(char));
@@ -129,9 +138,9 @@ int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
     DISPMANX_MODEINFO_T info;
     error = vc_dispmanx_display_get_info(display, &info);
     if (error != DISPMANX_SUCCESS) {
-	error = 1;
-	kano_log_error("kano-splash: failed to get display info\n");
-	goto close_display;
+        error = 1;
+        kano_log_error("kano-splash: failed to get display info\n");
+        goto close_display;
     }
 
     // initialize a transparent background
@@ -139,8 +148,8 @@ int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
     bool okay = initBackgroundLayer(&backgroundLayer, background, 0);
     if(!okay){
          kano_log_error("kano-splash: failed to init background layer\n");
-	 error=1;
-	 goto close_display;
+         error=1;
+         goto close_display;
     }
 
     // Find the first image from the animation directory
@@ -254,6 +263,19 @@ int display_animation (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
         if (looping && current_frame_number == number_of_frames - 1) {
             current_frame_number = 0;
         }
+
+        // Stop if the animation timeout was specified and it has expired
+        if (timeout) {
+            memset(&sysinfo_now, 0, sizeof(sysinfo_now));
+            sysinfo(&sysinfo_now);
+            if ((sysinfo_now.uptime - sysinfo_start.uptime) > timeout) {
+                if (debug)
+                    printf("terminating due to timeout: %dsecs\n", timeout);
+
+                error=0;
+                goto close_imagelayer;
+            }
+        }
     }
 
 close_imagelayer:
@@ -286,7 +308,7 @@ end:
 }
 
 int display_image (DISPMANX_DISPLAY_HANDLE_T display, sigset_t *pwaitfor,
-                   char *file, uint16_t timeout, uint16_t background)
+                   char *file, uint16_t timeout, uint16_t background, int debug)
 {
     int error = 0;
 
@@ -441,6 +463,7 @@ int main(int argc, char *argv[])
     pid_t command_child_pid=0;
     pid_t image_child_pid=0;
     int launch_command=false;
+    int debug=0;
 
     binary=basename(argv[0]);
     is_interp=strcmp(binary,"kano-splash")==0;
@@ -448,32 +471,34 @@ int main(int argc, char *argv[])
     if(!is_interp){
         int opt=0;
         
-        while ((opt = getopt(argc, argv, "b:t:")) != -1)
+        while ((opt = getopt(argc, argv, "b:t:d:")) != -1)
         {
             switch(opt)
             {
+            case 'd':
+                debug = strtol(optarg, NULL, 10);
+                break;
+
             case 'b':
-        
                 background = strtol(optarg, NULL, 16);
                 break;
         
             case 't':
-        
                 timeout = strtol(optarg, NULL, 10);
                 break;
-        
+
             default:
-        
-                usage();
+                usage(timeout);
                 break;
             }
         }
         file=argv[optind];
+
         //---------------------------------------------------------------------
    
         if (optind >= argc)
         {
-            usage();
+            usage(timeout);
         }
     }
     else{
@@ -550,10 +575,10 @@ int main(int argc, char *argv[])
             stat (file, &file_type);
             if (S_ISDIR(file_type.st_mode)) {
                 // TODO: parametrize loop mode - last function option
-                error = display_animation (display, &waitfor, file, timeout, background, 1);
+                error = display_animation (display, &waitfor, file, timeout, background, 1, debug);
             }
             else if (S_ISREG(file_type.st_mode)) {
-                error = display_image (display, &waitfor, file, timeout, background);
+                error = display_image (display, &waitfor, file, timeout, background, debug);
             }
             else {
                 error = 2; // file not found or not accessible
