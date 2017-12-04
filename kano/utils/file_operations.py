@@ -17,6 +17,7 @@ import fcntl
 import errno
 import stat
 import time
+import tempfile
 
 from kano.utils.user import get_user_unsudoed
 from kano.utils.shell import run_cmd
@@ -268,16 +269,18 @@ def sed(pattern, replacement, file_path, use_regexp=True):
     with open(file_path, "r") as file_handle:
         lines = file_handle.readlines()
 
-    with open(file_path, "w") as file_handle:
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp_f:
         for line in lines:
             if use_regexp:
                 modified_line = re.sub(pattern, replacement, line)
             else:
                 modified_line = line.replace(pattern, replacement)
 
-            file_handle.write(modified_line)
+            tmp_f.write(modified_line)
 
             if line != modified_line:
                 changed += 1
+
+    shutil.move(tmp_f.name, file_path)
 
     return changed
