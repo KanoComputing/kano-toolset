@@ -38,6 +38,7 @@ def send_cpu_id():
     if os.path.isfile(cpuid_filename):
         # We have already sent the CPU ID
         sent = True
+        pass
     else:
         try:
             # The code below is the legacy way of tracking cpuids
@@ -64,7 +65,7 @@ def send_cpu_id():
         pass
     else:
         try:
-            with open(cpuid_filename_boot, 'w') as f:
+            with open(cpuid_filename_boot, 'a') as f:
                 f.write('RaspberryPI model: {}\n{}\n{}\n'.format(
                     get_rpi_model(),
                     utc_time,
