@@ -1,2 +1,2 @@
 match_only_preset
-extra_cmd: kano-window-tool -t "Make Snake" -dyes -m -f
+extra_cmd: kano-window-tool -t "Make Snake" -dyes -f
