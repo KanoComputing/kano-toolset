@@ -9,9 +9,10 @@
 
 
 import os
-import mock
+import pytest
 
 
+@pytest.mark.gtk
 def test_navigation_requests(monkeypatch, webapp, navigation_action):
     '''
     Ensures that custom navigation requests to the webapp are parsed correctly.
