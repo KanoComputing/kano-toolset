@@ -70,5 +70,6 @@ check:
 	# Generate reports
 	coverage xml
 	coverage html
+	coverage-badge -o $(COVERAGE_REPORT_DIR)/kano-toolset-coverage.svg
 
 test: check

@@ -1,5 +1,7 @@
 # Kano Toolset
 
+[![Coverage](http://dev.kano.me/public/status-badges/kano-toolset-coverage.svg)](http://dev.kano.me/public/status-badges/kano-toolset-coverage.svg)
+
 Collection of utilities for the RaspberryPI and KanoOS.
 
 Most tools are used by the UI apps provided by the system, and their interactions.

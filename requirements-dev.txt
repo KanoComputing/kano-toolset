@@ -1,4 +1,5 @@
 behave
+coverage-badge
 mock
 pyfakefs
 pytest
