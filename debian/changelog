@@ -5,6 +5,7 @@ kano-toolset (3.15.0-0) unstable; urgency=low
   * Run tests on push
   * Implement tests for the kano.utils.system and kano.utils.users modules
   * Fix WiFi countries tests to work with PyTest
+  * Fix logging tests to work with PyTest
 
  -- Team Kano <dev@kano.me>  Wed, 20 Dec 2017 17:15:00 +0100
 
