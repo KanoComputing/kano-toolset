@@ -1,10 +1,11 @@
 # test.py
 #
-# Copyright (C) 2016 Kano Computing Ltd.
+# Copyright (C) 2016-2017 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Unit test for luon.py
 #
+import pytest
 import unittest
 
 import json
@@ -275,6 +276,7 @@ def run_tests(jfile=None, set_float=True):
         return all_succeeded
 
 
+@pytest.mark.lua
 class TestLua(unittest.TestCase):
     def test_lua_json(self):
         self.assertTrue(run_tests())
