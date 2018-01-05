@@ -6,7 +6,13 @@ kano-launcher/kano-launcher
 # Test files
 reports
 
-# Created by https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx,visualstudiocode
+# Google Tests
+googletest*
+gtest*
+gmock*
+
+
+# Created by https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx,visualstudiocode,cmake
 
 ### C++ ###
 # Prerequisites
@@ -41,6 +47,18 @@ reports
 *.exe
 *.out
 *.app
+
+### CMake ###
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+build
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
@@ -142,7 +160,6 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
 
 # Distribution / packaging
 .Python
@@ -177,6 +194,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.pytest_cache/
 nosetests.xml
 coverage.xml
 *.cover
@@ -185,10 +203,6 @@ coverage.xml
 # Translations
 *.mo
 *.pot
-
-# Django stuff:
-*.log
-local_settings.py
 
 # Flask stuff:
 instance/
@@ -271,10 +285,8 @@ GitHub.sublime-settings
 
 ### Vim ###
 # swap
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-v][a-z]
-[._]sw[a-p]
+.sw[a-p]
+.*.sw[a-p]
 # session
 Session.vim
 # temporary
@@ -290,4 +302,6 @@ tags
 !.vscode/extensions.json
 .history
 
-# End of https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx,visualstudiocode
+
+# End of https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx,visualstudiocode,cmake
+# End of https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx,visualstudiocode,cmake

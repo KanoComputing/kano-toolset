@@ -5,6 +5,11 @@
 //  License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 //
 
+
+#ifndef __HID_H__
+#define __HID_H__
+
+
 #include <stdbool.h>
 
 // Defaut generous buffer size to read from devices
@@ -47,7 +52,5 @@ extern "C"
 #endif
 void hid_terminate(HID_HANDLE hid);
 
-#ifdef __cplusplus
-extern "C"
-bool is_hotkey_pressed(HID_HANDLE hid, bool verbose);
-#endif
+
+#endif  // __HID_H__

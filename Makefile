@@ -29,7 +29,7 @@ docs:
 	cd docs && make all
 
 kano-keys-pressed:
-	cd kano-keys-pressed && make
+	cd kano-keys-pressed && cmake . && make
 
 kano-launcher: kano-c-logging
 	cd kano-launcher && make
