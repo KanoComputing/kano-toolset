@@ -8,42 +8,7 @@ kano-splash/kano-splash
 # Test files
 reports
 
-
-# Created by https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx
-
-### C++ ###
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# Created by https://www.gitignore.io/api/vim,macos,emacs,python,sublimetext,visualstudiocode
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
@@ -111,7 +76,7 @@ company-statistics-cache.el
 # anaconda-mode
 anaconda-mode/
 
-### OSX ###
+### macOS ###
 *.DS_Store
 .AppleDouble
 .LSOverride
@@ -145,6 +110,7 @@ __pycache__/
 *$py.class
 
 # C extensions
+*.so
 
 # Distribution / packaging
 .Python
@@ -212,7 +178,7 @@ target/
 .python-version
 
 # celery beat schedule file
-celerybeat-schedule
+celerybeat-schedule.*
 
 # SageMath parsed files
 *.sage.py
@@ -284,4 +250,12 @@ Session.vim
 # auto-generated tag files
 tags
 
-# End of https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+# End of https://www.gitignore.io/api/vim,macos,emacs,python,sublimetext,visualstudiocode
