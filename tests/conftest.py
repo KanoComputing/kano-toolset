@@ -13,3 +13,7 @@
 from tests.fixtures.webapp import *
 from tests.fixtures.users import *
 from tests.fixtures.system import *
+from tests.fixtures.cpu import *
+from tests.fixtures.disk import *
+from tests.fixtures.boards import *
+from tests.fixtures.keyboard import *

@@ -34,6 +34,8 @@ RPI_1_CPU_PROFILE = 'rpi_1'
 RPI_2_CPU_PROFILE = 'rpi_2'
 RPI_3_CPU_PROFILE = 'rpi_3'
 
+CPUINFO_FILE = '/proc/cpuinfo'
+
 
 '''
 Lookup table with keys as given by get_rpi_model() containing:
@@ -167,9 +169,7 @@ def get_rpi_model(revision=None):
         model_name = overclocked = ''
 
         if not revision:
-            o, _, _ = run_cmd('cat {}'.format('/proc/cpuinfo'))
-            o = o.splitlines()
-            for entry in o:
+            for entry in read_file_contents_as_lines(CPUINFO_FILE):
                 if entry.startswith('Revision'):
                     revision = entry.split(':')[1]
 
@@ -211,8 +211,7 @@ def get_cpu_id():
     '''
     Returns the RaspberryPI Serial number from /proc/cpuinfo
     '''
-    cpuinfo_file = '/proc/cpuinfo'
-    lines = read_file_contents_as_lines(cpuinfo_file)
+    lines = read_file_contents_as_lines(CPUINFO_FILE)
     if not lines:
         return
 
