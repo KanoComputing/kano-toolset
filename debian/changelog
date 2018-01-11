@@ -1,5 +1,6 @@
 kano-toolset (3.15.0-0) unstable; urgency=low
 
+  * Fixed the default button focus on KanoDialog class
   * Fixed issue with Make Snake launching windowed from Desktop
   * Create test coverage report
   * Run tests on push
