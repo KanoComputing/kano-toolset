@@ -8,7 +8,41 @@ kano-splash/kano-splash
 # Test files
 reports
 
-# Created by https://www.gitignore.io/api/vim,macos,emacs,python,sublimetext,visualstudiocode
+# Created by https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx,visualstudiocode
+
+### C++ ###
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
@@ -76,7 +110,7 @@ company-statistics-cache.el
 # anaconda-mode
 anaconda-mode/
 
-### macOS ###
+### OSX ###
 *.DS_Store
 .AppleDouble
 .LSOverride
@@ -258,4 +292,4 @@ tags
 !.vscode/extensions.json
 .history
 
-# End of https://www.gitignore.io/api/vim,macos,emacs,python,sublimetext,visualstudiocode
+# End of https://www.gitignore.io/api/vim,c++,emacs,python,sublimetext,osx,visualstudiocode
