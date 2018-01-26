@@ -115,7 +115,7 @@ class KanoDialog():
             def entry_activated(w):
                 self.returnvalue = self.widget.get_text()
                 self.dialog.response(Gtk.ResponseType.OK)
-        self.widget.connect('activate', entry_activated)
+            self.widget.connect('activate', entry_activated)
 
     def __add_scrolled_window(self):
         text = Gtk.TextView()
