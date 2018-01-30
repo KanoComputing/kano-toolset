@@ -1,6 +1,6 @@
 # file_operations.py
 #
-# Copyright (C) 2014-2016 Kano Computing Ltd.
+# Copyright (C) 2014-2018 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Utilities relating to file operations
@@ -199,6 +199,34 @@ def write_json(filepath, data, prettyprint=False, sort_keys=True):
         if rc == 0:
             cmd = 'underscore print -i {filepath} -o {filepath}'.format(filepath=filepath)
             run_cmd(cmd)
+
+
+def touch(path, times=None):
+    """Set the access and modified times of the file specified by path.
+
+    The function calls :func:`.ensure_dir` beforehand for you.
+    This is essentially a simple wrapper for :func:`os.utime`.
+
+    Args:
+        path (str): Path to the file create/modify
+        times (tuple): See :func:`os.utime`
+
+    Returns:
+        bool: Whether the operation was successful or not
+    """
+    try:
+        ensure_dir(os.path.dirname(path))
+        with open(path, 'a'):
+            os.utime(path, times)
+
+    except (IOError, OSError) as error:
+        from kano.logging import logger
+        logger.error(
+            "Could not touch {} due to permission/IO - {}"
+            .format(path, error)
+        )
+        return False
+    return True
 
 
 class open_locked(file):

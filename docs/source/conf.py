@@ -111,6 +111,7 @@ autodoc_mock_imports = [
     'Xlib',
 ]
 
+# For some reason this module didn't get picked up by autodoc mocking.
 import mock
 sys.modules['yaml'] = mock.Mock()
 
