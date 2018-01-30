@@ -38,11 +38,19 @@ import os
 CONF_FILE = '/etc/kano-profiling.conf'
 
 isConf = os.path.exists(CONF_FILE)
+conf_loaded = False
 
 
 def declare_timepoint(name, isStart):
+    global conf_loaded
+
     if not isConf:
         return
-    else:
-        import kano.profiling_late
-        kano.profiling_late.declare_timepoint(name, isStart)
+
+    import kano.profiling_late
+
+    if not conf_loaded:
+        kano.profiling_late.load_config()
+        conf_loaded = True
+
+    kano.profiling_late.declare_timepoint(name, isStart)
