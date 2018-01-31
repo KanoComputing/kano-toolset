@@ -24,7 +24,7 @@ import thread
 import atexit
 
 from kano.window import gdk_window_settings
-from kano.profiling import declare_timepoint
+# from kano.profiling import declare_timepoint
 
 def asynchronous_gtk_message(fun):
 
@@ -79,7 +79,7 @@ class WebApp(object):
     _inspector = False
 
     _disable_minimize = False
-    
+
     _pipe = True
 
     def run(self):
@@ -155,14 +155,14 @@ class WebApp(object):
         # if so, try to unminimise it
         if event.changed_mask & gdk.WINDOW_STATE_ICONIFIED:
             window.deiconify()
-            
+
     def _activate_inspector(self, inspector, target_view, splitter):
         inspector_view = webkit.WebView()
         splitter.add2(inspector_view)
         return inspector_view
 
     def _onload(self, wv, frame, user_data=None):
-        declare_timepoint("load",False)
+        # declare_timepoint("load",False)
         os.system("kano-stop-splash")
 
     def exit(self):
