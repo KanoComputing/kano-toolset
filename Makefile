@@ -18,9 +18,9 @@ endif
 BEHAVE_TAGS_FLAG := $(join $(addprefix --tags=-,$(OMITTED_TAGS)), $(space))
 
 
-.PHONY: clean docs kano-keys-pressed kano-splash kano-launcher kano-logging kano kano-networking kano-python parson check test
+.PHONY: clean docs kano-keys-pressed kano-launcher kano-logging kano kano-networking kano-python parson check test
 
-all: kano-keys-pressed kano-splash kano-launcher kano kano-networking kano-python parson
+all: kano-keys-pressed kano-launcher kano kano-networking kano-python parson
 
 clean:
 	cd docs && make clean
@@ -30,9 +30,6 @@ docs:
 
 kano-keys-pressed:
 	cd kano-keys-pressed && make
-
-kano-splash: kano-logging
-	cd kano-splash && make
 
 kano-launcher: kano-logging
 	cd kano-launcher && make
