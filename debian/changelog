@@ -14,8 +14,9 @@ kano-toolset (3.15.0-0) unstable; urgency=low
   * Fix WiFi countries tests to work with PyTest
   * Fix logging tests to work with PyTest
   * Mark Lua tests as such
+  * Update Raspberry Pi board revision numbers and detection functions
 
- -- Team Kano <dev@kano.me>  Wed, 20 Dec 2017 17:15:00 +0100
+ -- Team Kano <dev@kano.me>  Mon, 5 Feb 2018 13:55:00 +0100
 
 kano-toolset (3.14.0-0) unstable; urgency=low
 
