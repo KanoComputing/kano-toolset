@@ -105,6 +105,25 @@ Depends: ${misc:Depends},
 Description: Dev version of JSON library
  Dev version of JSON library by Krzysztof Gabis
 
+Package: libkano-c-logging
+Architecture: any
+Depends: ${misc:Depends}
+Description: Log wrapper library
+ Log wrapper library
+
+Package: libkano-c-logging-dbg
+Architecture: any
+Depends: ${misc:Depends}
+Description: Log wrapper library
+ Log wrapper library
+
+Package: libkano-c-logging-dev
+Architecture: any
+Depends: ${misc:Depends},
+         libkano-c-logging (= ${source:Version})
+Description: Log wrapper library
+ Log wrapper library
+
 Package: kano-toolset-i18n-orig
 Architecture: all
 Description: Data for working on translations of kano-toolset

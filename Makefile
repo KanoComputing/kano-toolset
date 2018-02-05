@@ -31,11 +31,13 @@ docs:
 kano-keys-pressed:
 	cd kano-keys-pressed && make
 
-kano-launcher: kano-logging
+kano-launcher: kano-c-logging
 	cd kano-launcher && make
 
-kano-logging:
-	cd kano-logging && make
+kano-c-logging:
+	cd libs/kano-c-logging && make
+	cd libs/kano-c-logging && make debug
+
 
 kano: kano-python
 	cd libs/kano && LOCAL_BUILD=1 make

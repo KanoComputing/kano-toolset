@@ -33,14 +33,6 @@ is currently pressed. This tool is used to regain control on RaspberryPI
 unsupported screens, and switch to a *safe mode*.
 
 
-Kano Splash
------------
-
-``kano-splash`` is a tool to show very fast popup messages based on
-image bitmaps. It uses the RaspberryPI GPU directly so it's very fast,
-and it sits on top of all desktop apps.
-
-
 kano-launcher
 -------------
 

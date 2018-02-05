@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <fcntl.h>
 
-#include "kano-log.h"
+#include "kano_c_logging.h"
 
 #define CONF_DIR "/usr/share/kano-toolset/kano-launcher/conf"
 

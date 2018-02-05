@@ -1,0 +1,2 @@
+#!/usr/bin/dh-exec
+libs/kano-c-logging/release/libkano_c_logging.so => usr/lib/libkano_c_logging.so.1

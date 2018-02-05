@@ -1,8 +1,8 @@
 
 all: kano-launcher kano-kill-ns
 
-LIBS=-L../kano-logging -lkano-logging
-INCLUDES=-I../kano-logging 
+LIBS=-L../libs/kano-c-logging/release/ -lkano_c_logging
+INCLUDES=-I../libs/kano-c-logging/includes
 kano-launcher:
 	gcc -std=c99 -D_BSD_SOURCE -gdwarf-2 $(INCLUDES) kano-launcher.c $(LIBS) -o kano-launcher 
 

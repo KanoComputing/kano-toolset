@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include "kano-log.h"
+#include "kano_c_logging.h"
 #define PATH_LEN 256
 #define LINK_LEN 256
 
