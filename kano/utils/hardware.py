@@ -252,7 +252,7 @@ def get_rpi_model(revision=None, use_cached=True):
     try:
         model_name = overclocked = ''
 
-        revision = get_board_revision(use_cached=use_cached)
+        revision = revision or get_board_revision(use_cached=use_cached)
         try:
             revision_hex = int(revision, 16)
         except ValueError:  # revision might be 'Beta'
@@ -262,7 +262,7 @@ def get_rpi_model(revision=None, use_cached=True):
         if revision_hex & 0x00FFFFFF in (0x00A02082, 0x00A22082, 0x00A32082):
             model_name = RPI_3_KEY
 
-        elif revision_hex & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041):
+        elif revision_hex & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041, 0x00A21042):
             model_name = RPI_2_B_KEY
 
         elif revision_hex & 0x00ff in (0x10, 0x13) or \

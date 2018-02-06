@@ -22,7 +22,9 @@ class BoardData(object):
     RPI_B_KEY = 'RPI/B'
     RPI_B_PLUS_KEY = 'RPI/B+'
     RPI_ZERO_KEY = 'RPI/Zero'
+    RPI_ZERO_W_KEY = 'RPI/Zero/W'
     RPI_COMPUTE_KEY = 'RPI/Compute'
+    RPI_COMPUTE_3_KEY = 'RPI/Compute/3'
     RPI_2_B_KEY = 'RPI/2/B'
     RPI_3_KEY = 'RPI/3'
 
@@ -31,8 +33,10 @@ class BoardData(object):
     RPI_B_SCORE = 2000
     RPI_B_PLUS_SCORE = 2000
     RPI_ZERO_SCORE = 3000
+    RPI_ZERO_W_SCORE = 3000
     RPI_COMPUTE_SCORE = 4000
     RPI_2_B_SCORE = 5000
+    RPI_COMPUTE_3_SCORE = 7000
     RPI_3_SCORE = 7000
 
     RPI_1_CPU_PROFILE = 'rpi_1'
@@ -110,11 +114,25 @@ BOARDS = [
         arm_v=6
     ),
     Board(
+        key=BoardData.RPI_ZERO_W_KEY,
+        name='',
+        profile=BoardData.RPI_1_CPU_PROFILE,
+        perf=BoardData.RPI_ZERO_SCORE,
+        arm_v=6
+    ),
+    Board(
         key=BoardData.RPI_COMPUTE_KEY,
         name='',
         profile=BoardData.RPI_1_CPU_PROFILE,
         perf=BoardData.RPI_COMPUTE_SCORE,
         arm_v=6
+    ),
+    Board(
+        key=BoardData.RPI_COMPUTE_3_KEY,
+        name='',
+        profile=BoardData.RPI_3_CPU_PROFILE,
+        perf=BoardData.RPI_3_SCORE,
+        arm_v=8
     ),
     Board(
         key=BoardData.RPI_2_B_KEY,
@@ -141,7 +159,6 @@ BOARDS = [
 ]
 
 
-
 @pytest.fixture(scope='module', params=BOARDS)
 def board(request):
     '''
@@ -149,7 +166,6 @@ def board(request):
     '''
 
     yield request.param
-
 
 
 @pytest.fixture(scope='module', params=PROPERTIES)

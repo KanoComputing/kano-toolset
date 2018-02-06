@@ -28,13 +28,12 @@ PLATFORMS = [
 ]
 
 
-
 @pytest.fixture(scope='function', params=PLATFORMS)
 def cpu(request, fs):
     '''
     Simulates several different platforms, each having a CPU of a different
     underlying architectures. It does this by mocking the system outputs which
-    would be associated with such a CPU, it does not actually emultate the
+    would be associated with such a CPU, it does not actually emulate the
     instruction set.
     '''
 
@@ -47,7 +46,6 @@ def cpu(request, fs):
     fs.add_real_file(cpuinfo_json_path)
     with open(cpuinfo_json_path, 'r') as cpuinfo_json_f:
         cpuinfo_json = json.load(cpuinfo_json_f)
-
 
     cpuinfo_dump_path = os.path.join(
         CPUINFO_DIR,
