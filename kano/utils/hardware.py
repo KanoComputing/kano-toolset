@@ -6,6 +6,8 @@
 # Utilities relating to RPi hardware and Kano peripherals
 
 
+import traceback
+
 from kano.logging import logger
 from kano.utils.shell import run_cmd
 from kano.utils.file_operations import read_file_contents_as_lines
@@ -122,6 +124,9 @@ BOARD_PROPERTIES = {
 }
 
 
+_g_revision = None
+
+
 def get_board_property(board_key, prop):
     board = BOARD_PROPERTIES.get(board_key)
 
@@ -155,52 +160,79 @@ def detect_kano_keyboard():
     return detect_kano_keyboard_type() is not None
 
 
-def is_model_a(revision=None):
-    """Check if the Raspberry Pi is model 1 A"""
-    return get_rpi_model(revision) == RPI_A_KEY
+def is_model_a(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model 1 A.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_A_KEY
 
 
-def is_model_a_plus(revision=None):
-    """Check if the Raspberry Pi is model 1 A+"""
-    return get_rpi_model(revision) == RPI_A_PLUS_KEY
+def is_model_a_plus(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model 1 A+.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_A_PLUS_KEY
 
 
-def is_model_b_beta(revision=None):
-    """Check if the Raspberry Pi is model 1 B beta"""
-    return get_rpi_model(revision) == RPI_B_BETA_KEY
+def is_model_b_beta(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model 1 B beta.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_B_BETA_KEY
 
 
-def is_model_b(revision=None):
-    """Check if the Raspberry Pi is model 1 B"""
-    return get_rpi_model(revision) == RPI_B_KEY
+def is_model_b(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model 1 B.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_B_KEY
 
 
-def is_model_b_plus(revision=None):
-    """Check if the Raspberry Pi is model 1 B+"""
-    return get_rpi_model(revision) == RPI_B_PLUS_KEY
+def is_model_b_plus(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model 1 B+.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_B_PLUS_KEY
 
 
-def is_model_zero(revision=None):
-    """Check if the Raspberry Pi is model Zero"""
-    return get_rpi_model(revision) == RPI_ZERO_KEY
+def is_model_zero(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model Zero.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_ZERO_KEY
 
 
-def is_model_zero_w(revision=None):
-    """Check if the Raspberry Pi is model Zero Wireless"""
-    return get_rpi_model(revision) == RPI_ZERO_W_KEY
+def is_model_zero_w(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model Zero Wireless.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_ZERO_W_KEY
 
 
-def is_model_2_b(revision=None):
-    """Check if the Raspberry Pi is model 2 B"""
-    return get_rpi_model(revision) == RPI_2_B_KEY
+def is_model_2_b(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model 2 B.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_2_B_KEY
 
 
-def is_model_3_b(revision=None):
-    """Check if the Raspberry Pi is model 3 B"""
-    return get_rpi_model(revision) == RPI_3_KEY
+def is_model_3_b(revision=None, use_cached=True):
+    """Check if the Raspberry Pi is model 3 B.
+
+    See :func:`.get_rpi_model`.
+    """
+    return get_rpi_model(revision=revision, use_cached=use_cached) == RPI_3_KEY
 
 
-def get_rpi_model(revision=None):
+def get_rpi_model(revision=None, use_cached=True):
     """Get the model key of the Rasperry Pi.
 
     Source for Raspberry Pi model numbers documented at:
@@ -209,51 +241,54 @@ def get_rpi_model(revision=None):
 
     Args:
         revision (str): Revision tag as extracted from /proc/cpuinfo.
+        use_cached (bool): See :func:`.get_board_revision`.
 
     Returns:
         str: Model key identifying the Raspberry Pi model (RPI A/A+/B/B+/Zero/
         CM/2B/3), e.g. RPI_3_KEY
     """
+    global _g_revision
+
     try:
         model_name = overclocked = ''
 
-        if not revision:
-            for entry in read_file_contents_as_lines(CPUINFO_FILE):
-                if entry.startswith('Revision'):
-                    revision = entry.split(':')[1]
-                    break
+        revision = get_board_revision(use_cached=use_cached)
+        try:
+            revision_hex = int(revision, 16)
+        except ValueError:  # revision might be 'Beta'
+            revision_hex = 0
 
         # The order of checks here is done Descending by Most Likely Model.
-        if int(revision, 16) & 0x00FFFFFF in (0x00A02082, 0x00A22082, 0x00A32082):
+        if revision_hex & 0x00FFFFFF in (0x00A02082, 0x00A22082, 0x00A32082):
             model_name = RPI_3_KEY
 
-        elif int(revision, 16) & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041):
+        elif revision_hex & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041):
             model_name = RPI_2_B_KEY
 
-        elif int(revision, 16) & 0x00ff in (0x10, 0x13) or \
-             int(revision, 16) & 0x00FFFFFF == 0x00900032:
+        elif revision_hex & 0x00ff in (0x10, 0x13) or \
+             revision_hex & 0x00FFFFFF == 0x00900032:
             model_name = RPI_B_PLUS_KEY
 
-        elif int(revision, 16) & 0x00ff in (0x2, 0x3, 0x4, 0x5, 0x6, 0xd, 0xe, 0xf):
+        elif revision_hex & 0x00ff in (0x2, 0x3, 0x4, 0x5, 0x6, 0xd, 0xe, 0xf):
             model_name = RPI_B_KEY
 
-        elif int(revision, 16) & 0x00ff in (0x12, 0x15) or \
-             int(revision, 16) & 0x00FFFFFF == 0x00900021:
+        elif revision_hex & 0x00ff in (0x12, 0x15) or \
+             revision_hex & 0x00FFFFFF == 0x00900021:
             model_name = RPI_A_PLUS_KEY
 
-        elif int(revision, 16) & 0x00ff in (0x7, 0x8, 0x9):
+        elif revision_hex & 0x00ff in (0x7, 0x8, 0x9):
             model_name = RPI_A_KEY
 
-        elif int(revision, 16) & 0x00FFFFFF == 0x009000C1:
+        elif revision_hex & 0x00FFFFFF == 0x009000C1:
             model_name = RPI_ZERO_W_KEY
 
-        elif int(revision, 16) & 0x00FFFFFF in (0x00900092, 0x00900093, 0x00920093):
+        elif revision_hex & 0x00FFFFFF in (0x00900092, 0x00900093, 0x00920093):
             model_name = RPI_ZERO_KEY
 
-        elif int(revision, 16) & 0x00FFFFFF == 0x00A020A0:
+        elif revision_hex & 0x00FFFFFF == 0x00A020A0:
             model_name = RPI_COMPUTE_3_KEY
 
-        elif int(revision, 16) & 0x00ff in (0x11, 0x14):
+        elif revision_hex & 0x00ff in (0x11, 0x14):
             model_name = RPI_COMPUTE_KEY
 
         elif revision == 'Beta':
@@ -266,7 +301,32 @@ def get_rpi_model(revision=None):
         return '{} {}'.format(model_name, overclocked).strip()
 
     except:
+        logger.error('Unexpected error: \n{}'.format(traceback.format_exc()))
         return 'Error getting model name'
+
+
+def get_board_revision(use_cached=True):
+    """Get the Raspberry Pi board revision.
+
+    Args:
+        use_cached (bool): Read the revision from a cached value or read
+            it from the ``/proc/cpuinfo`` file directly.
+
+    Returns:
+        str: Hexadecimal value for the Raspberry Pi board revision; emptry
+        string if the value could not be read.
+    """
+    global _g_revision
+
+    if use_cached and _g_revision:
+        return _g_revision
+
+    for entry in reversed(read_file_contents_as_lines(CPUINFO_FILE)):
+        if entry.startswith('Revision'):
+            _g_revision = entry.split(':')[1].strip()
+            return _g_revision
+
+    return ''
 
 
 def is_monitor():
