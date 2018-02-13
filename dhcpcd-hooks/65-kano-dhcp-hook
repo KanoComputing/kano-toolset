@@ -33,7 +33,6 @@ REBOOT | BOUND)
     systemd-run /usr/bin/kano-set-system-date $reason
 
     systemd-run /usr/bin/kano-network-hook $reason
-    systemd-run /usr/bin/kano-dashboard-sysupdates "bound" "$ip_addr"
 
     # Try uploading the tracking data to our servers
     # Should be quiet on failure

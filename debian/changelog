@@ -16,8 +16,9 @@ kano-toolset (3.15.0-0) unstable; urgency=low
   * Mark Lua tests as such
   * Update Raspberry Pi board revision numbers and detection functions
   * Implemented caching for board revision lib functions
+  * Remove dhcpcd hook to dashboard sysupdates, moved to Updater
 
- -- Team Kano <dev@kano.me>  Tue, 6 Feb 2018 16:20:00 +0100
+ -- Team Kano <dev@kano.me>  Tue, 13 Feb 2018 19:15:00 +0100
 
 kano-toolset (3.14.0-0) unstable; urgency=low
 
