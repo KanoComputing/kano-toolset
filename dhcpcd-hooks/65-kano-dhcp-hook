@@ -1,34 +1,35 @@
 # 65-kano-dhcp-hook
 #
-# Copyright (C) 2017 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2017 - 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # DHCP hook script to prepare Kano OS settings when network comes up
-#
 # To enable this hook for logging, edit /etc/systemd/journalctl.conf and set Storage=persistent
-# Reboot, and execute "kano-test-dhcp".
+# Reboot and execute "kano-test-dhcp".
+#
+# In case that a user is already connected to a network (either multihomed or from 
+# previous reboot) then gracefully exit with success/0 code.
 
-
-# file that external applications can monitor for internet availability triggers
+# A lock file to inform for network connectivity
 monitor_file="/var/run/internet_monitor"
 
+# Network service manager logging
 logger "kano-dhcp-hook: info reason=$reason iface=$interface"
 
-case "$reason" in
-REBOOT | BOUND)
-    ip_addr=`ip addr show wlan0 | grep inet | awk '{print $2}' | sed -s 's/\/.*//')`
-    logger "kano-dhcp-hook: REBOOT event ipaddr=$ip_addr on iface=$interface"
-
-    # Are we already connected through a different device?
+# Check if the network is already up
+# through another interface/device
+is_connected () {
     if [ -f $monitor_file ]; then
         logger "kano-dhcp-hook: REBOOT hook discarded, already networked from a previous REBOOT"
         exit 0
     else
         echo "internet: up" > $monitor_file
     fi
+}
 
-    logger "kano-dhcp-hook: launching network up scripts"
-
+# Initialise the network through the kano hook and dashboard
+# network wrappers and perform tracking synchronisation
+kano_network_init () {
     systemd-run --service-type=forking /usr/bin/kano-sentry-startup $reason
     systemd-run /usr/bin/kano-set-system-date $reason
 
@@ -37,24 +38,60 @@ REBOOT | BOUND)
     # Try uploading the tracking data to our servers
     # Should be quiet on failure
     kano-sync --upload-tracking-data --silent &
+}
 
-    # Sync objects from the content API in the background
-    # TODO: This should be removed once we have the daemon done
+# Sync objects from the content API in the background
+# TODO: This should be removed once we have the daemon done
+kano_daemon () {
     kano-content sync &
-
     kano-tracker-ctl +1 'internet-connection-established' &
-    ;;
+}
 
-NOCARRIER | STOPPED)
-    # Are we still networked due to multihomed connection?
+# Check for a multihomed connection keep connected if sucessfull
+# otherwise disconnect with a notifying through the logger
+is_multihomed () {
     is_internet
     if [ $? -eq 0 ]; then
-    	logger "kano-dhcp-hook: NOCARRIER/STOPPED but still connected, aborting action"
+    	logger "kano-dhcp-hook: $reason but still connected, aborting action."
     	exit 0
     else
-        logger "kano-dhcp-hook: NOCARRIER/STOPPED and connectivity lost"
+        logger "kano-dhcp-hook: $reason and connectivity lost."
         rm $monitor_file
     fi
+}
+
+# In case of lease RENEWal or REBOUND to a new DHCP server
+# check if connection is sucesfully active and modifly
+# the monitor_file accordingly
+is_reconnected () {
+    if [ $? -eq 0 ]; then
+        logger "kano-dhcp-hook: $reason but still connected...Aborting."
+    exit 0
+    elif ([ $reason = "INFORM" ] && [ $if_up ]); then
+        kano_network_init
+        kano_daemon
+    else
+        logger "kano-dhcp-hook: $ifname down after $reason."
+        rm $monitor_file
+    fi
+}
+
+case "$reason" in
+REBOOT | BOUND)
+    ip_addr=`ip addr show wlan0 | grep inet | awk '{print $2}' | sed -s 's/\/.*//')`
+    logger "kano-dhcp-hook: REBOOT event ipaddr=$ip_addr on iface=$interface"
+    is_connected
+    logger "kano-dhcp-hook: launching network up scripts"
+    kano_network_init
+    kano_daemon
     ;;
 
+INFORM|RENEW|REBIND|RELEASE)
+    is_internet
+    is_reconnected
+    ;;
+
+NOCARRIER|STOP|STOPPED)
+    is_multihomed
+    ;;
 esac
