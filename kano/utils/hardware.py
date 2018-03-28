@@ -24,6 +24,7 @@ RPI_COMPUTE_KEY = 'RPI/Compute'
 RPI_COMPUTE_3_KEY = 'RPI/Compute/3'
 RPI_2_B_KEY = 'RPI/2/B'
 RPI_3_KEY = 'RPI/3'
+RPI_3_PLUS_KEY = 'RPI/3/B+'
 
 
 # "performance" scores for RPi boards
@@ -37,6 +38,7 @@ RPI_COMPUTE_SCORE = 4000
 RPI_2_B_SCORE = 5000
 RPI_COMPUTE_3_SCORE = 7000
 RPI_3_SCORE = 7000
+RPI_3_PLUS_SCORE = 8000
 
 RPI_1_CPU_PROFILE = 'rpi_1'
 RPI_2_CPU_PROFILE = 'rpi_2'
@@ -119,6 +121,12 @@ BOARD_PROPERTIES = {
         'name': 'Raspberry Pi 3',
         'cpu_profile': RPI_3_CPU_PROFILE,
         'performance': RPI_3_SCORE,
+        'arch': 'armv8'
+    },
+    RPI_3_PLUS_KEY: {
+        'name': 'Raspberry Pi 3 B+',
+        'cpu_profile': RPI_3_CPU_PROFILE,
+        'performance': RPI_3_PLUS_SCORE,
         'arch': 'armv8'
     }
 }
@@ -271,6 +279,9 @@ def get_rpi_model(revision=None, use_cached=True):
 
         elif revision_hex & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041, 0x00A21042):
             model_name = RPI_2_B_KEY
+
+        elif revision_hex & 0x00FFFFFF == 0x00A020D3:
+            model_name = RPI_3_PLUS_KEY
 
         elif revision_hex & 0x00ff in (0x10, 0x13) or \
              revision_hex & 0x00FFFFFF == 0x00900032:

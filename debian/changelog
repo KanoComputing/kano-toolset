@@ -1,9 +1,15 @@
+kano-toolset (4.2.0-0) unstable; urgency=low
+
+  * Added revision code support for RPi 3B+ models and update RPi2 and Zero ones
+
+ -- Team Kano <dev@kano.me>  Thu, 4 Oct 2018 12:23:00 +0100
+
 kano-toolset (4.1.0-0) unstable; urgency=low
 
   * Add keyboard for CKT to the detection routine
   * Fix logging tracebacks
 
- -- Team Kano <dev@kano.me>  Mon, 30 Jul  2018 29:38:00 +0100
+ -- Team Kano <dev@kano.me>  Mon, 30 Jul  2018 19:38:00 +0100
 
 kano-toolset (4.0.0-0) unstable; urgency=low
 
