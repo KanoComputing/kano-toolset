@@ -1,3 +1,13 @@
+/**
+ * kano_combobox.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * Combo-box styling
+ */
+
+
 GtkMenuItem.KanoComboBox, GtkMenuItem.KanoComboBox.up_button, GtkMenuItem.KanoComboBox.down_button {
     background: #ffffff;
     border-width: 2px;
@@ -26,7 +36,8 @@ GtkMenuItem.KanoComboBox.down_button {
 
 GtkMenuItem.KanoComboBox GtkLabel {
     color: @active_writing;
-    font: Bariol 14;
+    font-family: Bariol;
+    font-size: 14pt;
 }
 
 GtkMenuItem.KanoComboBox:hover {
@@ -55,5 +66,6 @@ GtkButton.KanoComboBox {
 
 GtkButton.KanoComboBox GtkLabel {
     color: @active_writing;
-    font: Bariol 14;
+    font-family: Bariol;
+    font-size: 14pt;
 }

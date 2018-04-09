@@ -1,11 +1,12 @@
-/*
-# heading.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-#
-*/
+/**
+ * heading.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * Heading styling
+ */
+
 
 @define-color title_color #323232;
 @define-color subheading_color #6e6e6e;
@@ -14,12 +15,15 @@
 .title {
     color: @title_color;
     padding-top:30px;
-    font: Bariol Bold 20px;
+    font-family: Bariol;
+    font-size: 20px;
+    font-weight: bold;
 }
 /* Description of current project */
 .description {
     color: @subheading_color;
     padding-left: 30px;
     padding-right: 30px;
-    font: Bariol 14;
+    font-family: Bariol;
+    font-size: 14pt;
 }

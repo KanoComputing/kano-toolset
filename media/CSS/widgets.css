@@ -1,11 +1,12 @@
 /*
-# common.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-# This controls the styles
-*/
+ * widgets.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * This controls the styles
+ */
+
 
 /* All */
 * {
@@ -72,11 +73,12 @@ GtkEntry {
     border-width: 2px;
     border-radius:3px;
     padding: 10px;
-    font: Bariol 13;
+    font-family: Bariol;
+    font-size: 13pt;
     background: #ffffff;
 }
 
-GtkEntry:insensitive {
+GtkEntry:disabled {
     border-color: @inactive_border;
     color: @inactive_writing;
     border-style: solid;
@@ -103,7 +105,8 @@ GtkImage:hover {
  */
 GtkComboBox {
     /* font affects arrow size */
-    font: Bariol 5;
+    font-family: Bariol;
+    font-size: 5pt;
 }
 
 GtkComboBox GtkButton {
@@ -117,7 +120,8 @@ GtkComboBox GtkButton {
 
 GtkComboBox GtkCellView {
     color: @active_writing;
-    font: Bariol 14;
+    font-family: Bariol;
+    font-size: 14pt;
 }
 
 GtkComboBox .menu {
@@ -137,13 +141,14 @@ GtkComboBox .separator {
  */
 GtkCheckButton,
 GtkRadioButton {
-    font: Bariol 13;
+    font-family: Bariol;
+    font-size: 13pt;
     color: @active_writing;
     box-shadow: inset 0 0, inset 0 0;
     outline-width: 0;
 }
 
-GtkRadioButton:insensitive {
+GtkRadioButton:disabled {
     color: @inactive_writing;
 }
 
@@ -153,7 +158,9 @@ GtkRadioButton:insensitive {
 .title {
     color: @title_color;
     padding-top:25px;
-    font: Bariol Bold 16;
+    font-family: Bariol;
+    font-size: 16pt;
+    font-weight: bold;
 }
 
 /**
@@ -162,7 +169,8 @@ GtkRadioButton:insensitive {
 .description {
     color: @subheading_color;
     padding-bottom: 18px;
-    font: Bariol 14;
+    font-family: Bariol;
+    font-size: 14pt;
 }
 
 /**
@@ -180,12 +188,15 @@ GtkRadioButton:insensitive {
 /* Title of menu button on default intro screen (Keyboard, Wfi etc) */
 .menu_intro_label {
     color: @title_color;
-    font: Bariol Bold 18;
+    font-family: Bariol;
+    font-size: 18pt;
+    font-weight: bold;
 }
 /* Info about the settings of the curet project */
 .menu_custom_label {
     color: @subheading_color;
-    font: Bariol 12;
+    font-family: Bariol;
+    font-size: 12pt;
 }
 
 .white {
@@ -205,11 +216,14 @@ GtkRadioButton:insensitive {
 }
 
 .bold_label {
-    font: Bariol Bold 14px;
+    font-family: Bariol;
+    font-size: 14px;
+    font-weight: bold;
     color: @title_color;
 }
 
 .desc_label {
-    font: Bariol 14px;
+    font-family: Bariol;
+    font-size: 14px;
     color: @subheading_color;
 }

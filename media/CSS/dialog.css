@@ -1,11 +1,12 @@
-/*
-# dialog.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-# This controls the dialog style
-*/
+/**
+ * dialog.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * This controls the dialog style
+ */
+
 
 GtkDialog {
     background: #e7e7e7;
@@ -27,7 +28,8 @@ GtkEntry {
     border-width: 2px;
     border-radius:3px;
     padding: 10px;
-    font: Bariol 13;
+    font-family: Bariol;
+    font-size: 13pt;
 }
 
 
@@ -36,7 +38,8 @@ GtkRadioButton {
     border-style: solid;
     border-color: @active_border;
     border-width: 2px;
-    font: Bariol 13;
+    font-family: Bariol;
+    font-size: 13pt;
     background: #ffffff;
 }
 

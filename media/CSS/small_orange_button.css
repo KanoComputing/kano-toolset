@@ -1,11 +1,11 @@
-/*
-# kano_orange_button.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-# The main button that updates the changes made in each level
-*/
+/**
+ * small_orange_button.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * The main button that updates the changes made in each level
+ */
 
 
 .small_orange_button {
@@ -15,10 +15,12 @@
 
 .small_orange_button GtkLabel {
     color: @kano_orange;
-    font: Bariol Bold 13px;
+    font-family: Bariol;
+    font-size: 13px;
+    font-weight: bold;
 }
 
-.small_orange_button GtkLabel:insensitive {
+.small_orange_button GtkLabel:disabled {
     color: @kano_grey;
     background: transparent;
 }

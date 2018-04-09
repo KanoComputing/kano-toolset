@@ -1,14 +1,17 @@
-/*
-# top_bar.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-#
-*/
+/**
+ * shutdown.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * Styling for the shutdown
+ */
+
 
 .shutdown_title {
     color: #222222;
-    font: Bariol Bold 16;
+    font-family: Bariol;
+    font-size: 16pt;
+    font-weight: bold;
     padding-top: 10px;
 }

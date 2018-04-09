@@ -1,11 +1,12 @@
-/*
-# progress_bar.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-#
-*/
+/**
+ * kano_progress.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * Progress bar styling
+ */
+
 
 * {
     -GtkProgressBar-min-horizontal-bar-height: 30;
@@ -32,6 +33,8 @@ GtkProgressBar.KanoProgressBar.progressbar {
 }
 
 GtkLabel.KanoProgressBar {
-    font: Bariol bold 15;
+    font-family: Bariol;
+    font-size: 15pt;
+    font-weight: bold;
     color: @active_writing;
 }

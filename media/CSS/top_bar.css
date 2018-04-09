@@ -1,11 +1,12 @@
-/*
-# top_bar.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-#
-*/
+/**
+ * top_bar.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * Styling for the window handle
+ */
+
 
 @define-color top_bar_color #e1e1e1;
 
@@ -28,5 +29,7 @@
 /* Header in top bar (title of window) */
 .top_bar_title {
     color: #222222;
-    font: Bariol Bold 13;
+    font-family: Bariol;
+    font-size: 13pt;
+    font-weight: bold;
 }

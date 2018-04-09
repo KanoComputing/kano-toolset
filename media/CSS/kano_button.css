@@ -22,19 +22,21 @@
 
 .kano_button GtkLabel {
     color: #ffffff;
-    font: Bariol Bold 13;
+    font-family: Bariol;
+    font-size: 13pt;
+    font-weight: bold;
 }
 
-.kano_button:insensitive {
+.kano_button:disabled {
     background: #dddddd;
 }
 
-.kano_button GtkLabel:insensitive {
+.kano_button GtkLabel:disabled {
     color: #aaaaaa;
     background: #dddddd;
 }
 
-.loading_kano_button GtkLabel:insensitive {
+.loading_kano_button GtkLabel:disabled {
     color: #ffffff;
 }
 
@@ -57,7 +59,7 @@ GtkButton.green_background:active {
 
 /* When spinner is spinning */
 
-.green_background.loading_kano_button:insensitive {
+.green_background.loading_kano_button:disabled {
     background: @kano_green_darker;
 }
 
@@ -80,7 +82,7 @@ GtkButton.red_background:active {
 
 /* When spinner is spinning */
 
-.red_background.loading_kano_button:insensitive {
+.red_background.loading_kano_button:disabled {
     background: @kano_red_darker;
 }
 
@@ -103,7 +105,7 @@ GtkButton.orange_background:active {
 
 /* When spinner is spinning */
 
-.orange_background.loading_kano_button:insensitive {
+.orange_background.loading_kano_button:disabled {
     background: @kano_orange_darker;
 }
 
@@ -126,7 +128,7 @@ GtkButton.grey_background:active {
 
 /* When spinner is spinning */
 
-.grey_background.loading_kano_button:insensitive {
+.grey_background.loading_kano_button:disabled {
     background: @kano_grey_darker;
 }
 
@@ -149,7 +151,7 @@ GtkButton.blue_background:active {
 
 /* When spinner is spinning */
 
-.blue_background.loading_kano_button:insensitive {
+.blue_background.loading_kano_button:disabled {
     background: @kano_blue_darker;
 }
 

@@ -1,3 +1,12 @@
+/**
+ * scrollbar-wide.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * Styling for a wide scrollbar
+ */
+
 
 * {
     -GtkScrolledWindow-scrollbar-spacing: 0;
@@ -56,7 +65,7 @@ GtkScrolledWindow {
 .scrollbar.button,
 .scrollbar.button:active
 /*.scrollbar.button:active:hover,
-.scrollbar.button:insensitive,
+.scrollbar.button:disabled,
 .scrollbar.button:hover:backdrop,
 .scrollbar.button:active:hover:backdrop*/ {
     border-style: none;
@@ -102,7 +111,7 @@ GtkScrolledWindow {
     color: @scrollbar_slider_prelight;
 }*/
 
-.scrollbar.button:insensitive {
+.scrollbar.button:disabled {
     color: mix(@scrollbar_slider, @scrollbar_trough, 0.6);
 }
 
@@ -114,7 +123,7 @@ GtkScrolledWindow {
     color: @scrollbar_slider_unfocused;
 }
 
-.scrollbar.button:insensitive:backdrop {
+.scrollbar.button:disabled:backdrop {
     color: mix(@scrollbar_slider_unfocused, @scrollbar_trough_unfocused, 0.7);
 }
 
@@ -136,7 +145,7 @@ GtkScrolledWindow {
     to (shade(@theme_bg_color, 1.06)));
 }
 
-.scrollbar.trough:insensitive {
+.scrollbar.trough:disabled {
     background-color: @scrollbar_trough_insensitive;
     border-style: solid;
     border-image: none;
@@ -153,7 +162,7 @@ GtkScrolledWindow {
     border-image: none;
 }
 
-.scrollbar.trough:insensitive:backdrop {
+.scrollbar.trough:disabled:backdrop {
     background-image: none;
     background-color: mix(@scrollbar_trough_unfocused,
                       @scrollbar_trough_insensitive, 0.5);
@@ -182,7 +191,7 @@ GtkScrolledWindow {
     border-width: 2px;
 }
 
-.scrollbar.slider:prelight:active {
+.scrollbar.slider:hover:active {
     background-image: none;
     background-color: @scrollbar_slider_active;
     border-style: solid;
@@ -191,7 +200,7 @@ GtkScrolledWindow {
     border-width: 3px;
 }
 
-.scrollbar.slider:insensitive {
+.scrollbar.slider:disabled {
     background-color: @scrollbar_slider_insensitive;
     border-style: solid;
     border-image: none;

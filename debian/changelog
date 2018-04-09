@@ -1,8 +1,9 @@
 kano-toolset (4.0.0-0) unstable; urgency=low
 
   * Added function to query Debian Stretch OS
+  * Fix support for Gtk packages included with Stretch.
 
- -- Team Kano <dev@kano.me>  Wed, 25 Apr 2017 15:46:44 +0100
+ -- Team Kano <dev@kano.me>  Mon, 9 Apr 2018 11:09:00 +0100
 
 kano-toolset (3.15.0-1) unstable; urgency=low
 
