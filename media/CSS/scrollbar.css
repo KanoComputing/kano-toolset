@@ -10,7 +10,6 @@
 
 * {
     -GtkScrolledWindow-scrollbar-spacing: 0;
-    -GtkScrolledWindow-scrollbars-within-bevel: 1;
 }
 
 GtkScrolledWindow {
@@ -39,16 +38,8 @@ GtkScrolledWindow {
 .scrollbar {
     background-image: none;
     border-style: solid;
-    -GtkRange-trough-border: 0;
     -GtkScrollbar-has-backward-stepper: false;
     -GtkScrollbar-has-forward-stepper: false;
-    -GtkRange-slider-width: 12;
-    /* minimum size for the slider. sadly can't be in '.slider'
-       where it belongs */
-    -GtkScrollbar-min-slider-length: 42;
-
-    -GtkRange-stepper-spacing: 0;
-    -GtkRange-trough-under-steppers: 1;
 }
 
 .scrollbars-junction, /* the small square between scrollbars!!! */
@@ -213,4 +204,3 @@ GtkScrolledWindow {
     border-color: transparent;
     border-width: 1px;
 }
-

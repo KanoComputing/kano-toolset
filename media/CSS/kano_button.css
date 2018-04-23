@@ -8,7 +8,7 @@
 */
 
 .kano_button {
-    -GtkWidget-focus-line-width: 0;
+    outline-width: 0;
     border-radius: 4px;
     border-color: transparent;
     border-width: 3px;
@@ -154,4 +154,3 @@ GtkButton.blue_background:active {
 .blue_background.loading_kano_button:disabled {
     background: @kano_blue_darker;
 }
-

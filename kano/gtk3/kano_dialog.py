@@ -20,6 +20,8 @@
 
 
 from gi.repository import Gtk
+from gi import require_version
+require_version('Gtk', '3.0')
 from kano.gtk3.buttons import KanoButton, OrangeButton
 from kano.gtk3.heading import Heading
 from kano.gtk3.scrolled_window import ScrolledWindow
