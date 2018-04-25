@@ -121,6 +121,7 @@ functable = {
     'restore_signals': ku_shell,
 
     'is_jessie': ku_system,
+    'is_stretch': ku_system,
     'is_systemd': ku_system,
 
 

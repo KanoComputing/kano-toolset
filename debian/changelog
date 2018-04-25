@@ -1,3 +1,9 @@
+kano-toolset (4.0.0-0) unstable; urgency=low
+
+  * Added function to query Debian Stretch OS
+
+ -- Team Kano <dev@kano.me>  Wed, 25 Apr 2017 15:46:44 +0100
+
 kano-toolset (3.15.0-1) unstable; urgency=low
 
   * Split kano-splash out

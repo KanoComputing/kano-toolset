@@ -5,28 +5,37 @@
 #
 # Utilities related to the operating system
 
-
 import os
+
+
+def get_debian_version(stamp_file='/etc/debian_version'):
+    '''
+    Returns Debian version number from official stamp file
+    '''
+    try:
+        with open(stamp_file) as f:
+            osversion = f.read().strip()
+
+        major, minor = osversion.split('.')
+        return major, minor
+    except Exception:
+        return None, None
 
 
 def is_jessie():
     '''
-    Returns True if /etc/debian_version tells us
-    we are running in a Debian Jessie OS.
+    Returns True if running Debian Jessie
     '''
-    jessie_found = False
+    major, minor = get_debian_version()
+    return major == '8'
 
-    try:
-        with open('/etc/debian_version') as f:
-            osversion = f.read().strip()
 
-        major, dummy_minor = osversion.split('.')
-        if major == '8':
-            jessie_found = True
-    except Exception:
-        pass
-
-    return jessie_found
+def is_stretch():
+    '''
+    Returns True if runing Debian Stretch
+    '''
+    major, minor = get_debian_version()
+    return major == '9'
 
 
 def is_systemd():
