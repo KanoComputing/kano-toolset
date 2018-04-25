@@ -22,6 +22,7 @@ class ScrolledWindow(Gtk.ScrolledWindow):
 
     def __init__(self, hexpand=None, vexpand=None, wide_scrollbar=False):
         Gtk.ScrolledWindow.__init__(self, hexpand=hexpand, vexpand=vexpand)
+        self.set_overlay_scrolling(False)
 
     @staticmethod
     def apply_styling_to_screen(wide=False):

@@ -12,8 +12,9 @@
     -GtkScrolledWindow-scrollbar-spacing: 0;
 }
 
-GtkScrolledWindow {
-    padding: 10px;
+scrolledwindow overshoot,
+scrolledwindow undershoot {
+    background-image: none;
 }
 
 /********************************************************
@@ -35,15 +36,16 @@ GtkScrolledWindow {
 @define-color scrollbar_slider_insensitive alpha(black, 0);
 @define-color scrollbar_slider_unfocused @bg_color;
 
-.scrollbar {
+scrollbar {
+    background-color: @scrollbar_trough;
     background-image: none;
     border-style: solid;
     -GtkScrollbar-has-backward-stepper: false;
     -GtkScrollbar-has-forward-stepper: false;
 }
 
-.scrollbars-junction, /* the small square between scrollbars!!! */
-.scrollbar.trough {
+scrollbars-junction, /* the small square between scrollbars!!! */
+scrollbar trough {
     background-image: none;
     background-color: @scrollbar_trough;
     border-width: 0;
@@ -51,12 +53,12 @@ GtkScrolledWindow {
     border-image: none;
 }
 
-.scrollbar.button,
-.scrollbar.button:active,
-.scrollbar.button:active:hover,
-.scrollbar.button:disabled,
-.scrollbar.button:hover:backdrop,
-.scrollbar.button:active:hover:backdrop {
+scrollbar button,
+scrollbar button:active,
+scrollbar button:active:hover,
+scrollbar button:disabled,
+scrollbar button:hover:backdrop,
+scrollbar button:active:hover:backdrop {
     border-style: none;
     border-image: none;
     border-radius: 0;
@@ -64,60 +66,44 @@ GtkScrolledWindow {
     background-color: transparent;
 }
 
-.scrollbar.button:active,
-.scrollbar.button:active:hover {
+scrollbar button:active,
+scrollbar button:active:hover {
     background-color: mix(@scrollbar_slider, @scrollbar_trough, 0.8);
 }
 
-/*.scrollbar.button.top:hover {
-    box-shadow: inset 0px -1px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
-}
-
-.scrollbar.button.bottom:hover {
-    box-shadow: inset 0px 1px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
-}
-
-.scrollbar.button.right:hover {
-    box-shadow: inset 1px 0px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
-}
-
-.scrollbar.button.left:hover {
-    box-shadow: inset -1px 0px mix(@scrollbar_slider, @scrollbar_trough, 0.8);
-}*/
-
-.scrollbar.button.top:hover:backdrop,
-.scrollbar.button.bottom:hover:backdrop,
-.scrollbar.button.right:hover:backdrop,
-.scrollbar.button.left:hover:backdrop {
+scrollbar button.top:hover:backdrop,
+scrollbar button.bottom:hover:backdrop,
+scrollbar button.right:hover:backdrop,
+scrollbar button.left:hover:backdrop {
     box-shadow: none;
 }
 
-.scrollbar.button {
+scrollbar button {
     color: @scrollbar_slider;
 }
 
-.scrollbar.button:hover {
+scrollbar button:hover {
     color: @scrollbar_slider_prelight;
 }
 
-.scrollbar.button:disabled {
+scrollbar button:disabled {
     color: mix(@scrollbar_slider, @scrollbar_trough, 0.6);
 }
 
-.scrollbar.button:active {
+scrollbar button:active {
     color: @scrollbar_slider_active;
 }
 
-.scrollbar.button:backdrop {
+scrollbar button:backdrop {
     color: @scrollbar_slider_unfocused;
 }
 
-.scrollbar.button:disabled:backdrop {
+scrollbar button:disabled:backdrop {
     color: mix(@scrollbar_slider_unfocused, @scrollbar_trough_unfocused, 0.7);
 }
 
-.scrollbar.trough.vertical,
-.scrollbar.trough.vertical:backdrop {
+scrollbar trough.vertical,
+scrollbar trough.vertical:backdrop {
     background-image: -gtk-gradient (linear,
     left top, right top,
     from (shade (@theme_bg_color, 0.90)),
@@ -125,8 +111,8 @@ GtkScrolledWindow {
     to (shade(@theme_bg_color, 1.06)));
 }
 
-.scrollbar.trough.horizontal,
-.scrollbar.trough.horizontal:backdrop {
+scrollbar trough.horizontal,
+scrollbar trough.horizontal:backdrop {
     background-image: -gtk-gradient (linear,
     left top, left bottom,
     from (shade (@theme_bg_color, 0.90)),
@@ -134,7 +120,7 @@ GtkScrolledWindow {
     to (shade(@theme_bg_color, 1.06)));
 }
 
-.scrollbar.trough:disabled {
+scrollbar trough:disabled {
     background-color: @scrollbar_trough_insensitive;
     border-style: solid;
     border-image: none;
@@ -142,8 +128,8 @@ GtkScrolledWindow {
     border-width: 3px;
 }
 
-.scrollbars-junction:backdrop,
-.scrollbar.trough:backdrop {
+scrollbars-junction:backdrop,
+scrollbar trough:backdrop {
     background-image: none;
     background-color: @scrollbar_trough_unfocused;
     border-width: 0;
@@ -151,7 +137,7 @@ GtkScrolledWindow {
     border-image: none;
 }
 
-.scrollbar.trough:disabled:backdrop {
+scrollbar trough:disabled:backdrop {
     background-image: none;
     background-color: mix(@scrollbar_trough_unfocused,
                       @scrollbar_trough_insensitive, 0.5);
@@ -160,7 +146,7 @@ GtkScrolledWindow {
     border-image: none;
 }
 
-.scrollbar.slider {
+scrollbar slider {
     background-image: none;
     background-color: @scrollbar_slider;
     border-radius: 20px;
@@ -170,7 +156,7 @@ GtkScrolledWindow {
     border-width: 2px;
 }
 
-.scrollbar.slider:hover {
+scrollbar slider:hover {
     transition: 1000ms linear; /* doesn't work */
     background-image: none;
     background-color: @scrollbar_slider_prelight;
@@ -180,7 +166,7 @@ GtkScrolledWindow {
     border-width: 2px;
 }
 
-.scrollbar.slider:hover:active {
+scrollbar slider:hover:active {
     background-image: none;
     background-color: @scrollbar_slider_active;
     border-style: solid;
@@ -189,7 +175,7 @@ GtkScrolledWindow {
     border-width: 3px;
 }
 
-.scrollbar.slider:disabled {
+scrollbar slider:disabled {
     background-color: @scrollbar_slider_insensitive;
     border-style: solid;
     border-image: none;
@@ -197,7 +183,7 @@ GtkScrolledWindow {
     border-width: 1px;
 }
 
-.scrollbar.slider:backdrop {
+scrollbar slider:backdrop {
     background-color: @scrollbar_slider_unfocused;
     border-style: solid;
     border-image: none;
