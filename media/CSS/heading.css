@@ -15,9 +15,8 @@
 .title {
     color: @title_color;
     padding-top:30px;
-    font-family: Bariol;
+    font-family: Bariol Bold;
     font-size: 20px;
-    font-weight: bold;
 }
 /* Description of current project */
 .description {

@@ -1,33 +1,41 @@
-
-#!/usr/bin/env python
-
+#
 # kano_dialog.py
 #
 # Copyright (C) 2014 - 2018 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
 # This is a custom dialog pop up styled in Gtk 3
 #
 # Example usage:
-# from kano.gtk3 import kano_dialog
+#     from kano.gtk3 import kano_dialog
 #
-# kdialog = kano_dialog.KanoDialog("title", "description", [{"label":"OK", "return_value": 0, "color": "orange"}, {"label": "CANCEL", "return_value": -1, "color": "red"}])
-# response = kdialog.run()
-# if response == 0:
-#   print "OK button was clicked"
-# else:
-#   print "CANCEL button was clicked"
+#     kdialog = kano_dialog.KanoDialog(
+#         "title",
+#         "description",
+#         [
+#             {"label":"OK", "return_value": 0, "color": "orange"},
+#             {"label": "CANCEL", "return_value": -1, "color": "red"}
+#         ]
+#     )
+#     response = kdialog.run()
+#     if response == 0:
+#         print "OK button was clicked"
+#     else:
+#         print "CANCEL button was clicked"
+#
 
+import os
 
-from gi.repository import Gtk
 from gi import require_version
 require_version('Gtk', '3.0')
+
+from gi.repository import Gtk
+
 from kano.gtk3.buttons import KanoButton, OrangeButton
 from kano.gtk3.heading import Heading
 from kano.gtk3.scrolled_window import ScrolledWindow
 from kano.gtk3.apply_styles import apply_common_to_screen, apply_styling_to_widget, apply_colours_to_widget
 from kano.paths import common_css_dir
-import os
 
 radio_returnvalue = None
 button_defaults = {'return_value': 0, 'color': 'green'}

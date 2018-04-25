@@ -1,11 +1,14 @@
-#!/usr/bin/env python
-
+#
 # kano_dialog.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014 - 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
 # Heading used frequently around kano-settings and kano-login
+#
+
+from gi import require_version
+require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 from kano.paths import common_css_dir

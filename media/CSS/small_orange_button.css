@@ -15,9 +15,8 @@
 
 .small_orange_button GtkLabel {
     color: @kano_orange;
-    font-family: Bariol;
+    font-family: Bariol Bold;
     font-size: 13px;
-    font-weight: bold;
 }
 
 .small_orange_button GtkLabel:disabled {

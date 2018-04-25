@@ -1,18 +1,22 @@
-#!/usr/bin/env python
-
+#
 # kano_combobox.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014 - 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
 # This is an improved ComboBox (Dropdown) widget.
 # It's main advantage over the default is it's ability to set
 # the number of items to display when the dropdown is poped up.
+#
 
 import time
 import os
 import sys
 import types
+
+from gi import require_version
+require_version('Gtk', '3.0')
+
 from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
 
 

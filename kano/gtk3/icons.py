@@ -1,11 +1,15 @@
-#!/usr/bin/env python
-
+#
 # icons.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014 - 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
-# Creates pixbufs that we can use to make images from.  Uses a strip of icons, each 24px by 24px.
+# Creates pixbufs that we can use to make images from.  Uses a strip of icons,
+# each 24px by 24px.
+#
+
+from gi import require_version
+require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, GdkPixbuf
 from kano.paths import common_images_dir

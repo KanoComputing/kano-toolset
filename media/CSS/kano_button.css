@@ -1,11 +1,11 @@
-/*
-# kano_button.css
-#
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
-#
-# The main button that updates the changes made in each level
-*/
+/**
+ * kano_button.css
+ *
+ * Copyright (C) 2014 - 2018 Kano Computing Ltd.
+ * License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
+ *
+ * The main button that updates the changes made in each level
+ */
 
 .kano_button {
     outline-width: 0;
@@ -22,9 +22,8 @@
 
 .kano_button GtkLabel {
     color: #ffffff;
-    font-family: Bariol;
+    font-family: Bariol Bold;
     font-size: 13pt;
-    font-weight: bold;
 }
 
 .kano_button:disabled {

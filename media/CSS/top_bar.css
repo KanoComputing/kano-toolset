@@ -29,7 +29,6 @@
 /* Header in top bar (title of window) */
 .top_bar_title {
     color: #222222;
-    font-family: Bariol;
+    font-family: Bariol Bold;
     font-size: 13pt;
-    font-weight: bold;
 }

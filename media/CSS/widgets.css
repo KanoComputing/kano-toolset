@@ -148,9 +148,8 @@ GtkRadioButton:disabled {
 .title {
     color: @title_color;
     padding-top:25px;
-    font-family: Bariol;
+    font-family: Bariol Bold;
     font-size: 16pt;
-    font-weight: bold;
 }
 
 /**
@@ -178,9 +177,8 @@ GtkRadioButton:disabled {
 /* Title of menu button on default intro screen (Keyboard, Wfi etc) */
 .menu_intro_label {
     color: @title_color;
-    font-family: Bariol;
+    font-family: Bariol Bold;
     font-size: 18pt;
-    font-weight: bold;
 }
 /* Info about the settings of the curet project */
 .menu_custom_label {
@@ -206,9 +204,8 @@ GtkRadioButton:disabled {
 }
 
 .bold_label {
-    font-family: Bariol;
+    font-family: Bariol Bold;
     font-size: 14px;
-    font-weight: bold;
     color: @title_color;
 }
 

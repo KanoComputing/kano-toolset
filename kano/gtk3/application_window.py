@@ -1,14 +1,18 @@
-#!/usr/bin/env python
-
+#
 # Custom window base class
 #
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014 - 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
 # You can use this as a base for you application's window in case
 # you'd like to blur it.
+#
+
+from gi import require_version
+require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, Gdk
+
 from kano.gtk3.apply_styles import apply_common_to_screen
 
 
