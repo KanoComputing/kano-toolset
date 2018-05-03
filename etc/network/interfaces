@@ -1,0 +1,4 @@
+# Minimal configuration file to init networking.service
+# Ensures that the loopback network interface lo is up on init
+auto lo
+iface lo inet loopback

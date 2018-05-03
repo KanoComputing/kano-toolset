@@ -6,9 +6,10 @@ kano-toolset (4.0.0-0) unstable; urgency=low
 
 kano-toolset (3.15.0-1) unstable; urgency=low
 
+  * Add minimal wireless configuration files
   * Split kano-splash out
-
- -- Team Kano <dev@kano.me>  Tue, 19 Dec 2017 11:09:00 +0100
+  
+ -- Team Kano <dev@kano.me>  Tue, 3 May  2018 11:09:00 +0100
 
 kano-toolset (3.15.0-0) unstable; urgency=low
 

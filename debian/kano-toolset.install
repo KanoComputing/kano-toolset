@@ -1,6 +1,6 @@
 bin usr/
 kano usr/lib/python2.7/dist-packages/
-media /usr/share/kano/
+media usr/share/kano/
 
 js usr/share/kano-toolset/
 
@@ -24,4 +24,5 @@ share/kano-launcher/conf usr/share/kano-toolset/kano-launcher/
 kano-launcher/kano-launcher usr/bin/
 kano-launcher/kano-kill-ns usr/bin/
 
-locale/* /usr/share/locale
+locale/* usr/share/locale
+etc/* etc/
