@@ -7,7 +7,7 @@
  * This controls the dialog style
  */
 
-GtkDialog {
+dialog {
     background: #e7e7e7;
 }
 
@@ -20,7 +20,7 @@ GtkDialog {
     background: #e5e5e5;
 }
 
-GtkEntry {
+entry {
     border-color: @active_border;
     color: @active_writing;
     border-style: solid;
@@ -32,8 +32,8 @@ GtkEntry {
 }
 
 
-GtkCheckButton,
-GtkRadioButton {
+checkbutton,
+radiobutton {
     border-style: solid;
     border-color: @active_border;
     border-width: 2px;
@@ -42,16 +42,19 @@ GtkRadioButton {
     background: #ffffff;
 }
 
-GtkCheckButton:active,
-GtkRadioButton:active {
+/**
+ * Do we want this?
+ */
+checkbutton:active,
+radiobutton:active {
     color: @kano_green;
 }
 
-GtkCheckButton:hover {
+checkbutton:hover {
     background: transparent;
 }
 
-GtkRadioButton
-GtkLabel{
+radiobutton
+label {
     color: @active_writing;
 }

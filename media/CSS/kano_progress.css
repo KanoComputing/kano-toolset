@@ -13,7 +13,7 @@
     -GtkProgressBar-min-vertical-bar-width: 60;
 }
 
-GtkProgressBar.KanoProgressBar {
+progressbar.KanoProgressBar {
     border-style: solid;
     border-color: #dddddd;
     border-width: 3px;
@@ -21,18 +21,18 @@ GtkProgressBar.KanoProgressBar {
 }
 
 /* background bar */
-GtkProgressBar.KanoProgressBar.trough {
+progressbar.KanoProgressBar trough {
     background: #ffffff;
 }
 
 /* Moving part*/
-GtkProgressBar.KanoProgressBar.progressbar {
+progressbar.KanoProgressBar progress {
     background: @kano_green;
     border-radius: 3px;
     border-color: transparent;
 }
 
-GtkLabel.KanoProgressBar {
+label.KanoProgressBar {
     font-family: Bariol Bold;
     font-size: 15pt;
     color: @active_writing;

@@ -8,7 +8,7 @@
  */
 
 
-GtkMenuItem.KanoComboBox, GtkMenuItem.KanoComboBox.up_button, GtkMenuItem.KanoComboBox.down_button {
+menuitem.KanoComboBox, menuitem.KanoComboBox.up_button, menuitem.KanoComboBox.down_button {
     background: #ffffff;
     border-width: 2px;
     border-color: @active_border;
@@ -17,45 +17,45 @@ GtkMenuItem.KanoComboBox, GtkMenuItem.KanoComboBox.up_button, GtkMenuItem.KanoCo
 }
 
 
-GtkMenuItem.KanoComboBox {
+menuitem.KanoComboBox {
     padding-top: 5px;
     padding-bottom: 5px;
     border-top-style: none;
     border-bottom-style: none;
 }
 
-GtkMenuItem.KanoComboBox.up_button {
+menuitem.KanoComboBox.up_button {
     border-top-style: solid;
     border-bottom-style: none;
 }
 
-GtkMenuItem.KanoComboBox.down_button {
+menuitem.KanoComboBox.down_button {
     border-top-style: none;
     border-bottom-style: solid;
 }
 
-GtkMenuItem.KanoComboBox GtkLabel {
+menuitem.KanoComboBox label {
     color: @active_writing;
     font-family: Bariol;
     font-size: 14pt;
 }
 
-GtkMenuItem.KanoComboBox:hover {
+menuitem.KanoComboBox:hover {
     background: @kano_green;
     color: #ffffff;
 }
 
 /* These control the arrow button styling */
-GtkImageMenuItem.KanoComboBox {
+imagemenuitem.KanoComboBox {
     padding-top: 10px;
     padding-bottom: 10px;
 }
 
-GtkImageMenuItem.KanoComboBox:hover {
+imagemenuitem.KanoComboBox:hover {
     background: @kano_green;
 }
 
-GtkButton.KanoComboBox {
+button.KanoComboBox {
     background: #ffffff;
     border-color: @active_border;
     border-style: solid;
@@ -64,7 +64,7 @@ GtkButton.KanoComboBox {
     padding: 9px;
 }
 
-GtkButton.KanoComboBox GtkLabel {
+button.KanoComboBox label {
     color: @active_writing;
     font-family: Bariol;
     font-size: 14pt;

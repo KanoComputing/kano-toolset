@@ -22,17 +22,17 @@
 /**
   * This is to remove padding
   */
-GtkBox GtkEventBox,
-GtkBox GtkFixed,
-GtkBox GtkGrid,
-GtkEventBox GtkImage,
-GtkGrid GtkEventBox,
-GtkFixed GtkImage,
-GtkFixed GtkEventBox,
-GtkWindow GtkImage,
-GtkWindow GtkGrid,
-GtkWindow GtkBox,
-GtkWindow GtkEventBox {
+box eventbox,
+box fixed,
+box grid,
+eventbox image,
+grid eventbox,
+fixed image,
+fixed eventbox,
+window image,
+window grid,
+window box,
+window eventbox {
     padding: 0;
 }
 
@@ -41,7 +41,7 @@ GtkWindow GtkEventBox {
  * Standard window
  */
 
-GtkWindow {
+window {
     color: #ffffff;
     background: #ffffff;
 }
@@ -49,7 +49,7 @@ GtkWindow {
 /**
  * This affects all widgets
  */
-GtkWidget {
+widget {
     /* Needed for Jessie, removed all the box shadows from widgets */
     box-shadow: inset 0 0, inset 0 0;
     /* Remove weird outline of gifs on Jessie */
@@ -61,7 +61,7 @@ GtkWidget {
 /**
  * Standard entry
  */
-GtkEntry {
+entry {
     border-color: @active_border;
     color: @active_writing;
     border-style: solid;
@@ -73,7 +73,7 @@ GtkEntry {
     background: #ffffff;
 }
 
-GtkEntry:disabled {
+entry:disabled {
     border-color: @inactive_border;
     color: @inactive_writing;
     border-style: solid;
@@ -85,12 +85,12 @@ GtkEntry:disabled {
 /**
  * Standard images - remove background colours
  */
-GtkImage {
+image {
     border-style:none;
     background: transparent;
 }
 
-GtkImage:hover {
+image:hover {
     border-style: none;
     background: transparent;
 }
@@ -98,13 +98,13 @@ GtkImage:hover {
 /**
  * Standard dropdown lists
  */
-GtkComboBox {
+combobox {
     /* font affects arrow size */
     font-family: Bariol;
     font-size: 5pt;
 }
 
-GtkComboBox GtkButton {
+combobox button {
     border-color: @active_border;
     border-style: solid;
     border-width: 2px;
@@ -113,13 +113,13 @@ GtkComboBox GtkButton {
     background: #ffffff;
 }
 
-GtkComboBox GtkCellView {
+combobox cellview {
     color: @active_writing;
     font-family: Bariol;
     font-size: 14pt;
 }
 
-GtkComboBox .menu {
+combobox .menu {
     border-style: solid;
     border-color: @active_border;
     border-width: 2px;
@@ -129,8 +129,8 @@ GtkComboBox .menu {
 /**
  * Standard checkbuttons/radio-buttons
  */
-GtkCheckButton,
-GtkRadioButton {
+checkbutton,
+radiobutton {
     font-family: Bariol;
     font-size: 13pt;
     color: @active_writing;
@@ -138,7 +138,7 @@ GtkRadioButton {
     outline-width: 0;
 }
 
-GtkRadioButton:disabled {
+radiobutton:disabled {
     color: @inactive_writing;
 }
 

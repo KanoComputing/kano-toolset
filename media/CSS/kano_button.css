@@ -20,7 +20,7 @@
     padding: 6px 16px 6px 16px;
 }
 
-.kano_button GtkLabel {
+.kano_button label {
     color: #ffffff;
     font-family: Bariol Bold;
     font-size: 13pt;
@@ -30,12 +30,12 @@
     background: #dddddd;
 }
 
-.kano_button GtkLabel:disabled {
+.kano_button label:disabled {
     color: #aaaaaa;
     background: #dddddd;
 }
 
-.loading_kano_button GtkLabel:disabled {
+.loading_kano_button label:disabled {
     color: #ffffff;
 }
 
@@ -43,7 +43,7 @@
     background: @kano_green;
 }
 
-GtkButton.green_background:active {
+button.green_background:active {
     background: @kano_green_darker;
 }
 
@@ -66,7 +66,7 @@ GtkButton.green_background:active {
     background: @kano_red;
 }
 
-GtkButton.red_background:active {
+button.red_background:active {
     background: @kano_red_darker;
 }
 
@@ -89,7 +89,7 @@ GtkButton.red_background:active {
     background: @kano_orange;
 }
 
-GtkButton.orange_background:active {
+button.orange_background:active {
     background: @kano_orange_darker;
 }
 
@@ -112,7 +112,7 @@ GtkButton.orange_background:active {
     background: @kano_grey;
 }
 
-GtkButton.grey_background:active {
+button.grey_background:active {
     background: @kano_grey_darker;
 }
 
@@ -135,7 +135,7 @@ GtkButton.grey_background:active {
     background: @kano_blue;
 }
 
-GtkButton.blue_background:active {
+button.blue_background:active {
     background: @kano_blue_darker;
 }
 

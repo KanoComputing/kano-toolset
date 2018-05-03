@@ -13,13 +13,13 @@
     padding: 0px;
 }
 
-.small_orange_button GtkLabel {
+.small_orange_button label {
     color: @kano_orange;
     font-family: Bariol Bold;
     font-size: 13px;
 }
 
-.small_orange_button GtkLabel:disabled {
+.small_orange_button label:disabled {
     color: @kano_grey;
     background: transparent;
 }
@@ -28,13 +28,13 @@
     background: transparent;
 }
 
-GtkButtonBox .small_orange_button {
+buttonbox .small_orange_button {
     background: transparent;
     border-color: transparent;
     padding: 0px;
 }
 
-GtkButtonBox .small_orange_button:hover {
+buttonbox .small_orange_button:hover {
     background: transparent;
     border-color: transparent;
     padding: 0px;
