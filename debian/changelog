@@ -1,11 +1,12 @@
 kano-toolset (4.0.0-0) unstable; urgency=low
 
+  * Fix unaligned combobox appearing on settings
   * Added function to query Debian Stretch OS
   * Fix support for Gtk packages included with Stretch.
   * Add minimal wireless configuration files
   * Split kano-splash out
 
- -- Team Kano <dev@kano.me>  Tue, 3 May  2018 11:09:00 +0100
+ -- Team Kano <dev@kano.me>  Fri, 6 Jul  2018 14:24:56 +0100
 
 kano-toolset (3.15.0-0) unstable; urgency=low
 

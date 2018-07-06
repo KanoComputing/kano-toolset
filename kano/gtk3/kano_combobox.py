@@ -116,7 +116,7 @@ class KanoComboBox(Gtk.Button):
         self.dropdown.show_all()
         self.dropdown.popup(None, None, self.popup_set_position, None, event.button, event.time)
 
-    def popup_set_position(self, menu, data):
+    def popup_set_position(self, menu, data, cx, cy):
         # this is used by the popup() method to get the drawing x,y coordinates
         # we make it so that it is positioned just underneath the combobox button
         window = self.get_window()
@@ -126,7 +126,7 @@ class KanoComboBox(Gtk.Button):
         combobox_height = self.get_allocation().height
 
         # the y-coordinate is adjusted by 2px because of the border
-        return combobox_x, combobox_y + combobox_height - 2, True
+        return combobox_x, combobox_y + combobox_height - 2, True, cx, cy
 
     def on_scroll(self, widget, event):
         # distinguishing between scrolling up and down
