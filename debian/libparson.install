@@ -1,2 +1,0 @@
-#!/usr/bin/dh-exec
-libs/parson/release/libparson.so => usr/lib/libparson.so.1

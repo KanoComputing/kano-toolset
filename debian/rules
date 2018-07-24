@@ -9,7 +9,6 @@
 override_dh_strip:
 	dh_strip -plibkano-networking --dbg-package=libkano-networking-dbg
 	dh_strip -plibkano-python --dbg-package=libkano-python-dbg
-	dh_strip -plibparson --dbg-package=libparson-dbg
 	dh_strip -plibkano-c-logging --dbg-package=libkano-c-logging-dbg
 
 override_dh_auto_test:

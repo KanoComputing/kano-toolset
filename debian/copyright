@@ -4,7 +4,3 @@ Upstream-Contact: Kano developers <dev@kano.me>
 Files: *
 Copyright: 2013,2014,2015 Kano Computing Ltd.
 License: GPL-2+
-
-Files: libs/parson/lib/*
-Copyright: 2012-2016 Krzysztof Gabis (kgabis@gmail.com)
-License: MIT
