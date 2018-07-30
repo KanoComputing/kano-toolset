@@ -143,17 +143,24 @@ def get_board_property(board_key, prop):
 
 def detect_kano_keyboard_type():
     # Get information of all devices
-    o, _, _ = run_cmd('lsusb')
+    stdout, dummy_stderr, dummy_ret = run_cmd('lsusb')
 
     keyboard_ids = {
-        'en': 'ID 1997:2433',
+        'en': [
+            'ID 1997:2433',
+            'ID 1997:2435'
+        ],
         'es': 'ID 1997:2434'
     }
-    kano_keyboard = None
-    for lang, id in keyboard_ids.iteritems():
-        if id in o:
-            kano_keyboard = lang
-    return kano_keyboard
+
+    for lang, ids in keyboard_ids.iteritems():
+        if not isinstance(ids, list):
+            ids = [ids]
+
+        if any(kb_id in stdout for kb_id in ids):
+            return lang
+
+    return None
 
 
 def detect_kano_keyboard():
