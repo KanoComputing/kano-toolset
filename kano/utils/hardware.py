@@ -266,7 +266,7 @@ def get_rpi_model(revision=None, use_cached=True):
             revision_hex = 0
 
         # The order of checks here is done Descending by Most Likely Model.
-        if revision_hex & 0x00FFFFFF in (0x00A02082, 0x00A22082, 0x00A32082):
+        if revision_hex & 0x00FFFFFF in (0x00A02082, 0x00A22082, 0x00A32082, 0x00A52082):
             model_name = RPI_3_KEY
 
         elif revision_hex & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041, 0x00A21042):
