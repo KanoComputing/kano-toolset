@@ -368,8 +368,8 @@ def log_excepthook(exc_class, exc_value, tb):
     logger.error("Unhandled exception '{}' at {}"
                  .format(exc_value, exc_txt),
                  traceback=tb_txt,
-                 exc_class=exc_class,
-                 exc_value=exc_value)
+                 exc_class=repr(exc_class),
+                 exc_value=repr(exc_value))
     sys.__excepthook__(exc_class, exc_value, tb)
 
 sys.excepthook = log_excepthook
