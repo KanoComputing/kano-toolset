@@ -277,7 +277,7 @@ def get_rpi_model(revision=None, use_cached=True):
         if revision_hex & 0x00FFFFFF in (0x00A02082, 0x00A22082, 0x00A32082, 0x00A52082):
             model_name = RPI_3_KEY
 
-        elif revision_hex & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041, 0x00A21042):
+        elif revision_hex & 0x00FFFFFF in (0x00A01040, 0x00A01041, 0x00A21041, 0x00A22042):
             model_name = RPI_2_B_KEY
 
         elif revision_hex & 0x00FFFFFF == 0x00A020D3:
@@ -300,7 +300,7 @@ def get_rpi_model(revision=None, use_cached=True):
         elif revision_hex & 0x00FFFFFF == 0x009000C1:
             model_name = RPI_ZERO_W_KEY
 
-        elif revision_hex & 0x00FFFFFF in (0x00900092, 0x00900093, 0x00920093):
+        elif revision_hex & 0x00FFFFFF in (0x00900092, 0x00920092, 0x00900093, 0x00920093):
             model_name = RPI_ZERO_KEY
 
         elif revision_hex & 0x00FFFFFF == 0x00A020A0:
