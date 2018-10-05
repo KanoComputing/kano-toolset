@@ -17,6 +17,7 @@
     border-width: 0px;
     outline-width: 0px;
     -GtkTreeView-vertical-separator: 0;
+    caret-color: #000000;
 }
 
 /**
