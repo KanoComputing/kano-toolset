@@ -1,9 +1,10 @@
 kano-toolset (4.2.0-0) unstable; urgency=low
 
   * Added revision code support for RPi 3B+ models and update RPi2 and Zero ones
-  # Fixed the Gtk caret-color for the cursor to be visible in text inputs
+  * Fixed the Gtk caret-color for the cursor to be visible in text inputs
+  * Fixed traceback caused when calling get_user early during boot
 
- -- Team Kano <dev@kano.me>  Thu, 5 Oct 2018 12:23:00 +0100
+ -- Team Kano <dev@kano.me>  Mon, 8 Oct 2018 12:23:00 +0100
 
 kano-toolset (4.1.0-0) unstable; urgency=low
 
