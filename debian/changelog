@@ -28,7 +28,19 @@ kano-toolset (4.0.0-0) unstable; urgency=low
   * Add minimal wireless configuration files
   * Split kano-splash out
 
- -- Team Kano <dev@kano.me>  Fri, 6 Jul  2018 14:24:56 +0100
+ -- Team Kano <dev@kano.me>  Fri, 6 Jul 2018 14:24:56 +0100
+
+kano-toolset (3.16.1-0) unstable; urgency=low
+
+  * Backport: Fixed an issue with is_internet failing due to network iface name change
+
+ -- Team Kano <dev@kano.me>  Tue, 13 Dec 2018 11:09:00 +0000
+
+kano-toolset (3.16.0-0) unstable; urgency=low
+
+  * Backport: Split kano-splash out
+
+ -- Team Kano <dev@kano.me>  Fri, 6 Jul 2018 14:24:56 +0100
 
 kano-toolset (3.15.0-0) unstable; urgency=low
 
