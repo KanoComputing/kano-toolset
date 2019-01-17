@@ -1,7 +1,7 @@
 #
 # cursor.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
+# Copyright (C) 2014-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
 # Functions that changes the cursor's appearence
@@ -30,4 +30,3 @@ def attach_cursor_events(button):
     button.connect('enter-notify-event', hand_cursor)
     button.connect('leave-notify-event', arrow_cursor)
     button.connect('button-press-event', arrow_cursor)
-

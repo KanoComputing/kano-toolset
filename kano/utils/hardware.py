@@ -1,6 +1,6 @@
 # hardware.py
 #
-# Copyright (C) 2014-2016 Kano Computing Ltd.
+# Copyright (C) 2014-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Utilities relating to RPi hardware and Kano peripherals
@@ -284,14 +284,14 @@ def get_rpi_model(revision=None, use_cached=True):
             model_name = RPI_3_PLUS_KEY
 
         elif revision_hex & 0x00ff in (0x10, 0x13) or \
-             revision_hex & 0x00FFFFFF == 0x00900032:
+                revision_hex & 0x00FFFFFF == 0x00900032:
             model_name = RPI_B_PLUS_KEY
 
         elif revision_hex & 0x00ff in (0x2, 0x3, 0x4, 0x5, 0x6, 0xd, 0xe, 0xf):
             model_name = RPI_B_KEY
 
         elif revision_hex & 0x00ff in (0x12, 0x15) or \
-             revision_hex & 0x00FFFFFF == 0x00900021:
+                revision_hex & 0x00FFFFFF == 0x00900021:
             model_name = RPI_A_PLUS_KEY
 
         elif revision_hex & 0x00ff in (0x7, 0x8, 0x9):
@@ -318,7 +318,7 @@ def get_rpi_model(revision=None, use_cached=True):
 
         return '{} {}'.format(model_name, overclocked).strip()
 
-    except:
+    except Exception:
         logger.error('Unexpected error: \n{}'.format(traceback.format_exc()))
         return 'Error getting model name'
 

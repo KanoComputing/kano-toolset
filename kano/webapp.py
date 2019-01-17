@@ -2,8 +2,8 @@
 
 # webapp.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014-2019 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 
 '''
@@ -26,6 +26,7 @@ import atexit
 from kano.window import gdk_window_settings
 # from kano.profiling import declare_timepoint
 
+
 def asynchronous_gtk_message(fun):
 
     def worker((function, args, kwargs)):
@@ -38,10 +39,10 @@ def asynchronous_gtk_message(fun):
 
 
 def atexit_pipe_cleanup(pipe_file):
-    os.unlink (pipe_file)
+    os.unlink(pipe_file)
 
 
-def thr_inject_javascript (browser, pipe_file):
+def thr_inject_javascript(browser, pipe_file):
     '''
     This function reads from a pipe, a plain message interpreted as Javascript code.
     It then injects that code into the Webkit browser instance.
@@ -51,14 +52,14 @@ def thr_inject_javascript (browser, pipe_file):
 
     TODO: collect and return synchronous error level? what about pipe security?
     '''
-    if os.path.exists (pipe_file):
-        os.unlink (pipe_file)
+    if os.path.exists(pipe_file):
+        os.unlink(pipe_file)
 
-    os.mkfifo (pipe_file)
+    os.mkfifo(pipe_file)
     while True:
-        f = open (pipe_file, 'r')
+        f = open(pipe_file, 'r')
         pipe_data = f.read().strip('\n')
-        asynchronous_gtk_message (browser.execute_script)(pipe_data)
+        asynchronous_gtk_message(browser.execute_script)(pipe_data)
         f.close()
 
 
@@ -87,7 +88,6 @@ class WebApp(object):
 
         self._pipe_name = '/tmp/webapp.pipe'
 
-
         self._view = view = webkit.WebView()
         view.connect('navigation-policy-decision-requested',
                      self._nav_req_handler)
@@ -115,7 +115,9 @@ class WebApp(object):
         splitter.add1(sw)
 
         inspector = view.get_web_inspector()
-        inspector.connect("inspect-web-view", self._activate_inspector, splitter)
+        inspector.connect(
+            "inspect-web-view", self._activate_inspector, splitter
+        )
 
         self._win = win = gtk.Window(gtk.WINDOW_TOPLEVEL)
         win.set_title(self._title)
@@ -143,10 +145,13 @@ class WebApp(object):
 
         view.open(self._index)
 
-        # Start a thread that injects Javascript code coming from a filesystem pipe.
-        if self._pipe == True:
-            atexit.register (atexit_pipe_cleanup, self._pipe_name)
-            thread.start_new_thread (thr_inject_javascript, (self._view, self._pipe_name))
+        # Start a thread that injects Javascript code coming from a filesystem
+        # pipe.
+        if self._pipe is True:
+            atexit.register(atexit_pipe_cleanup, self._pipe_name)
+            thread.start_new_thread(
+                thr_inject_javascript, (self._view, self._pipe_name)
+            )
 
         gtk.main()
 
@@ -217,7 +222,7 @@ class WebApp(object):
         try:
             with open(path, "r") as f:
                 return f.read()
-        except:
+        except Exception:
             self.error("Unable to open file '%s'." % path)
             return ""
 
@@ -337,4 +342,3 @@ class WebApp(object):
         (language, country) = langcode.split('_')[:2] if '_' in langcode else (langcode, '')
 
         return '%s-%s' % (language, country) if country else language
-

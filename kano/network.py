@@ -2,10 +2,11 @@
 
 # network.py
 #
-# Copyright (C) 2014-2017 Kano Computing Ltd.
-# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014-2019 Kano Computing Ltd.
+# License:   http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
-# This script benefits from the great work by Ovidiu Ciule, ovidiu.ciule@gmail.com
+# This script benefits from the great work by Ovidiu Ciule,
+# ovidiu.ciule@gmail.com
 # PyWilist, a Python class module to parse wireless scanning
 # information as returned by GNU/Linux iwlist tool.
 # https://code.google.com/p/pywilist/   (Released under the MIT license)
@@ -14,7 +15,8 @@
 #
 
 '''
-Common functions used by kano-wifi and kano-connect to get wireless networking up
+Common functions used by kano-wifi and kano-connect to get wireless networking
+up
 '''
 
 import os
@@ -36,8 +38,8 @@ RC_CONNECTED = 0
 RC_BAD_PASSWORD = 1
 RC_AP_NOT_IN_RANGE = 2
 RC_NO_DHCP_LEASE = 3
-RC_INCORRECT_PASSWORD_LEN=4
-RC_INTERNAL_ERROR=5
+RC_INCORRECT_PASSWORD_LEN = 4
+RC_INTERNAL_ERROR = 5
 
 SUPPLICANT_CMD = 'wpa_supplicant -D nl80211,wext -t -d -c{} -i{} -f {} -B'
 
@@ -82,7 +84,7 @@ class IWList():
             # Strip blanks
             # Let's separate by cells
             cellDataL = []
-            #currentCell = None
+
             for s in rawdatas:
                 try:
                     # skip empty lines
@@ -150,7 +152,7 @@ class IWList():
                 try:
                     s = s.split("Noise level:")[1]
                     return s.strip().split(" ")[0]
-                except:
+                except Exception:
                     return 0
 
             def getCellQuality(s):
@@ -173,7 +175,13 @@ class IWList():
 
             # Provide default values for dongle drivers
             # which do not report all attributes that kano-wifi expects
-            cellData = { 'ESSID':'', 'Channel':'', 'Signal':'0', 'Quality':'' }
+            cellData = {
+                'ESSID': '',
+                'Channel': '',
+                'Signal': '0',
+                'Quality': ''
+            }
+
             for s in splitRawData:
                 if s.strip().startswith("Cell "):
                     cellData["Number"] = getCellNumber(s)
@@ -255,7 +263,7 @@ class IWList():
                     try:
                         if int(old_wnet["signal"]) < int(new_wnet["signal"]):
                             wlist[i] = new_wnet
-                    except:
+                    except Exception:
                         # The signal format is not an integer, keep the old network
                         pass
                     # The network is duplicated, do not add it again
@@ -333,7 +341,7 @@ def is_ethernet_plugged(eth_device='eth0'):
         with open('/sys/class/net/%s/operstate' % (eth_device), 'r') as f:
             if f.read().strip('\n').lower() == 'up':
                 plugged = True
-    except:
+    except Exception:
         pass
 
     return plugged
@@ -376,7 +384,7 @@ def is_gateway(iface):
     Find the default route gateway, try to contact it. Return True if responding
     '''
     out, _, _ = run_cmd("ip route show")
-    guess_ip = re.match('^default via ([0-9\.]*) dev {}'.format(iface), out)
+    guess_ip = re.match('^default via ([0-9\.]*) dev {}'.format(iface), out)  # noqa
     if guess_ip:
         return True
     else:
@@ -409,17 +417,17 @@ def get_wireless_country(enable_driver=False):
     Query current wireless country with "sudo iw reg get"
     '''
 
-    country_code=None
+    country_code = None
 
     try:
-        cc=os.getenv('KANO_WIFI_COUNTRY')
+        cc = os.getenv('KANO_WIFI_COUNTRY')
         if not cc:
-            cc=os.getenv('LANG')
+            cc = os.getenv('LANG')
 
         cc = cc.split('_')[1][:2]
-        if cc and cc not in ('US'):
-            country_code=cc.upper()
-    except:
+        if cc and cc not in ('US',):
+            country_code = cc.upper()
+    except Exception:
         pass
 
     # Tell the wireless driver to operate on this country
@@ -439,15 +447,16 @@ def wpa_conf(essid, psk, confile, wep=False):
 
     # Prepare settings section for WEP or WPA
     if wep is True:
-        # If the key starts with "hex" lowercase, what follows is the Hexadecimal form
-        # Otherwise it is in string form. Double quotes is how wpa_supplicant distinguishes.
+        # If the key starts with "hex" lowercase, what follows is the
+        # Hexadecimal form otherwise it is in string form. Double quotes is
+        # how wpa_supplicant distinguishes.
         if psk.startswith('hex'):
-            psk=psk[3:]
+            psk = psk[3:]
         else:
             # Escape single & double quotes manually
-            psk = psk.replace ("'", "\'")
-            psk = psk.replace ('"', '\"')
-            psk='"%s"' % psk
+            psk = psk.replace("'", "\'")
+            psk = psk.replace('"', '\"')
+            psk = '"%s"' % psk
 
         lines_wpa_conf = '''
           network={
@@ -496,12 +505,12 @@ def wpa_conf(essid, psk, confile, wep=False):
                         pass
                     else:
                         lines_wpa_conf.append(line + '\n')
-            except:
+            except Exception:
                 logger.error('Error calling wpa_passphrase to translate essid/psk pair')
                 return False
 
     # save the WPA configuration file
-    f=open(confile, 'wt')
+    f = open(confile, 'wt')
     for k in lines_wpa_conf:
         f.write(k)
     f.close()
@@ -534,13 +543,17 @@ def reload_kernel_module(device_vendor='148f', device_product='5370', module='rt
         time.sleep(5)
         rc_load += rc
 
-
-        logger.info('Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d' %
-                    (module, device_vendor, device_product, rc_load))
+        logger.info(
+            'Reloading wifi dongle kernel module "%s" for deviceID %s:%s rc=%d'
+            % (module, device_vendor, device_product, rc_load)
+        )
         if rc_load == 0:
             reloaded = True
     else:
-        logger.info('Not reloading kernel module because device not found (%s:%s)' % (device_vendor, device_product))
+        logger.info(
+            'Not reloading kernel module because device not found ({}:{})'
+            .format(device_vendor, device_product)
+        )
 
     return reloaded
 
@@ -549,12 +562,11 @@ def do_wait_for_dhcp(connection_timeout=60):
     '''
     Waits for a DHCP lease to be obtained, returns True on success
     '''
-    connected=False
 
     def is_internet_up(monitor_file=INTERNET_UP_FILE):
         return os.path.isfile(monitor_file)
 
-    for attempt in xrange(0, connection_timeout):
+    for dummy_attempt in xrange(0, connection_timeout):
         time.sleep(1)
         if is_internet_up():
             return True
@@ -564,15 +576,18 @@ def do_wait_for_dhcp(connection_timeout=60):
 
 def do_connect(iface, wpa_file, connection_timeout, debug=False):
     '''
-    This function connects to the WPA supplicant event flow to detect the result of a connection attempt.
-    It returns a return code with an indication of the connection result. See the RC_* constants.
+    This function connects to the WPA supplicant event flow to detect the
+    result of a connection attempt.
 
-    This code uses heuristics based on the supplicant source code: https://w1.fi/wpa_supplicant/
+    It returns a return code with an indication of the connection result. See
+    the RC_* constants.
+
+    This code uses heuristics based on the supplicant source code:
+        https://w1.fi/wpa_supplicant/
     '''
-    rc=None
-    connected=False
+    rc = None
     scans = 0
-    max_scans=3   # Heuristics: Maximum number of scans before assuming the AP is not in range
+    max_scans = 3  # Heuristics: Maximum number of scans before assuming the AP is not in range
 
     def debug_msg(message):
         if debug:
@@ -586,31 +601,38 @@ def do_connect(iface, wpa_file, connection_timeout, debug=False):
         proc.stdin.flush()
 
     # Start the WPA supplicant in the background
-    supplicant_command=SUPPLICANT_CMD.format(wpa_file, iface, SUPPLICANT_LOGFILE)
-    debug_msg ('do_connect starts: {}'.format(supplicant_command))
+    supplicant_command = SUPPLICANT_CMD.format(
+        wpa_file, iface, SUPPLICANT_LOGFILE
+    )
+    debug_msg('do_connect starts: {}'.format(supplicant_command))
     run_cmd(supplicant_command)
 
-    cli=subprocess.Popen(['wpa_cli'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    cli = subprocess.Popen(
+        ['wpa_cli'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE
+    )
     time.sleep(1)
-    rc=cli.poll()
-    while rc == None:
+    rc = cli.poll()
+    while rc is None:
         output = cli.stdout.readline().replace('\n', '')
         debug_msg(output)
 
         if output.find('CTRL-EVENT-CONNECTED') != -1:
             debug_msg('Event "Associated" detected')
             close_wpa_cli(cli)
-            rc=RC_CONNECTED
+            rc = RC_CONNECTED
             break
         elif output.find('reason=WRONG_KEY') != -1:
             debug_msg('Event "wrong key" detected')
             close_wpa_cli(cli)
-            rc=RC_BAD_PASSWORD
+            rc = RC_BAD_PASSWORD
             break
         elif output.find('reason=CONN_FAILED') != -1:
             debug_msg('Event "AP not in range" detected')
             close_wpa_cli(cli)
-            rc=RC_AP_NOT_IN_RANGE
+            rc = RC_AP_NOT_IN_RANGE
             break
 
         if output.find('WPS-AP-AVAILABLE') != -1:
@@ -618,26 +640,27 @@ def do_connect(iface, wpa_file, connection_timeout, debug=False):
             if scans == max_scans:
                 debug_msg('Event "timeout due to too many scans" detected')
                 close_wpa_cli(cli)
-                reason_code = RC_AP_NOT_IN_RANGE
+                rc = RC_AP_NOT_IN_RANGE
                 break
 
-        rc=cli.poll()
+        rc = cli.poll()
 
     # If we are associated, wait for DHCP lease to become available
-    if rc==RC_CONNECTED:
+    if rc == RC_CONNECTED:
         if not do_wait_for_dhcp(connection_timeout=connection_timeout):
-            rc=RC_NO_DHCP_LEASE
+            rc = RC_NO_DHCP_LEASE
 
     debug_msg('do_connect() returns rc={}'.format(rc))
     return rc
 
 
-def connect(iface, essid, encrypt='off', seckey=None, \
-                wpa_custom_file=None, connect_timeout=60, debug=False):
+def connect(iface, essid, encrypt='off', seckey=None,
+            wpa_custom_file=None, connect_timeout=60, debug=False):
     '''
     Attempts a wireless association with provided parameters.
 
-    If wpa_custom_file is provided, it will point to a wpa_supplication configuration file.
+    If wpa_custom_file is provided, it will point to a wpa_supplication
+    configuration file.
     Essid, encrypt and seckey should be empty, and all parameters will be
     delegated to the WPA daemon with this configuration file.
 
@@ -648,17 +671,21 @@ def connect(iface, essid, encrypt='off', seckey=None, \
     connect_timeout is the time in seconds to wait for the DHCP lease
     and internet connection to become ready.
 
-    Passing True to debug, will display events emitted by WPA supplicant to stdout.
+    Passing True to debug, will display events emitted by WPA supplicant to
+    stdout.
 
     Returns one of the RC_* constants defined at the top of this module.
     '''
 
-    wifi_conf_file=None
+    wifi_conf_file = None
 
     if os.access(KANO_CONNECT_PIDFILE, os.R_OK):
-        client_module=sys.argv[0]
+        client_module = sys.argv[0]
         if client_module.find('kano-connect') == -1:
-            logger.info ('Cancelling kano-connect to give control to %s' % sys.argv[0])
+            logger.info(
+                'Cancelling kano-connect to give control to {}'
+                .format(sys.argv[0])
+            )
             run_cmd('pkill -f kano-connect')
             time.sleep(1)
 
@@ -697,13 +724,16 @@ def connect(iface, essid, encrypt='off', seckey=None, \
             elif len(seckey) in (10, 26, 116):
                 # Good, this is the correct length for a HEX key.
                 # Prepend "hex" internally so supplicant settings can be applied.
-                seckey='hex' + seckey
+                seckey = 'hex' + seckey
             else:
                 logger.error("The WEP key lenght is incorrect (%d) should be 5/13/58 (ASCII) or 10/26/116 (HEX)" % (len(seckey)))
                 return RC_INCORRECT_PASSWORD_LEN
-        elif len(seckey) not in (10+3, 26+3, 116+3):
+        elif len(seckey) not in (10 + 3, 26 + 3, 116 + 3):
             # For keys that start with "hex", make sure their length is also correct.
-            logger.error("The HEX WEP key lenght is incorrect (%d) should 10/26/116" % (len(seckey)))
+            logger.error(
+                "The HEX WEP key length is incorrect (%d) should 10/26/116"
+                % len(seckey)
+            )
             return RC_INCORRECT_PASSWORD_LEN
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
@@ -717,13 +747,16 @@ def connect(iface, essid, encrypt='off', seckey=None, \
         #
 
     elif encrypt == 'wpa':
-
         if not seckey.startswith('hex'):
-            wpalen=len(seckey)
+            wpalen = len(seckey)
+
             if wpalen < 8 or wpalen > 63:
                 # WPA passphrases lenght is not correct
-                logger.error("The WPA key lenght is incorrect " \
-                                 "(%d) should be between 8 and 63 chars" % wpalen)
+                logger.error(
+                    "The WPA key lenght is incorrect "
+                    "(%d) should be between 8 and 63 chars"
+                    % wpalen
+                )
                 return RC_INCORRECT_PASSWORD_LEN
 
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
@@ -736,7 +769,6 @@ def connect(iface, essid, encrypt='off', seckey=None, \
             return RC_CONNECTED
         else:
             return RC_NO_DHCP_LEASE
-
 
     # Wait until we are associated, and that we have an Internet link
     reason = do_connect(iface, wifi_conf_file, connect_timeout, debug=debug)
@@ -767,9 +799,11 @@ def is_redirected():
     '''
 
     cmdline = shlex.split("curl -Is 'www.google.com'")
-    p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    (out, err) = p.communicate()
-    return (out.find("http://www.google.") == -1)
+    p = subprocess.Popen(
+        cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    out, err = p.communicate()
+    return out.find("http://www.google.") == -1
 
 
 class KwifiCache:
@@ -791,7 +825,7 @@ class KwifiCache:
         try:
             os.unlink(self.cache_file)
             return True
-        except:
+        except Exception:
             return False
 
     def get(self, essid):
@@ -799,32 +833,47 @@ class KwifiCache:
         try:
             if wdata['essid'] == essid:
                 return wdata
-        except:
+        except Exception:
             return None
 
     def get_latest(self):
         return self._get_cache_()
 
     def _save_cache_(self, essid, encryption, enckey, wpaconf):
-        wdata = json.dumps({'essid': essid, 'encryption': encryption, 'enckey': enckey, 'conf': wpaconf},
-                           sort_keys=True, indent=4, separators=(',', ': '))
+        wdata = json.dumps(
+            {
+                'essid': essid,
+                'encryption': encryption,
+                'enckey': enckey,
+                'conf': wpaconf
+            },
+            sort_keys=True,
+            indent=4,
+            separators=(',', ': ')
+        )
+
         with open(self.cache_file, 'w') as f:
             f.write(wdata)
             f.write('\n')
+
         return True
 
     def _get_cache_(self):
         if not os.access(self.cache_file, os.R_OK):
             return None
+
         with open(self.cache_file, 'r') as f:
             lastknown = f.read()
+
         wdata = json.loads(lastknown)
+
         return wdata
 
 
 def launch_browser(*args):
     # TODO: Set the default system browser setting somewhere
-    # if you are not root, you will get a "su" prompt that would misteriously stall you
+    # if you are not root, you will get a "su" prompt that would misteriously
+    # stall you
     if not os.getuid() == 0:
         return
 
@@ -833,13 +882,13 @@ def launch_browser(*args):
 
 def launch_chromium(*args):
     user_name = get_user_unsudoed()
-    arguments=''.join(*args)
+    arguments = ''.join(*args)
     run_bg('su - ' + user_name + ' -c "chromium {}"'.format(arguments))
 
 
 def launch_midori(*args):
     user_name = get_user_unsudoed()
-    arguments=''.join(*args)
+    arguments = ''.join(*args)
     run_bg('su - ' + user_name + ' -c "midori {}"'.format(arguments))
 
 

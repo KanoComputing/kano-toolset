@@ -1,6 +1,6 @@
 # decorators.py
 #
-# Copyright (C) 2015-2016 Kano Computing Ltd.
+# Copyright (C) 2015-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Decorators used to simplify control and ease modularity
@@ -82,22 +82,22 @@ def retry(tries, delay=3, backoff=2):
 
     def deco_retry(f):
         def f_retry(*args, **kwargs):
-            mtries, mdelay = tries, delay # make mutable
+            mtries, mdelay = tries, delay  # make mutable
 
-            rv = f(*args, **kwargs) # first attempt
+            rv = f(*args, **kwargs)  # first attempt
             while mtries > 0:
-                if rv is True: # Done on success
+                if rv is True:  # Done on success
                     return True
 
-                mtries -= 1      # consume an attempt
-                time.sleep(mdelay) # wait...
+                mtries -= 1  # consume an attempt
+                time.sleep(mdelay)  # wait...
                 mdelay *= backoff  # make future wait longer
 
-                rv = f(*args, **kwargs) # Try again
+                rv = f(*args, **kwargs)  # Try again
 
-            return False # Ran out of tries :-(
+            return False  # Ran out of tries :-(
 
-        return f_retry # true decorator -> decorated function
+        return f_retry  # true decorator -> decorated function
     return deco_retry  # @retry(arg[, ...]) -> true decorator
 
 

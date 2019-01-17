@@ -2,20 +2,7 @@
 # Placeholder makefile so "debuild" can be gently persuaded to work
 #
 
-REPORT_DIR = reports
-COVERAGE_REPORT_DIR = $(REPORT_DIR)/coverage
-TESTS_REPORT_DIR = $(REPORT_DIR)/tests
-
-# Elaborate mechanism just to get the correct syntax for the pytest markers param
-_FIRST_TAG := $(firstword $(OMITTED_TAGS))
-PYTEST_TAGS_EXPR := $(foreach tag, $(OMITTED_TAGS), $(if $(filter $(tag), $(_FIRST_TAG)),not $(tag),and not $(tag)))
-
-ifeq ($(PYTEST_TAGS_EXPR), )
-	PYTEST_TAGS_FLAG :=
-else
-	PYTEST_TAGS_FLAG := -m "$(strip $(PYTEST_TAGS_EXPR))"
-endif
-BEHAVE_TAGS_FLAG := $(join $(addprefix --tags=-,$(OMITTED_TAGS)), $(space))
+REPO:= kano-toolset
 
 
 .PHONY: clean docs kano-keys-pressed kano-launcher kano-logging kano kano-networking kano-python parson check test
@@ -56,25 +43,8 @@ parson:
 	cd libs/parson && make debug
 
 #
-# Run the tests
+# Add test targets
 #
-# Requirements:
-#     - pytest
-#     - behave
-#     - pytest-cov
-#
-check:
-	# Refresh the reports directory
-	rm -rf $(REPORT_DIR)
-	mkdir -p $(REPORT_DIR)
-	mkdir -p $(COVERAGE_REPORT_DIR)
-	mkdir -p $(TESTS_REPORT_DIR)
-	# Run the tests
-	-coverage run --module pytest $(PYTEST_TAGS_FLAG) --junitxml=$(TESTS_REPORT_DIR)/pytest_results.xml
-	-coverage run --append --module behave $(BEHAVE_TAGS_FLAG) --junit --junit-directory=$(TESTS_REPORT_DIR)
-	# Generate reports
-	coverage xml
-	coverage html
-	coverage-badge -o $(COVERAGE_REPORT_DIR)/kano-toolset-coverage.svg
-
+include pythontest.mk
+check: pythontest
 test: check

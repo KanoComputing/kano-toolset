@@ -1,6 +1,6 @@
 # luon.py
 #
-# Copyright (C) 2016 Kano Computing Ltd.
+# Copyright (C) 2016-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Output 'pure data' python structures as lua tables.
@@ -14,12 +14,11 @@
 #  value for json_nil
 
 
-
 def escape_char(c, ascii_only):
-    '''
+    r'''
     Escape char 'c' for use in a lua string.
 
-    uses '\d instead of `\u' because we want to be compatible with lua 5.1
+    uses '\d' instead of '\u' because we want to be compatible with lua 5.1
     '''
 
     if ord(c) < ord(' ') or ord(c) >= 127 or c == '"' or c == '\\':
@@ -36,6 +35,7 @@ def escape_string(s, ascii_only):
     Escape a whole LSON string
     '''
     return ''.join([escape_char(c, ascii_only) for c in s])
+
 
 NL = '\n'
 
@@ -55,7 +55,7 @@ class lines:
         '''
 
         if next.endswith(NL):
-            self.lines += ' '*self.prefix+self.curr+next
+            self.lines += ' ' * self.prefix + self.curr + next
             self.curr = ''
         else:
             self.curr += next
@@ -79,7 +79,7 @@ class lines:
         '''
         return finished string
         '''
-        return self.lines+self.curr
+        return self.lines + self.curr
 
 
 def to_lua_lines(lines, obj, ascii_only):
@@ -116,7 +116,7 @@ def to_lua_lines(lines, obj, ascii_only):
             to_lua_lines(lines, k, ascii_only)
             lines += '] = '
             to_lua_lines(lines, i, ascii_only)
-            lines += ', '+NL
+            lines += ', ' + NL
         lines.pop()
         lines += '}'
     elif isinstance(obj, bool):
@@ -135,15 +135,15 @@ def dumps(x, ascii_only=False):
     '''
     Convert a data item to lua module, returning as a string
     '''
-    l = lines()
-    l += "function f(json_nil)\n"
-    l.push()
-    l += "local val ="
-    to_lua_lines(l, x, ascii_only)
-    l += "\n"
-    l += "return val"
-    l += "\n"
-    l.pop()
-    l += "end\n"
-    l += "return f\n"
-    return l.end()
+    lua = lines()
+    lua += "function f(json_nil)\n"
+    lua.push()
+    lua += "local val ="
+    to_lua_lines(lua, x, ascii_only)
+    lua += "\n"
+    lua += "return val"
+    lua += "\n"
+    lua.pop()
+    lua += "end\n"
+    lua += "return f\n"
+    return lua.end()

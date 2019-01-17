@@ -35,32 +35,32 @@ COLOURS = {
 }
 
 PRESETS = {
-    "code":           ["green", "dark-gray", True],
-    "key":            ["red", "dark-gray", True],
+    "code": ["green", "dark-gray", True],
+    "key": ["red", "dark-gray", True],
 
-    "faded":          ["yellow", None, False],
-    "alert":          ["red", None, True],
-    "highlight":      ["blue", None, True],
+    "faded": ["yellow", None, False],
+    "alert": ["red", None, True],
+    "highlight": ["blue", None, True],
 
-    "pass":           ["green", None, True],
-    "fail":           ["red", None, True],
+    "pass": ["green", None, True],
+    "fail": ["red", None, True],
 
-    "info":           ["green", None, True],
-    "debug":          ["blue", None, True],
-    "warning":        ["yellow", None, True],
-    "error":          ["red", None, True],
-    "none":           [None, None, False],
+    "info": ["green", None, True],
+    "debug": ["blue", None, True],
+    "warning": ["yellow", None, True],
+    "error": ["red", None, True],
+    "none": [None, None, False],
 
     # Used in colours-cli
     "command_prompt": ["light-cyan", None, False],
-    "keyboard":       ["white", "light-red", True],
-    "instructions":   ["light-cyan", "dark-gray", False],
-    "success_text":   ["light-green", None, False],
-    "success_icon":   ["white", "green", True],
-    "hint_text":      ["light-yellow", None, False],
-    "hint_icon":      ["dark-gray", "light-yellow", True],
-    "error_text":     ["light-red", None, False],
-    "error_icon":     ["white", "red", True]
+    "keyboard": ["white", "light-red", True],
+    "instructions": ["light-cyan", "dark-gray", False],
+    "success_text": ["light-green", None, False],
+    "success_icon": ["white", "green", True],
+    "hint_text": ["light-yellow", None, False],
+    "hint_icon": ["dark-gray", "light-yellow", True],
+    "error_text": ["light-red", None, False],
+    "error_icon": ["white", "red", True]
 }
 
 enabled = True
@@ -80,7 +80,7 @@ def name_to_fg_colour(name):
     """ Convert name to foreground colour code.
         Returns None if the colour name isn't supported. """
 
-    if not COLOURS.has_key(name):
+    if name not in COLOURS:
         return None
 
     return COLOURS[name]
@@ -90,7 +90,7 @@ def name_to_bg_colour(name):
     """ Convert name to background color code.
         Returns None if the colour name isn't supported. """
 
-    if not COLOURS.has_key(name):
+    if name not in COLOURS:
         return None
 
     return COLOURS[name] + 10
@@ -152,7 +152,7 @@ def decorate_string(string, fg_colour=None, bg_colour=None, bold=False):
             decorate_string(s, "red", "light-gray")
     """
 
-    extended_re = "^extended\(([0-9]+)\)$"
+    extended_re = "^extended\(([0-9]+)\)$"  # noqa
 
     # parameters for the colouring functions (fg_num, bg_num)
     # the bold flag is handled separately

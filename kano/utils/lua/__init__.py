@@ -8,4 +8,3 @@
 
 __author__ = 'Kano Computing Ltd.'
 __email__ = 'dev@kano.me'
-

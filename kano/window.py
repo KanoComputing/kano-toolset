@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-
+#
 # window.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+# Copyright (C) 2014-2019 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 
 '''
@@ -190,7 +189,8 @@ def get_child_windows(win):
 def gdk_window_settings(win, x=None, y=None, width=None, height=None,
                         decoration=None, maximized=False, centered=False):
     '''
-    Applies appeareance and position modifications to the Window identified by win    
+    Applies appeareance and position modifications to the Window identified by
+    win
     '''
     # Screen dimensions
     scr_width = gdk.screen_width()

@@ -1,6 +1,6 @@
 # __init__.py
 #
-# Copyright (C) 2014-2016 Kano Computing Ltd.
+# Copyright (C) 2014-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Init for the kano utils module
@@ -11,50 +11,62 @@ __email__ = 'dev@kano.me'
 
 import sys
 
+
 def ku_audio(name):
     import kano.utils.audio
     return getattr(kano.utils.audio, name)
+
 
 def ku_file_operations(name):
     import kano.utils.file_operations
     return getattr(kano.utils.file_operations, name)
 
+
 def ku_disk(name):
     import kano.utils.disk
     return getattr(kano.utils.disk, name)
+
 
 def ku_gui(name):
     import kano.utils.gui
     return getattr(kano.utils.gui, name)
 
+
 def ku_hardware(name):
     import kano.utils.hardware
     return getattr(kano.utils.hardware, name)
+
 
 def ku_http_requests(name):
     import kano.utils.http_requests
     return getattr(kano.utils.http_requests, name)
 
+
 def ku_misc(name):
     import kano.utils.misc
     return getattr(kano.utils.misc, name)
+
 
 def ku_processes(name):
     import kano.utils.processes
     return getattr(kano.utils.processes, name)
 
+
 def ku_shell(name):
     import kano.utils.shell
     return getattr(kano.utils.shell, name)
+
 
 def ku_system(name):
     import kano.utils.system
     return getattr(kano.utils.system, name)
 
+
 def ku_user(name):
     import kano.utils.user
     return getattr(kano.utils.user, name)
-        
+
+
 functable = {
     'play_sound': ku_audio,
     'percent_to_millibel': ku_audio,
@@ -134,6 +146,7 @@ functable = {
     'enforce_root': ku_user
 
 }
+
 
 # lazy loader: only import utils module when actually used
 class loader:

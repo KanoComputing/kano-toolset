@@ -89,7 +89,7 @@ def get_volume():
 
     percent = 100
 
-    cmd = "amixer | head -n 6 | grep -Po '(\d{1,3})(?=%)'"
+    cmd = "amixer | head -n 6 | grep -Po '(\d{1,3})(?=%)'"  # noqa
     output, _, _ = run_cmd(cmd)
 
     try:

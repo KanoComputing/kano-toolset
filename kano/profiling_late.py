@@ -52,31 +52,52 @@ def declare_timepoint(name, isStart):
                 pythonProfile = True
                 if isStart:
                     if point_current:
-                        logger.error('Stop profiling for point "{0}" and do "{1}" instead'.format(point_current, name))
+                        logger.error(
+                            'Stop profiling for point "{0}" and do "{1}" '
+                            'instead'
+                            .format(point_current, name)
+                        )
                         myProfile.disable()
                         myProfile.clear()
                     point_current = name
                     myProfile.enable()
                 else:
                     if point_current != name:
-                        logger.error('Can\'t stop point "{0}" since a profiling session for "{1}" is being run'.format(name, point_current))
+                        logger.error(
+                            'Can\'t stop point "{0}" since a profiling '
+                            'session for "{1}" is being run'
+                            .format(name, point_current)
+                        )
                     else:
                         myProfile.disable()
                         # Check if the statfile location in specified
                         if ct['python']['statfile']:
                             try:
                                 myProfile.dump_stats(ct['python']['statfile'])
-                            except IOError as e:
-                                if e.errno == 2:
-                                    logger.error('Path to "{}" probably does not exist'.format(ct['python']['statfile']))
+                            except IOError as err:
+                                if err.errno == 2:
+                                    logger.error(
+                                        'Path to "{}" probably does not exist'
+                                        .format(ct['python']['statfile'])
+                                    )
                                 else:
-                                    logger.error('dump_stats IOError: errno:{0}: {1} '.format(e.errno, e.strerror))
+                                    logger.error(
+                                        'dump_stats IOError: errno:{0}: {1} '
+                                        .format(err.errno, err.strerror)
+                                    )
                         else:
-                            logger.error('No statfile entry in profiling conf file "{}"'.format(CONF_FILE))
+                            logger.error(
+                                'No statfile entry in profiling conf file "{}"'
+                                .format(CONF_FILE)
+                            )
                         myProfile.clear()
                         point_current = ""
             else:
-                logger.info('Profiling conf file doesnt enable the Python profiler for point {} at app {}'.format(name, app_name))
+                logger.info(
+                    'Profiling conf file doesnt enable the Python '
+                    'profiler for point {} at app {}'
+                    .format(name, app_name)
+                )
 
             # Check if we want to run some other command at this timepoint
             if isStart and has_key(ct, 'start_exec'):
@@ -86,8 +107,19 @@ def declare_timepoint(name, isStart):
                 cmd = ct['end_exec']
                 os.system(cmd)
         else:
-            logger.info('Profiling conf file doesnt include point:{} for app {}'.format(name, app_name))
+            logger.info(
+                'Profiling conf file doesnt include point:{} for app {}'
+                .format(name, app_name)
+            )
     else:
-        logger.info('Profiling conf file doesnt include app:{}'.format(app_name))
+        logger.info(
+            'Profiling conf file doesnt include app:{}'.format(app_name)
+        )
 
-    logger.debug('timepoint '+name, transition=name, isStart=isStart, cmd=cmd, pythonProfile=pythonProfile)
+    logger.debug(
+        'timepoint ' + name,
+        transition=name,
+        isStart=isStart,
+        cmd=cmd,
+        pythonProfile=pythonProfile
+    )

@@ -2,14 +2,15 @@
 
 # __init__.py
 #
-# Copyright (C) 2014 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# Copyright (C) 2014-2019 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 
 __author__ = 'Kano Computing Ltd.'
 __email__ = 'dev@kano.me'
 
-import os, sys
+import os
+import sys
 
 DIR_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if DIR_PATH != '/usr':
@@ -20,4 +21,3 @@ else:
 
 import kano_i18n.init
 kano_i18n.init.register_domain('kano-toolset', LOCALE_PATH)
-

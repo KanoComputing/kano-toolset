@@ -1,7 +1,7 @@
 #
 # labelled_entries.py
 #
-# Copyright (C) 2014 - 2018 Kano Computing Ltd.
+# Copyright (C) 2014-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
 # Template for creating a list of labelled entries
@@ -96,5 +96,3 @@ def create_labelled_widget(heading, description="", widget=None):
     align.add(box)
 
     return align
-
-

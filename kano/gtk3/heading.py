@@ -1,7 +1,7 @@
 #
 # kano_dialog.py
 #
-# Copyright (C) 2014 - 2018 Kano Computing Ltd.
+# Copyright (C) 2014-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPLv2
 #
 # Heading used frequently around kano-settings and kano-login
@@ -56,4 +56,3 @@ class Heading():
         self.container.set_margin_right(right_margin)
         self.container.set_margin_top(top_margin)
         self.container.set_margin_bottom(bottom_margin)
-

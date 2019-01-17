@@ -1,6 +1,6 @@
 # kano.logging
 #
-# Copyright (C) 2014 Kano Computing Ltd.
+# Copyright (C) 2014-2019 Kano Computing Ltd.
 # License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
 #
 
@@ -268,6 +268,7 @@ class Logger:
 
         self._log_file = open("{}/{}.log".format(logs_dir, self._app_name), "a")
 
+
 logger = Logger()
 
 
@@ -310,14 +311,14 @@ def read_logs(app=None):
     for d in _get_log_dirs():
         if os.path.isdir(d):
             for log in os.listdir(d):
-                if app is None or re.match("^{}\.log".format(app), log):
+                if app is None or re.match("^{}\.log".format(app), log):  # noqa
                     log_path = os.path.join(d, log)
                     with open(log_path, "r") as f:
                         data[log_path] = []
                         for line in f.readlines():
                             try:
                                 data[log_path].append(json.loads(line))
-                            except:
+                            except Exception:
                                 # unable to read the line, skip it
                                 pass
 
@@ -332,7 +333,7 @@ def cleanup(app=None, line_limit=TAIL_LENGTH):
     for d in dirs:
         if os.path.isdir(d):
             for log in os.listdir(d):
-                if app is None or re.match("^{}\.log".format(app), log):
+                if app is None or re.match("^{}\.log".format(app), log):  # noqa
                     log_path = os.path.join(d, log)
                     try:
                         __tail_log_file(log_path, line_limit)
@@ -362,7 +363,7 @@ def log_excepthook(exc_class, exc_value, tb):
         (filename, number, function, line_text) = traceback.extract_tb(tb)[-1]
         exc_txt = "{} line {} function {} [{}]".format(
             filename, number, function, line_text)
-    except:
+    except Exception:
         exc_txt = ""
 
     logger.error("Unhandled exception '{}' at {}"
@@ -371,5 +372,6 @@ def log_excepthook(exc_class, exc_value, tb):
                  exc_class=repr(exc_class),
                  exc_value=repr(exc_value))
     sys.__excepthook__(exc_class, exc_value, tb)
+
 
 sys.excepthook = log_excepthook

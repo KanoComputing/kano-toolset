@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-
+#
 # xwindow.py
 #
-# Copyright (C) 2015 Kano Computing Ltd.
-# License: GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+# Copyright (C) 2015-2019 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # low level Xlib utilities
 #
@@ -44,7 +43,7 @@ def find_xwindow_by_id(xid, parent):
             r = find_xwindow_by_id(xid, c)
             if r is not None:
                 return r
-    except:
+    except Exception:
         return None
 
 
@@ -56,6 +55,7 @@ def xid_to_str(xid):
 # NB this function opens its own X connection. This is only safe because
 # we don't return any objects, only xids. Normally Xlib objects must be used
 # in the context of a Display().
+
 
 def get_child_windows_from_xid(xid):
     '''
@@ -69,5 +69,5 @@ def get_child_windows_from_xid(xid):
             for c in xw.query_tree().children:
                 children.append(xid_to_str(c.id))
             return children
-    except:
+    except Exception:
         return []
