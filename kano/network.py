@@ -26,15 +26,8 @@ import json
 import re
 import shutil
 from kano.utils import run_cmd, get_user_unsudoed, run_bg, write_file_contents
+from kano import paths
 from kano.logging import logger
-
-DNS_FILE = '/etc/resolvconf/resolv.conf.d/base'
-DNS_INTERFACES_FILE = '/etc/resolvconf/interface-order'
-DNS_INTERFACES_BACKUP_FILE = '/etc/resolvconf/interface-order.backup'
-SUPPLICANT_CMD = 'wpa_supplicant -D nl80211,wext -t -d -c{} -i{} -f {} -B'
-SUPPLICANT_LOGFILE = '/var/log/kano_wpa.log'
-INTERNET_UP_FILE = '/var/run/internet_monitor'
-KANO_CONNECT_PIDFILE = '/var/run/kano-connect.pid'
 
 # Return codes returned by connect() and do_connect() functions
 RC_CONNECTED = 0
@@ -43,6 +36,8 @@ RC_AP_NOT_IN_RANGE = 2
 RC_NO_DHCP_LEASE = 3
 RC_INCORRECT_PASSWORD_LEN=4
 RC_INTERNAL_ERROR=5
+
+SUPPLICANT_CMD = 'wpa_supplicant -D nl80211,wext -t -d -c{} -i{} -f {} -B'
 
 
 class IWList():
@@ -710,7 +705,7 @@ def connect(iface, essid, encrypt='off', seckey=None, \
             return RC_INCORRECT_PASSWORD_LEN
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
-        wifi_conf_file = '/etc/kano_wpa_connect.conf'
+        wifi_conf_file = SUPPLICANT_CONFIG
         if not wpa_conf(essid, seckey, confile=wifi_conf_file, wep=True):
             return RC_INTERNAL_ERROR
 
@@ -730,7 +725,7 @@ def connect(iface, essid, encrypt='off', seckey=None, \
                 return RC_INCORRECT_PASSWORD_LEN
 
         logger.info("Starting wpa_supplicant for network '%s' to interface %s" % (essid, iface))
-        wifi_conf_file = '/etc/kano_wpa_connect.conf'
+        wifi_conf_file = SUPPLICANT_CONFIG
         if not wpa_conf(essid, seckey, confile=wifi_conf_file):
             return RC_INTERNAL_ERROR
 
