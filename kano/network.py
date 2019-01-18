@@ -26,8 +26,10 @@ import json
 import re
 import shutil
 from kano.utils import run_cmd, get_user_unsudoed, run_bg, write_file_contents
-from kano import paths
 from kano.logging import logger
+
+from kano.paths import DNS_FILE, DNS_INTERFACES_FILE, DNS_INTERFACES_BACKUP_FILE,\
+    SUPPLICANT_LOGFILE, SUPPLICANT_CONFIG, INTERNET_UP_FILE, KANO_CONNECT_PIDFILE
 
 # Return codes returned by connect() and do_connect() functions
 RC_CONNECTED = 0
