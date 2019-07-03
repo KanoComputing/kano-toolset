@@ -172,7 +172,11 @@ class Logger:
 
         if level > 0 and (level <= sys_log_level or level <= sys_output_level):
             if self._app_name is None:
-                self.set_app_name(sys.argv[0])
+                try:
+                    self.set_app_name(sys.argv[0])
+                except (AttributeError, IndexError):
+                    # argv is likely not accessible, use default value
+                    self.set_app_name('unknown-app')
 
             lines = msg.encode('utf8') if type(msg) == unicode else msg
             lines = lines.strip().split("\n")

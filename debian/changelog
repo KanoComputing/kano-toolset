@@ -1,3 +1,10 @@
+kano-toolset (4.3.0-0) unstable; urgency=low
+
+  * Prevent tracebacks when the logger can't access the application name from
+    the provided args
+
+ -- Team Kano <dev@kano.me>  Wed, 3 Jul 2019 17:47:00 +0100
+
 kano-toolset (4.2.1-0) unstable; urgency=low
 
   * Switched to using the original wpa supplicant configuration file
