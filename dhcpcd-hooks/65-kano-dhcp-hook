@@ -7,7 +7,7 @@
 # To enable this hook for logging, edit /etc/systemd/journalctl.conf and set Storage=persistent
 # Reboot and execute "kano-test-dhcp".
 #
-# In case that a user is already connected to a network (either multihomed or from 
+# In case that a user is already connected to a network (either multihomed or from
 # previous reboot) then gracefully exit with success/0 code.
 
 # A lock file to inform for network connectivity
@@ -30,14 +30,12 @@ is_connected () {
 # Initialise the network through the kano hook and dashboard
 # network wrappers and perform tracking synchronisation
 kano_network_init () {
+    systemctl restart internet-available.target
+
+    # TODO: move everything below to a systemd service linked to the above target
     systemd-run --service-type=forking /usr/bin/kano-sentry-startup $reason
     systemd-run /usr/bin/kano-set-system-date $reason
-
     systemd-run /usr/bin/kano-network-hook $reason
-
-    # Try uploading the tracking data to our servers
-    # Should be quiet on failure
-    kano-sync --upload-tracking-data --silent &
 }
 
 # Sync objects from the content API in the background
@@ -52,8 +50,8 @@ kano_daemon () {
 is_multihomed () {
     is_internet
     if [ $? -eq 0 ]; then
-    	logger "kano-dhcp-hook: $reason but still connected, aborting action."
-    	exit 0
+        logger "kano-dhcp-hook: $reason but still connected, aborting action."
+        exit 0
     else
         logger "kano-dhcp-hook: $reason and connectivity lost."
         rm $monitor_file
